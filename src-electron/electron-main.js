@@ -2,7 +2,7 @@ import { app, dialog, BrowserWindow, Menu, screen } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import cmdExists from 'command-exists'
-import tlm from './instrumentation.js'
+import telemetry from './instrumentation.js'
 import { trace } from '@opentelemetry/api'
 import { registerMenu } from './menu.js'
 import { loadDocument, registerCallbacks } from './handlers.js'
@@ -23,12 +23,12 @@ const DFG = {
   lsp,
   updater,
   terminal,
-  tlm
+  telemetry
 }
 global.DFG = DFG
 
 // Initialize Instrumentation
-DFG.tlm.initialize()
+DFG.telemetry.initialize()
 const tracer = trace.getTracer('draftforge', app.getVersion())
 
 // ensure only 1 instance of the app is running

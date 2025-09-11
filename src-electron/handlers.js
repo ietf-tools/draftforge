@@ -432,13 +432,13 @@ export function registerCallbacks () {
     }
   })
   ipcMain.on('setTelemetryState', (ev, opts) => {
-    DFG.tlm.conf.enabled = (opts.enabled === true)
-    if (DFG.tlm.conf.enabled) {
-      DFG.tlm.start()
+    DFG.telemetry.conf.enabled = (opts.enabled === true)
+    if (DFG.telemetry.conf.enabled) {
+      DFG.telemetry.start()
     } else {
-      DFG.tlm.stop()
+      DFG.telemetry.stop()
     }
-    DFG.tlm.saveConfig()
+    DFG.telemetry.saveConfig()
   })
   // ----------------------------------------------------------
   // AUTH
