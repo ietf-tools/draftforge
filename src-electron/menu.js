@@ -95,12 +95,12 @@ export function registerMenu () {
             {
               label: 'Text'
             },
-            {
-              label: 'Comments'
-            },
-            {
-              label: 'Code Components'
-            },
+            // {
+            //   label: 'Comments'
+            // },
+            // {
+            //   label: 'Code Components'
+            // },
             {
               label: 'XML'
             }
