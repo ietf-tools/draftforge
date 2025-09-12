@@ -173,7 +173,7 @@ window.onbeforeunload = (ev) => {
   if (editorStore.confirmExit) {
     $q.dialog({
       title: 'Confirm',
-      message: 'Are you sure you want to close DraftEditor?',
+      message: 'Are you sure you want to close DraftForge?',
       persistent: true,
       ok: {
         label: 'Exit',
