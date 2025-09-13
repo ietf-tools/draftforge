@@ -118,11 +118,13 @@ async function saveToFile () {
 onMounted(() => {
   const contents = modelStore[docsStore.activeDocument.id].getValue()
   const comments = []
+  let idx = 1
   for (const match of contents.matchAll(commentsRgx)) {
-    comments.push(match[1].trim())
+    comments.push(`${idx}. ${match[1].trim()}`)
+    idx++
   }
   if (comments.length > 0) {
-    state.output = comments.join('\n\n============\n\n')
+    state.output = comments.join('\n\n--------\n\n')
   } else {
     $q.notify({
       message: 'No comments found.',
