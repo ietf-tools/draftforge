@@ -40,7 +40,7 @@ Simply download the [latest release](https://github.com/ietf-tools/editor/releas
 ## Prerequisites
 
 - Git
-- [Node.js](https://nodejs.org/en/download/) `20.x` or later
+- [Node.js](https://nodejs.org/en/download/) `24.x` or later
 
 ## Setup
 

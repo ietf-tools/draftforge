@@ -10,6 +10,12 @@ q-list
     q-item-section
       q-item-label Extract [rfced] comments
       q-item-label.text-purple-2(caption) List all comments for the RPC staff
+  q-item(clickable v-if='currentMode === `review`' @click='extractCodeComponents' disabled)
+    q-item-section(side)
+      q-icon(name='mdi-code-block-tags' size='xs' color='purple-2')
+    q-item-section
+      q-item-label Extract Code Components
+      q-item-label.text-purple-2(caption) List all sourcecode blocks
   q-item(clickable @click='reformat')
     q-item-section(side)
       q-icon(name='mdi-page-previous-outline' size='xs' color='purple-2')
@@ -50,6 +56,10 @@ function extractRfcedComments () {
   $q.dialog({
     component: defineAsyncComponent(() => import('components/ExtractRfcedCommentsDialog.vue'))
   })
+}
+
+function extractCodeComponents () {
+  // TODO: Extract code components
 }
 
 function reformat () {

@@ -121,6 +121,7 @@ import { checkHyphenation } from 'src/tools/hyphenation'
 import { checkInclusiveLanguage } from 'src/tools/inclusive-language'
 import { checkNonAscii } from 'src/tools/non-ascii'
 import { checkCommonPlaceholders } from 'src/tools/placeholders'
+import { checkTypos } from 'src/tools/typos'
 import { useDocsStore } from 'src/stores/docs'
 import { useEditorStore } from 'src/stores/editor'
 import { modelStore } from 'src/stores/models'
@@ -174,6 +175,13 @@ const valChecks = [
     description: 'Check for accidental repeated terms',
     icon: 'mdi-repeat',
     click: () => repeatedWordsCheck()
+  },
+  {
+    key: 'typos',
+    title: 'Typos Check',
+    description: 'Check for common typos',
+    icon: 'mdi-typewriter',
+    click: () => typosCheck()
   }
 ]
 
@@ -185,7 +193,7 @@ function resetIgnores (key) {
   }
   $q.notify({
     message: 'Ignores cleared!',
-    caption: 'All ignores for this check have been reset.',
+    caption: 'All ignores for this check have been reset. Run the validation again to get updated results.',
     color: 'positive',
     icon: 'mdi-playlist-remove'
   })
@@ -337,6 +345,25 @@ function repeatedWordsCheck (silent) {
   }
 }
 
+function typosCheck (silent) {
+  const results = checkTypos(modelStore[docsStore.activeDocument.id].getValue(), getIgnores('typos'))
+  if (results.count < 1) {
+    editorStore.setValidationCheckState('typos', 1)
+    editorStore.setValidationCheckDetails('typos', [])
+    if (!silent) {
+      $q.notify({
+        message: 'Looks good!',
+        caption: 'No common typos found.',
+        color: 'positive',
+        icon: 'mdi-typewriter'
+      })
+    }
+  } else {
+    editorStore.setValidationCheckState('typos', -2)
+    editorStore.setValidationCheckDetails('typos', results)
+  }
+}
+
 function runAllChecks () {
   editorStore.clearErrors()
   articlesCheck(true)
@@ -345,6 +372,7 @@ function runAllChecks () {
   nonAsciiCheck(true)
   placeholdersCheck(true)
   repeatedWordsCheck(true)
+  typosCheck(true)
 
   if (editorStore.errors.length < 1) {
     $q.notify({
@@ -379,6 +407,9 @@ function runSelectedCheck (key) {
       break
     case 'repeatedWords':
       repeatedWordsCheck(true)
+      break
+    case 'typos':
+      typosCheck(true)
       break
   }
 }

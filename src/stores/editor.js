@@ -73,7 +73,8 @@ export const useEditorStore = defineStore('editor', {
       inclusiveLanguage: 0,
       nonAscii: 0,
       placeholders: 0,
-      repeatedWords: 0
+      repeatedWords: 0,
+      typos: 0
     },
     validationChecksDetails: {
       articles: [],
@@ -81,7 +82,8 @@ export const useEditorStore = defineStore('editor', {
       inclusiveLanguage: [],
       nonAscii: [],
       placeholders: [],
-      repeatedWords: []
+      repeatedWords: [],
+      typos: []
     },
     wordWrap: true,
     workingDirectory: '',

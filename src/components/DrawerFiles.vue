@@ -7,15 +7,16 @@
       q-icon.q-ml-sm(name='mdi-information-outline' color='light-blue-3')
         q-tooltip {{ editorStore.workingDirectory }}
       q-space
-      //- q-btn(
-      //-   flat
-      //-   size='sm'
-      //-   icon='mdi-folder-plus-outline'
-      //-   padding='xs xs'
-      //-   text-color='light-blue-3'
-      //-   @click='setWorkingDirectory'
-      //-   )
-      //-   q-tooltip Create Folder
+      q-btn(
+        flat
+        size='sm'
+        icon='mdi-folder-plus'
+        padding='xs xs'
+        text-color='light-blue-3'
+        @click='createFolder'
+        disabled
+        )
+        q-tooltip Create Folder
       q-btn(
         flat
         size='sm'
