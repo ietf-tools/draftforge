@@ -87,38 +87,31 @@ const dictionnary = [
   },
   {
     triggers: ['more that', 'more then'],
-    suggestion: 'more than',
-    multiline: true
+    suggestion: 'more than'
   },
   {
     triggers: ['greater that', 'greater then'],
-    suggestion: 'greater than',
-    multiline: true
+    suggestion: 'greater than'
   },
   {
     triggers: ['less that', 'less then'],
-    suggestion: 'less than',
-    multiline: true
+    suggestion: 'less than'
   },
   {
     triggers: ['fewer that', 'fewer then'],
-    suggestion: 'fewer than',
-    multiline: true
+    suggestion: 'fewer than'
   },
   {
     triggers: ['different that', 'different then'],
-    suggestion: 'different than',
-    multiline: true
+    suggestion: 'different than'
   },
   {
     triggers: ['rather that', 'rather then'],
-    suggestion: 'rather than',
-    multiline: true
+    suggestion: 'rather than'
   },
   {
     triggers: ['other that', 'other then'],
-    suggestion: 'other than',
-    multiline: true
+    suggestion: 'other than'
   },
   {
     triggers: ['lager'],
@@ -130,53 +123,43 @@ const dictionnary = [
   },
   {
     triggers: ['according the'],
-    suggestion: 'according to the',
-    multiline: true
+    suggestion: 'according to the'
   },
   {
     triggers: ['specified section'],
-    suggestion: 'specified in Section',
-    multiline: true
+    suggestion: 'specified in Section'
   },
   {
     triggers: ['provided section'],
-    suggestion: 'provided in Section',
-    multiline: true
+    suggestion: 'provided in Section'
   },
   {
     triggers: ['described section'],
-    suggestion: 'described in Section',
-    multiline: true
+    suggestion: 'described in Section'
   },
   {
     triggers: ['discussed section'],
-    suggestion: 'discussed in Section',
-    multiline: true
+    suggestion: 'discussed in Section'
   },
   {
     triggers: ['detailed section'],
-    suggestion: 'detailed in Section',
-    multiline: true
+    suggestion: 'detailed in Section'
   },
   {
     triggers: ['listed section'],
-    suggestion: 'listed in Section',
-    multiline: true
+    suggestion: 'listed in Section'
   },
   {
     triggers: ['defined section'],
-    suggestion: 'defined in Section',
-    multiline: true
+    suggestion: 'defined in Section'
   },
   {
     triggers: ['presented section'],
-    suggestion: 'presented in Section',
-    multiline: true
+    suggestion: 'presented in Section'
   },
   {
     triggers: ['specified this'],
-    suggestion: 'specified in this',
-    multiline: true
+    suggestion: 'specified in this'
   },
   {
     triggers: ['exiting'],
@@ -192,43 +175,36 @@ const dictionnary = [
   },
   {
     triggers: ['IPV4', 'IPV6'],
-    suggestion: 'IPv4/IPv6 (case sensitive)',
+    suggestion: 'IPv4/IPv6',
     caseSensitive: true
   },
   {
     triggers: ['mime media type'],
-    suggestion: 'media type',
-    multiline: true
+    suggestion: 'media type'
   },
   {
     triggers: ['central express way'],
-    suggestion: 'Central Expressway',
-    multiline: true
+    suggestion: 'Central Expressway'
   },
   {
     triggers: ['some the'],
-    suggestion: 'some of the',
-    multiline: true
+    suggestion: 'some of the'
   },
   {
     triggers: ['have be'],
-    suggestion: 'have been',
-    multiline: true
+    suggestion: 'have been'
   },
   {
     triggers: ['has be'],
-    suggestion: 'has been',
-    multiline: true
+    suggestion: 'has been'
   },
   {
     triggers: ['huawei technology'],
-    suggestion: 'Huawei Technologies',
-    multiline: true
+    suggestion: 'Huawei Technologies'
   },
   {
     triggers: ['number authority'],
-    suggestion: 'Numbers Authority',
-    multiline: true
+    suggestion: 'Numbers Authority'
   },
   {
     triggers: ['amphitheater', 'ampitheater', 'ampitheatre'],
@@ -236,33 +212,27 @@ const dictionnary = [
   },
   {
     triggers: ['international telecommunications union'],
-    suggestion: 'International Telecommunication Union',
-    multiline: true
+    suggestion: 'International Telecommunication Union'
   },
   {
     triggers: ['any the'],
-    suggestion: 'any of the',
-    multiline: true
+    suggestion: 'any of the'
   },
   {
     triggers: ['the of'],
-    suggestion: 'the',
-    multiline: true
+    suggestion: 'the'
   },
   {
     triggers: ['described rfc'],
-    suggestion: 'described in RFC',
-    multiline: true
+    suggestion: 'described in RFC'
   },
   {
     triggers: ['may chose'],
-    suggestion: 'may choose',
-    multiline: true
+    suggestion: 'may choose'
   },
   {
     triggers: ['to chose'],
-    suggestion: 'to choose',
-    multiline: true
+    suggestion: 'to choose'
   },
   {
     triggers: ['Designated Expert'],
@@ -271,8 +241,7 @@ const dictionnary = [
   },
   {
     triggers: ['needs be'],
-    suggestion: 'needs to be',
-    multiline: true
+    suggestion: 'needs to be'
   },
   {
     triggers: ['theses'],
@@ -301,59 +270,88 @@ const dictionnary = [
 ]
 
 export function checkTypos (text, ignores = []) {
-  const matchRgx = new RegExp(`[<> "'.:;=([{-](${flatten(dictionnary.map(d => d.triggers)).join('|')})(?:[^a-z0-9])`, 'gi')
+  const matchRgxCI = new RegExp(`(?:^|[<> "'.:;=([{-])(${flatten(dictionnary.filter(d => !d.caseSensitive).map(d => d.triggers)).join('|')})(?:[^a-z0-9]|$)`, 'gi')
+  const matchRgxCS = new RegExp(`(?:^|[<> "'.:;=([{-])(${flatten(dictionnary.filter(d => d.caseSensitive).map(d => d.triggers)).join('|')})(?:[^a-zA-Z0-9]|$)`, 'g')
   const textLines = text.split('\n')
 
   const decorations = []
   const occurences = []
   const details = []
   const termCount = {}
+
+  function processMatch (term, match, lineIdx, caseSensitive = false) {
+    const dictEntry = find(dictionnary, d => d.triggers.includes(term))
+    let occIdx = occurences.indexOf(term)
+    if (occIdx < 0) {
+      occIdx = occurences.push(term) - 1
+    }
+    const startColumnAdjusted = match.index === 0 ? match.index + 1 : match.index + 2
+    decorations.push({
+      options: {
+        hoverMessage: {
+          value: caseSensitive ? `Did you mean ${dictEntry.suggestion}? (case sensitive)` : `Did you mean ${dictEntry.suggestion}?`
+        },
+        className: 'dec-warning',
+        minimap: {
+          position: 1
+        },
+        glyphMarginClassName: 'dec-warning-margin'
+      },
+      range: {
+        startLineNumber: lineIdx + 1,
+        startColumn: startColumnAdjusted,
+        endLineNumber: lineIdx + 1,
+        endColumn: startColumnAdjusted + match[1].length
+      }
+    })
+    details.push({
+      key: crypto.randomUUID(),
+      group: occIdx + 1,
+      message: match[1].toLowerCase(),
+      range: {
+        startLineNumber: lineIdx + 1,
+        startColumn: startColumnAdjusted,
+        endLineNumber: lineIdx + 1,
+        endColumn: startColumnAdjusted + match[1].length
+      },
+      value: term
+    })
+    if (termCount[term]) {
+      termCount[term]++
+    } else {
+      termCount[term] = 1
+    }
+  }
+
   for (const [lineIdx, line] of textLines.entries()) {
-    for (const match of line.matchAll(matchRgx)) {
-      const term = match[1].toLowerCase()
-      if (ignores.includes(term)) {
+    const lineTrimmed = line.trimEnd()
+    const combinedLine = textLines[lineIdx + 1] ? `${lineTrimmed} ${textLines[lineIdx + 1].trimStart()}` : line
+
+    // Match case insensitive typos
+    for (const match of combinedLine.matchAll(matchRgxCI)) {
+      if (match.index >= lineTrimmed.length) {
+        // Skip matches in the second combined line
         continue
       }
-      const dictEntry = find(dictionnary, d => d.triggers.includes(term))
-      let occIdx = occurences.indexOf(term)
-      if (occIdx < 0) {
-        occIdx = occurences.push(term) - 1
+      const term = match[1].toLowerCase()
+      if (ignores.includes(term)) {
+        // Skip matches in the ignore list
+        continue
       }
-      decorations.push({
-        options: {
-          hoverMessage: {
-            value: `Did you mean ${dictEntry.suggestion}?`
-          },
-          className: 'dec-warning',
-          minimap: {
-            position: 1
-          },
-          glyphMarginClassName: 'dec-warning-margin'
-        },
-        range: {
-          startLineNumber: lineIdx + 1,
-          startColumn: match.index + 2,
-          endLineNumber: lineIdx + 1,
-          endColumn: match.index + 2 + match[1].length
-        }
-      })
-      details.push({
-        key: crypto.randomUUID(),
-        group: occIdx + 1,
-        message: match[1].toLowerCase(),
-        range: {
-          startLineNumber: lineIdx + 1,
-          startColumn: match.index + 2,
-          endLineNumber: lineIdx + 1,
-          endColumn: match.index + 2 + match[1].length
-        },
-        value: term
-      })
-      if (termCount[term]) {
-        termCount[term]++
-      } else {
-        termCount[term] = 1
+      processMatch(term, match, lineIdx, false)
+    }
+
+    // Match case insensitive typos
+    for (const match of combinedLine.matchAll(matchRgxCS)) {
+      if (match.index >= lineTrimmed.length) {
+        // Skip matches in the second combined line
+        continue
       }
+      if (ignores.includes(match[1].toLowerCase())) {
+        // Skip matches in the ignore list
+        continue
+      }
+      processMatch(match[1], match, lineIdx, true)
     }
   }
 
