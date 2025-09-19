@@ -6,11 +6,11 @@
     q-space
     q-btn.q-mr-sm(
       v-if='editorStore.validationChecksDirty'
-      icon='mdi-close'
-      padding='none'
+      label='Clear'
+      padding='none xs'
       size='sm'
       no-caps
-      flat
+      outline
       color='light-blue-3'
       @click='clearErrors'
       )
@@ -110,10 +110,111 @@ q-list
                     q-item-section(side)
                       q-icon(name='mdi-playlist-remove' size='xs' color='purple-2')
                     q-item-section Ignore "{{ dtl.value }}" for this document
+
+q-separator.q-mt-md(inset)
+.q-px-md.q-pt-md.q-pb-sm
+  .flex.items-center
+    .text-caption.text-light-blue-3
+      strong ID Nits
+q-list
+  q-item(
+    clickable
+    @click='idnitsCheck'
+    )
+    q-item-section(side)
+      q-icon(name='mdi-cube-scan' size='xs' color='amber')
+    q-item-section
+      q-item-label Run idnits
+      q-item-label.text-amber(caption) Check for nits in this document
+    q-item-section(side)
+      q-circular-progress(v-show='state.idnitsLoading' indeterminate size='xs' color='amber')
+  q-item
+    q-item-section
+      q-select(
+        outlined
+        label='Mode'
+        v-model='state.idnitsMode'
+        :options='idnitsModes'
+        dense
+        color='light-blue-4'
+        emit-value
+        map-options
+        )
+    q-item-section(side)
+      q-btn(
+        flat
+        :icon='state.idnitsOffline ? `mdi-access-point-network-off` : `mdi-satellite-uplink`'
+        :color='state.idnitsOffline ? `red` : `light-blue-4`'
+        dense
+        size='sm'
+        @click='state.idnitsOffline = !state.idnitsOffline'
+        )
+        q-tooltip Offline Mode
+  q-expansion-item.bg-dark-5.q-mt-sm(
+    v-if='state.idnitsErrors.length > 0'
+    group='idnits'
+    default-opened
+    dense
+    )
+    template(#header)
+      q-item-section
+        .flex.items-center
+          q-icon.q-mr-sm(name='mdi-close-box' color='red')
+          q-item-label.text-red-3 {{ state.idnitsErrors.length > 1 ? state.idnitsErrors.length + ' errors' : ' 1 error' }}
+    .bg-dark-5.checkdetails
+      q-list(dense, separator)
+        q-item(
+          v-for='nit of state.idnitsErrors'
+          )
+          q-item-section
+            .text-caption: strong.text-red-4 {{ nit.name }}
+            .text-caption.text-blue-grey-2 {{ nit.message }}
+          q-item-section(side)
+            q-btn(color='dark-2' text-color='white' icon='mdi-chevron-right' padding='sm xs' size='sm' unelevated)
+  q-expansion-item.bg-dark-5(
+    v-if='state.idnitsWarnings.length > 0'
+    group='idnits'
+    dense
+    )
+    template(#header)
+      q-item-section
+        .flex.items-center
+          q-icon.q-mr-sm(name='mdi-alert' color='warning')
+          q-item-label.text-orange-3 {{ state.idnitsWarnings.length > 1 ? state.idnitsWarnings.length + ' warnings' : ' 1 warning' }}
+    .bg-dark-5.checkdetails
+      q-list(dense, separator)
+        q-item(
+          v-for='nit of state.idnitsWarnings'
+          )
+          q-item-section
+            .text-caption: strong.text-orange-4 {{ nit.name }}
+            .text-caption.text-blue-grey-2 {{ nit.message }}
+          q-item-section(side)
+            q-btn(color='dark-2' text-color='white' icon='mdi-chevron-right' padding='sm xs' size='sm' unelevated)
+  q-expansion-item.bg-dark-5(
+    v-if='state.idnitsComments.length > 0'
+    group='idnits'
+    dense
+    )
+    template(#header)
+      q-item-section
+        .flex.items-center
+          q-icon.q-mr-sm(name='mdi-information' color='cyan')
+          q-item-label.text-light-blue-3 {{ state.idnitsComments.length > 1 ? state.idnitsComments.length + ' comments' : ' 1 comment' }}
+    .bg-dark-5.checkdetails
+      q-list(dense, separator)
+        q-item(
+          v-for='nit of state.idnitsComments'
+          )
+          q-item-section
+            .text-caption: strong.text-light-blue-4 {{ nit.name }}
+            .text-caption.text-blue-grey-2 {{ nit.message }}
+          q-item-section(side)
+            q-btn(color='dark-2' text-color='white' icon='mdi-chevron-right' padding='sm xs' size='sm' unelevated)
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted } from 'vue'
+import { onBeforeUnmount, onMounted, reactive } from 'vue'
 import { useQuasar } from 'quasar'
 import { checkArticles } from 'src/tools/articles'
 import { checkRepeatedWords } from 'src/tools/repeated-words'
@@ -122,9 +223,11 @@ import { checkInclusiveLanguage } from 'src/tools/inclusive-language'
 import { checkNonAscii } from 'src/tools/non-ascii'
 import { checkCommonPlaceholders } from 'src/tools/placeholders'
 import { checkTypos } from 'src/tools/typos'
+import { checkIdnits } from 'src/tools/idnits'
 import { useDocsStore } from 'src/stores/docs'
 import { useEditorStore } from 'src/stores/editor'
 import { modelStore } from 'src/stores/models'
+import { MODES } from '@ietf-tools/idnits'
 
 const $q = useQuasar()
 
@@ -132,6 +235,16 @@ const $q = useQuasar()
 
 const docsStore = useDocsStore()
 const editorStore = useEditorStore()
+
+const state = reactive({
+  idnitsLoading: false,
+  idnitsMode: MODES.NORMAL,
+  idnitsOffline: false,
+  idnitsTotal: 0,
+  idnitsErrors: [],
+  idnitsWarnings: [],
+  idnitsComments: []
+})
 
 const valChecks = [
   {
@@ -183,6 +296,12 @@ const valChecks = [
     icon: 'mdi-typewriter',
     click: () => typosCheck()
   }
+]
+
+const idnitsModes = [
+  { label: 'Normal', value: MODES.NORMAL },
+  { label: 'Forgive Checklist', value: MODES.FORGIVE_CHECKLIST },
+  { label: 'Submission', value: MODES.SUBMISSION }
 ]
 
 // IGNORES METHODS
@@ -362,6 +481,65 @@ function typosCheck (silent) {
     editorStore.setValidationCheckState('typos', -2)
     editorStore.setValidationCheckDetails('typos', results)
   }
+}
+
+async function idnitsCheck () {
+  if (state.idnitsLoading) { return }
+  state.idnitsLoading = true
+  idnitsReset()
+  try {
+    const results = await checkIdnits(modelStore[docsStore.activeDocument.id].getValue(), docsStore.activeDocument.fileName, state.idnitsMode, state.idnitsOffline)
+    state.idnitsTotal = results.length
+    for (const result of results) {
+      switch (result.constructor.name) {
+        case 'ValidationError': {
+          state.idnitsErrors.push(result)
+          break
+        }
+        case 'ValidationWarning': {
+          state.idnitsWarnings.push(result)
+          break
+        }
+        case 'ValidationComment': {
+          state.idnitsComments.push(result)
+          break
+        }
+        default: {
+          console.warn('idnits - Invalid result type: ', result)
+        }
+      }
+    }
+    if (state.idnitsTotal > 0) {
+      $q.notify({
+        message: state.idnitsTotal > 1 ? `${state.idnitsTotal} nits found.` : '1 nit found.',
+        caption: 'Review the sidebar for nits details.',
+        color: 'orange-8',
+        icon: 'mdi-cube-scan'
+      })
+    } else {
+      $q.notify({
+        message: 'Looks good!',
+        caption: 'No nits found.',
+        color: 'positive',
+        icon: 'mdi-cube-scan'
+      })
+    }
+  } catch (err) {
+    console.warn(err)
+    $q.notify({
+      message: 'Unexpected error',
+      caption: err.message,
+      color: 'negative',
+      icon: 'mdi-close-octagon'
+    })
+  }
+  state.idnitsLoading = false
+}
+function idnitsReset () {
+  state.idnitsTotal = 0
+  state.idnitsErrors = []
+  state.idnitsWarnings = []
+  state.idnitsComments = []
 }
 
 function runAllChecks () {
