@@ -93,10 +93,10 @@ jobs:
             platform: darwin
             arch: x64
             artifacts: "dist/electron/Packaged/*-x64-*.+(dmg|zip)"
-          - os: windows-latest
-            platform: win32
-            arch: x64
-            artifacts: "signed-build/*.exe,dist/electron/Packaged/latest.yml"
+          # - os: windows-latest
+          #   platform: win32
+          #   arch: x64
+          #   artifacts: "signed-build/*.exe,dist/electron/Packaged/latest.yml"
     env:
       PKG_VERSION: ${{needs.prepare.outputs.pkg_version}}
 
