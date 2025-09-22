@@ -51,6 +51,12 @@ export const useEditorStore = defineStore('editor', {
     gitCurrentBranch: '',
     gitLocalBranches: [],
     gitRemoteBranches: [],
+    idnits: {
+      total: 0,
+      errors: [],
+      warnings: [],
+      comments: []
+    },
     keybindings: 'default',
     lastChangeTimestamp: null,
     line: 1,
@@ -64,7 +70,7 @@ export const useEditorStore = defineStore('editor', {
     terminalShell: defaultShell.cmd,
     terminalArgs: defaultShell.args,
     theme: 'ietf-dark',
-    translucencyEffects: true,
+    translucencyEffects: false,
     validationChecksCurrent: null,
     validationChecksDirty: false,
     validationChecks: {
@@ -136,6 +142,7 @@ export const useEditorStore = defineStore('editor', {
       this.gitRemotes = await window.ipcBridge.gitListRemotes(this.workingDirectory)
     },
     async clearErrors (skipCheck) {
+      // Clear standard checks
       this.errors = []
       for (const key in this.validationChecks) {
         if (key === skipCheck) {
@@ -148,6 +155,12 @@ export const useEditorStore = defineStore('editor', {
       if (!skipCheck) {
         this.validationChecksDirty = false
       }
+
+      // Clear idnits results
+      this.idnits.total = 0
+      this.idnits.errors = []
+      this.idnits.warnings = []
+      this.idnits.comments = []
     },
     setValidationCheckState (key, newState) {
       this.validationChecks[key] = newState

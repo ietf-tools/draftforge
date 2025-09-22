@@ -8,10 +8,16 @@ q-item
     .text-blue-grey-1.q-mt-xs(v-if='props.nit.path'): strong #[q-icon(name='mdi-transfer-right' color='white')]  {{ props.nit.path }}
     .text-blue-grey-1.q-mt-xs(v-if='props.nit.lines')
       q-icon.q-mr-xs(name='mdi-transfer-right' color='teal-4')
-      q-badge.text-teal-1(
+      q-chip(
         v-for="(ln, lnIdx) of props.nit.lines"
         :key="lnIdx"
         color='teal-10'
+        text-color='teal-1'
+        square
+        size='sm'
+        dense
+        clickable
+        @click='goToPosition(ln)'
         ) Ln {{ ln.line }}, Col {{ ln.pos }}
   q-item-section(side)
     q-btn(
@@ -40,5 +46,12 @@ const props = defineProps({
 
 function viewReference (url) {
   window.ipcBridge.emit('launchBrowser', { url })
+}
+
+function goToPosition (loc) {
+  EVENT_BUS.emit('revealPosition', {
+    lineNumber: loc.line,
+    column: loc.pos
+  })
 }
 </script>

@@ -196,6 +196,10 @@ function selectFile (target) {
   })
 }
 
+function createFolder () {
+
+}
+
 // MOUNTED
 
 onMounted(() => {

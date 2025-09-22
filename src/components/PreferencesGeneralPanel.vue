@@ -35,6 +35,7 @@ q-form.q-gutter-md.q-pa-lg
     .col
       .text-body2 Enable Translucency Effects
       .text-caption.text-grey-5 Show translucent background effects on modals and menu UI elements.
+      .text-caption.text-orange-7: strong The UI may feel less responsive when enabled on some systems.
     .col-auto
       q-toggle(
         v-model='editorStore.translucencyEffects'

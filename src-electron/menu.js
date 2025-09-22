@@ -180,25 +180,25 @@ export function registerMenu () {
               label: 'Find Xrefs'
             }
           ]
-        },
-        { type: 'separator' },
-        {
-          label: 'Spelling and Grammar',
-          submenu: [
-            {
-              label: 'Check Spelling'
-            },
-            {
-              label: 'Check Grammar'
-            },
-            {
-              label: 'Check for Common Typos'
-            },
-            {
-              label: 'Check for Duplicates'
-            }
-          ]
         }
+        // { type: 'separator' },
+        // {
+        //   label: 'Spelling and Grammar',
+        //   submenu: [
+        //     {
+        //       label: 'Check Spelling'
+        //     },
+        //     {
+        //       label: 'Check Grammar'
+        //     },
+        //     {
+        //       label: 'Check for Common Typos'
+        //     },
+        //     {
+        //       label: 'Check for Duplicates'
+        //     }
+        //   ]
+        // }
       ]
     },
     {

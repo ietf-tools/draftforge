@@ -116,6 +116,18 @@ q-separator.q-mt-md(inset)
   .flex.items-center
     .text-caption.text-light-blue-3
       strong ID Nits
+    q-space
+    q-btn.q-mr-sm(
+      v-if='editorStore.idnits.total > 0'
+      label='Clear'
+      padding='none xs'
+      size='sm'
+      no-caps
+      outline
+      color='light-blue-3'
+      @click='clearErrors'
+      )
+      q-tooltip Clear ID Nits results
 q-list
   q-item(
     clickable
@@ -151,7 +163,7 @@ q-list
         )
         q-tooltip Offline Mode
   q-expansion-item.bg-dark-5.q-mt-sm(
-    v-if='state.idnitsErrors.length > 0'
+    v-if='editorStore.idnits.errors.length > 0'
     group='idnits'
     default-opened
     dense
@@ -160,17 +172,17 @@ q-list
       q-item-section
         .flex.items-center
           q-icon.q-mr-sm(name='mdi-close-box' color='red')
-          q-item-label.text-red-3 {{ state.idnitsErrors.length > 1 ? state.idnitsErrors.length + ' errors' : ' 1 error' }}
+          q-item-label.text-red-3 {{ editorStore.idnits.errors.length > 1 ? editorStore.idnits.errors.length + ' errors' : ' 1 error' }}
     .bg-dark-5.checkdetails
       q-list(dense, separator)
         idnits-result-item(
-          v-for='nit of state.idnitsErrors'
+          v-for='nit of editorStore.idnits.errors'
           :nit='nit'
           color='red'
           )
 
   q-expansion-item.bg-dark-5(
-    v-if='state.idnitsWarnings.length > 0'
+    v-if='editorStore.idnits.warnings.length > 0'
     group='idnits'
     dense
     )
@@ -178,16 +190,16 @@ q-list
       q-item-section
         .flex.items-center
           q-icon.q-mr-sm(name='mdi-alert' color='warning')
-          q-item-label.text-orange-3 {{ state.idnitsWarnings.length > 1 ? state.idnitsWarnings.length + ' warnings' : ' 1 warning' }}
+          q-item-label.text-orange-3 {{ editorStore.idnits.warnings.length > 1 ? editorStore.idnits.warnings.length + ' warnings' : ' 1 warning' }}
     .bg-dark-5.checkdetails
       q-list(dense, separator)
         idnits-result-item(
-          v-for='nit of state.idnitsWarnings'
+          v-for='nit of editorStore.idnits.warnings'
           :nit='nit'
           color='orange'
           )
   q-expansion-item.bg-dark-5(
-    v-if='state.idnitsComments.length > 0'
+    v-if='editorStore.idnits.comments.length > 0'
     group='idnits'
     dense
     )
@@ -195,11 +207,11 @@ q-list
       q-item-section
         .flex.items-center
           q-icon.q-mr-sm(name='mdi-information' color='cyan')
-          q-item-label.text-light-blue-3 {{ state.idnitsComments.length > 1 ? state.idnitsComments.length + ' comments' : ' 1 comment' }}
+          q-item-label.text-light-blue-3 {{ editorStore.idnits.comments.length > 1 ? editorStore.idnits.comments.length + ' comments' : ' 1 comment' }}
     .bg-dark-5.checkdetails
       q-list(dense, separator)
         idnits-result-item(
-          v-for='nit of state.idnitsComments'
+          v-for='nit of editorStore.idnits.comments'
           :nit='nit'
           color='light-blue'
           )
@@ -480,24 +492,27 @@ function typosCheck (silent) {
 async function idnitsCheck () {
   if (state.idnitsLoading) { return }
   state.idnitsLoading = true
-  idnitsReset()
+  editorStore.idnits.total = 0
+  editorStore.idnits.errors = []
+  editorStore.idnits.warnings = []
+  editorStore.idnits.comments = []
   try {
     const results = await checkIdnits(modelStore[docsStore.activeDocument.id].getValue(), docsStore.activeDocument.fileName, state.idnitsMode, state.idnitsOffline)
-    state.idnitsTotal = results.length
+    editorStore.idnits.total = results.length
     for (const result of results) {
       if (result instanceof ValidationWarning) {
-        state.idnitsWarnings.push(result)
+        editorStore.idnits.warnings.push(result)
       } else if (result instanceof ValidationComment) {
-        state.idnitsComments.push(result)
+        editorStore.idnits.comments.push(result)
       } else if (result instanceof ValidationError) { // must be last, as other types extend ValidationError
-        state.idnitsErrors.push(result)
+        editorStore.idnits.errors.push(result)
       } else {
         console.warn('idnits - Invalid result type: ', result)
       }
     }
-    if (state.idnitsTotal > 0) {
+    if (editorStore.idnits.total > 0) {
       $q.notify({
-        message: state.idnitsTotal > 1 ? `${state.idnitsTotal} nits found.` : '1 nit found.',
+        message: editorStore.idnits.total > 1 ? `${editorStore.idnits.total} nits found.` : '1 nit found.',
         caption: 'Review the sidebar for nits details.',
         color: 'orange-8',
         icon: 'mdi-cube-scan'
@@ -520,12 +535,6 @@ async function idnitsCheck () {
     })
   }
   state.idnitsLoading = false
-}
-function idnitsReset () {
-  state.idnitsTotal = 0
-  state.idnitsErrors = []
-  state.idnitsWarnings = []
-  state.idnitsComments = []
 }
 
 function runAllChecks () {
