@@ -16,6 +16,8 @@ import { useUserStore } from 'src/stores/user'
 import AppModeSidebar from 'components/AppModeSidebar.vue'
 import UpdaterDialog from 'components/UpdaterDialog.vue'
 
+window.DRAFTFORGE = true
+
 const $q = useQuasar()
 
 const docsStore = useDocsStore()

@@ -163,25 +163,11 @@ q-list
           q-item-label.text-red-3 {{ state.idnitsErrors.length > 1 ? state.idnitsErrors.length + ' errors' : ' 1 error' }}
     .bg-dark-5.checkdetails
       q-list(dense, separator)
-        q-item(
+        idnits-result-item(
           v-for='nit of state.idnitsErrors'
+          :nit='nit'
+          color='red'
           )
-          q-item-section.text-caption(style='max-width: 280px;')
-            strong.text-red-4.ellipsis(style='max-width: 280px;') {{ nit.name }}
-              q-tooltip {{ nit.name }}
-            .text-blue-grey-2 {{ nit.message }}
-            .text-blue-grey-1.q-mt-xs(v-if='nit.text') #[q-icon(name='mdi-transfer-right' color='white')] {{ nit.text }}
-            .text-blue-grey-1.q-mt-xs(v-if='nit.path'): strong #[q-icon(name='mdi-transfer-right' color='white')]  {{ nit.path }}
-            .text-blue-grey-1.q-mt-xs(v-if='nit.lines')
-              q-icon.q-mr-xs(name='mdi-transfer-right' color='teal-4')
-              q-badge.text-teal-1(
-                v-for="(ln, lnIdx) of nit.lines"
-                :key="lnIdx"
-                color='teal-10'
-                ) Ln {{ ln.line }}, Col {{ ln.pos }}
-          q-item-section(side)
-            q-btn(color='dark-2' text-color='white' icon='mdi-information-outline' padding='xs xs' size='sm' unelevated round)
-              q-tooltip View Reference
 
   q-expansion-item.bg-dark-5(
     v-if='state.idnitsWarnings.length > 0'
@@ -195,14 +181,11 @@ q-list
           q-item-label.text-orange-3 {{ state.idnitsWarnings.length > 1 ? state.idnitsWarnings.length + ' warnings' : ' 1 warning' }}
     .bg-dark-5.checkdetails
       q-list(dense, separator)
-        q-item(
+        idnits-result-item(
           v-for='nit of state.idnitsWarnings'
+          :nit='nit'
+          color='orange'
           )
-          q-item-section
-            .text-caption: strong.text-orange-4 {{ nit.name }}
-            .text-caption.text-blue-grey-2 {{ nit.message }}
-          q-item-section(side)
-            q-btn(color='dark-2' text-color='white' icon='mdi-chevron-right' padding='sm xs' size='sm' unelevated)
   q-expansion-item.bg-dark-5(
     v-if='state.idnitsComments.length > 0'
     group='idnits'
@@ -215,14 +198,11 @@ q-list
           q-item-label.text-light-blue-3 {{ state.idnitsComments.length > 1 ? state.idnitsComments.length + ' comments' : ' 1 comment' }}
     .bg-dark-5.checkdetails
       q-list(dense, separator)
-        q-item(
+        idnits-result-item(
           v-for='nit of state.idnitsComments'
+          :nit='nit'
+          color='light-blue'
           )
-          q-item-section
-            .text-caption: strong.text-light-blue-4 {{ nit.name }}
-            .text-caption.text-blue-grey-2 {{ nit.message }}
-          q-item-section(side)
-            q-btn(color='dark-2' text-color='white' icon='mdi-chevron-right' padding='sm xs' size='sm' unelevated)
 </template>
 
 <script setup>
@@ -240,6 +220,8 @@ import { useDocsStore } from 'src/stores/docs'
 import { useEditorStore } from 'src/stores/editor'
 import { modelStore } from 'src/stores/models'
 import { MODES, ValidationError, ValidationComment, ValidationWarning } from '@ietf-tools/idnits'
+
+import IdnitsResultItem from './IdnitsResultItem.vue'
 
 const $q = useQuasar()
 
@@ -503,12 +485,12 @@ async function idnitsCheck () {
     const results = await checkIdnits(modelStore[docsStore.activeDocument.id].getValue(), docsStore.activeDocument.fileName, state.idnitsMode, state.idnitsOffline)
     state.idnitsTotal = results.length
     for (const result of results) {
-      if (result instanceof ValidationError) {
-        state.idnitsErrors.push(result)
-      } else if (result instanceof ValidationWarning) {
+      if (result instanceof ValidationWarning) {
         state.idnitsWarnings.push(result)
       } else if (result instanceof ValidationComment) {
         state.idnitsComments.push(result)
+      } else if (result instanceof ValidationError) { // must be last, as other types extend ValidationError
+        state.idnitsErrors.push(result)
       } else {
         console.warn('idnits - Invalid result type: ', result)
       }
@@ -531,7 +513,7 @@ async function idnitsCheck () {
   } catch (err) {
     console.warn(err)
     $q.notify({
-      message: 'Unexpected error',
+      message: 'Fatal error - idnits crashed',
       caption: err.message,
       color: 'negative',
       icon: 'mdi-close-octagon'
