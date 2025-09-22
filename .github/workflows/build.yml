@@ -32,7 +32,7 @@ jobs:
         skipInvalidTags: true
 
     - name: Create Draft Release
-      uses: ncipollo/release-action@v1.14.0
+      uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
       with:
         prerelease: true
         draft: false
@@ -52,7 +52,7 @@ jobs:
         writeToFile: false
 
     - name: Update Release Body
-      uses: ncipollo/release-action@v1.14.0
+      uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
       with:
         prerelease: true
         updateOnlyUnreleased: true
@@ -138,7 +138,7 @@ jobs:
 
     - name: macOS - Import Certs into keychain
       if: ${{ matrix.platform == 'darwin' }}
-      uses: apple-actions/import-codesign-certs@v3
+      uses: apple-actions/import-codesign-certs@95e84a1a18f2bdbc5c6ab9b7f4429372e4b13a8b # v5.0.3
       with:
         p12-file-base64: ${{ env.CSC_LINK }}
         p12-password: ${{ env.CSC_KEY_PASSWORD }}
@@ -221,7 +221,7 @@ jobs:
     # => ADD TO RELEASE
 
     - name: Add Packages to Release
-      uses: ncipollo/release-action@v1.14.0
+      uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
       with:
         prerelease: true
         updateOnlyUnreleased: true
@@ -273,7 +273,7 @@ jobs:
         node merge-update-manifests.mjs
 
     - name: Add Manifest to Release
-      uses: ncipollo/release-action@v1.14.0
+      uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
       with:
         prerelease: true
         updateOnlyUnreleased: true
@@ -299,7 +299,7 @@ jobs:
 
     steps:
     - name: Finalize Release
-      uses: ncipollo/release-action@v1.14.0
+      uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
       with:
         allowUpdates: true
         makeLatest: true
