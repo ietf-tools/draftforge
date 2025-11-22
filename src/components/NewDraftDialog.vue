@@ -100,34 +100,90 @@ const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginC
 // METHODS
 
 async function selectType (docType, tmpl) {
-  let data = '<?xml version="1.0" encoding="utf-8"?>'
+  let data = ''
 
-  if (tmpl) {
-    let tmplUrl = ''
-    switch (tmpl) {
-      case 'standard':
-        tmplUrl = 'https://github.com/ietf-tools/rfcxml-templates-and-schemas/raw/main/draft-rfcxml-general-template-standard-00.xml'
-        break
-      case 'bare':
-        tmplUrl = 'https://github.com/ietf-tools/rfcxml-templates-and-schemas/raw/main/draft-rfcxml-general-template-bare-00.xml'
-        break
-      case 'annotated':
-        tmplUrl = 'https://github.com/ietf-tools/rfcxml-templates-and-schemas/raw/main/draft-rfcxml-general-template-annotated-00.xml'
-        break
-    }
-    if (tmplUrl) {
-      try {
-        data = await fetch(tmplUrl, {
-          credentials: 'omit'
-        }).then(r => r.text())
-      } catch (err) {
-        $q.notify({
-          message: 'Failed to fetch template',
-          caption: err.message,
-          color: 'negative',
-          icon: 'mdi-alert'
-        })
+  let tmplUrl = ''
+  switch (docType) {
+    case 'xml': {
+      data = '<?xml version="1.0" encoding="utf-8"?>'
+      switch (tmpl) {
+        case 'standard': {
+          tmplUrl = 'https://github.com/ietf-tools/rfcxml-templates-and-schemas/raw/main/draft-rfcxml-general-template-standard-00.xml'
+          break
+        }
+        case 'bare': {
+          tmplUrl = 'https://github.com/ietf-tools/rfcxml-templates-and-schemas/raw/main/draft-rfcxml-general-template-bare-00.xml'
+          break
+        }
+        case 'annotated': {
+          tmplUrl = 'https://github.com/ietf-tools/rfcxml-templates-and-schemas/raw/main/draft-rfcxml-general-template-annotated-00.xml'
+          break
+        }
       }
+      break
+    }
+    case 'md': {
+      data = `---
+title: Untitled Draft
+abbrev:
+docname: draft-abc-xyz-latest
+
+category: info
+submissiontype: IETF
+ipr: trust200902
+area:
+workgroup:
+
+author:
+  - name:
+    org:
+    email:
+
+normative:
+
+informative:
+
+--- abstract
+
+TODO Abstract
+
+--- middle
+
+# Introduction
+
+TODO Introduction
+
+# Conventions and Definitions
+{::boilerplate bcp14-tagged}
+
+# Security Considerations
+
+TODO Security
+
+# IANA Considerations
+
+This document has no IANA actions.
+
+--- back
+
+# Acknowledgements
+{:numbered="false"}
+
+TODO acknowledgements`
+    }
+  }
+  if (tmplUrl) {
+    try {
+      data = await fetch(tmplUrl, {
+        credentials: 'omit'
+      }).then(r => r.text())
+    } catch (err) {
+      $q.notify({
+        message: 'Failed to fetch template from GitHub',
+        caption: err.message,
+        color: 'negative',
+        icon: 'mdi-alert'
+      })
     }
   }
 

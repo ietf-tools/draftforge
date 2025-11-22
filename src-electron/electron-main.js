@@ -13,6 +13,7 @@ import lsp from './lsp.js'
 import updater from './updater.js'
 import terminal from './terminal.js'
 import { createKeybindingsHandler } from './keyhandler.js'
+import { installExtension, VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
 const DFG = {
   currentDir: fileURLToPath(new URL('.', import.meta.url)),
@@ -139,6 +140,10 @@ async function createWindow () {
 
   if (process.env.DEBUGGING) {
     // if on DEV or Production with debug enabled
+    installExtension(VUEJS_DEVTOOLS)
+      .then((ext) => console.log(`Added Extension:  ${ext.name}`))
+      .catch((err) => console.log('An error occurred: ', err))
+
     DFG.mainWindow.webContents.openDevTools({
       activate: false,
       mode: 'detach',
