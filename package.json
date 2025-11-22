@@ -1,0 +1,57 @@
+{
+  "name": "draftforge",
+  "displayName": "DraftForge",
+  "description": "Write, review, refine and submit Internet-Drafts",
+  "version": "0.0.1",
+  "type": "module",
+  "engines": {
+    "vscode": "^1.106.1"
+  },
+  "categories": [
+    "Linters",
+    "Formatters"
+  ],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "draftforge.idnits",
+        "title": "Run idnits on document"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "draftforge",
+          "title": "DraftForge",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "draftforge": [
+        {
+          "id": "draftforge-checks",
+          "name": "Validation Checks"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "1.106.1",
+    "@vscode/test-cli": "0.0.12",
+    "@vscode/test-electron": "2.5.2",
+    "eslint": "9.39.1"
+  },
+  "dependencies": {
+    "@ietf-tools/idnits": "3.0.0-alpha.70"
+  }
+}
