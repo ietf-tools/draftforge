@@ -18,13 +18,27 @@
       {
         "command": "draftforge.idnits",
         "title": "Run idnits on document"
+      },
+      {
+        "command": "draftforge.runAllChecks",
+        "title": "Run All Checks",
+        "icon": "$(debug-all)"
       }
     ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "draftforge.runAllChecks",
+          "when": "view == draftforge-checks",
+          "group": "navigation"
+        }
+      ]
+    },
     "viewsContainers": {
       "activitybar": [
         {
           "id": "draftforge",
-          "title": "DraftForge",
+          "title": "IETF DraftForge",
           "icon": "media/icon.svg"
         }
       ]
@@ -34,6 +48,14 @@
         {
           "id": "draftforge-checks",
           "name": "Validation Checks"
+        },
+        {
+          "id": "draftforge-tools",
+          "name": "Tools"
+        },
+        {
+          "id": "draftforge-snippets",
+          "name": "Snippets"
         }
       ]
     }
