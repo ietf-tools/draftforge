@@ -6,14 +6,14 @@ class ChecksProvider {
     this.onDidChangeTreeData = this._onDidChangeTreeData.event
 
     this.checks = [
-      { id: 'articles', label: 'Articles Check', description: 'Check for bad indefinite articles usage' },
-      { id: 'hyphenation', label: 'Hyphenation Check', description: 'Check for consistent usage of hyphenation' },
-      { id: 'idnits', label: 'IDNits', description: 'Run idnits on the current document' },
-      { id: 'inclusiveLanguage', label: 'Inclusive Language Check', description: 'Check for usage of non-inclusive terms' },
-      { id: 'nonAscii', label: 'Non-ASCII Check', description: 'Check for non-ASCII characters' },
-      { id: 'placeholders', label: 'Placeholders Check', description: 'Check for common placeholders' },
-      { id: 'repeatedWords', label: 'Repeated Words Check', description: 'Check for accidental repeated terms' },
-      { id: 'typos', label: 'Typos Check', description: 'Check for common typos' }
+      { id: 'articles', label: 'Articles Check', description: 'Check for bad indefinite articles usage', icon: 'repo' },
+      { id: 'hyphenation', label: 'Hyphenation Check', description: 'Check for consistent usage of hyphenation', icon: 'diff-removed' },
+      { id: 'idnits', label: 'IDNits', description: 'Run idnits on the current document', icon: 'tasklist' },
+      { id: 'inclusiveLanguage', label: 'Inclusive Language Check', description: 'Check for usage of non-inclusive terms', icon: 'heart' },
+      { id: 'nonAscii', label: 'Non-ASCII Check', description: 'Check for non-ASCII characters', icon: 'symbol-key' },
+      { id: 'placeholders', label: 'Placeholders Check', description: 'Check for common placeholders', icon: 'bracket' },
+      { id: 'repeatedWords', label: 'Repeated Words Check', description: 'Check for accidental repeated terms', icon: 'layers' },
+      { id: 'typos', label: 'Typos Check', description: 'Check for common typos', icon: 'debug' }
     ]
   }
 
@@ -24,7 +24,7 @@ class ChecksProvider {
   getTreeItem(check) {
     const item = new vscode.TreeItem(check.label, vscode.TreeItemCollapsibleState.None)
     item.description = check.description
-    item.iconPath = new vscode.ThemeIcon('debug-alt')
+    item.iconPath = new vscode.ThemeIcon(check.icon ?? 'debug-alt')
     item.command = {
       command: 'draftforge.runCheck',
       title: 'Run Check',

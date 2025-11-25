@@ -20,9 +20,17 @@
         "title": "Run idnits on document"
       },
       {
+        "command": "draftforge.login",
+        "title": "Login with an IETF Account"
+      },
+      {
+        "command": "draftforge.register",
+        "title": "Create an IETF Account"
+      },
+      {
         "command": "draftforge.runAllChecks",
         "title": "Run All Checks",
-        "icon": "$(debug-all)"
+        "icon": "$(run-all)"
       }
     ],
     "menus": {
@@ -43,8 +51,19 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "draftforge-setup",
+        "contents": "In order to use online features, you must connect your IETF account.\n[Login with an IETF Account](command:draftforge.login)\n[Create an IETF Account](command:draftforge.register)\nFor questions and bug reports, [open an issue](https://github.com/ietf-tools/draftforge/issues) on the IETF DraftForge GitHub repository or send an email to support@ietf.org."
+      }
+    ],
     "views": {
       "draftforge": [
+        {
+          "id": "draftforge-setup",
+          "name": "Setup",
+          "when": "!draftforge.isSetup"
+        },
         {
           "id": "draftforge-checks",
           "name": "Validation Checks"

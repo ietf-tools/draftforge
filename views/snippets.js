@@ -7,10 +7,16 @@ class SnippetsProvider {
 
     this.snippets = [
       {
-        id: 'rfcHeader',
-        label: 'RFC-style Header',
-        description: 'Insert a standard RFC header',
-        body: 'Author: ${1:Your Name}\nDate: ${2:YYYY-MM-DD}\nTitle: ${3:Draft Title}\n\n'
+        id: 'xmlAuthorBlock',
+        label: 'Author Block',
+        description: 'Insert an author block',
+        body: '<author fullname="${1:Full Name}" initials="${2:Initials}" surname="${3:Surname}">\n\t<organization>${4:Organization}</organization>\n\t\t<address>\n\t\t\t<postal>\n\t\t\t\t<country>${5:Country Name}</country>\n\t\t\t</postal>\n\t\t\t<email>${6:Email Address}</email>\n\t</address>\n</author>'
+      },
+      {
+        id: 'xmlDateElement',
+        label: 'Date Element',
+        description: 'Insert a date element',
+        body: '<date day="${1:DD}" month="${2:Month}" year="${3:YYYY}" />'
       },
       {
         id: 'fencedCode',
