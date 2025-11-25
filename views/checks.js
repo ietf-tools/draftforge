@@ -44,7 +44,7 @@ let checksStatusBarItem
 /**
  * @param {vscode.ExtensionContext} context
  */
-export function activateChecksView (context) {
+export function activateChecksView (context, diagnosticCollection) {
     const checksProvider = new ChecksProvider()
     const checksView = vscode.window.createTreeView('draftforge-checks', { treeDataProvider: checksProvider })
     context.subscriptions.push(checksView)
@@ -59,9 +59,8 @@ export function activateChecksView (context) {
           case 'idnits':
             await vscode.commands.executeCommand('draftforge.idnits')
             break
-          case 'spelling':
-            // simple placeholder - implement real spelling logic as needed
-            vscode.window.showInformationMessage('Spelling check not yet implemented.')
+          case 'placeholders':
+            await vscode.commands.executeCommand('draftforge.checkPlaceholders')
             break
           default:
             vscode.window.showWarningMessage(`Unknown check: ${check.id}`)

@@ -5,6 +5,7 @@ import { activateChecksView } from './views/checks.js'
 import { activateToolsView } from './views/tools.js'
 import { activateSnippetsView } from './views/snippets.js'
 import { registerSetupCommands } from './commands/setup.js'
+import { registerCheckPlaceholdersCommand } from './commands/placeholders.js'
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -14,10 +15,16 @@ export function activate(context) {
 
 	vscode.commands.executeCommand('setContext', 'draftforge.isSetup', false)
 
-	registerSetupCommands(context)
-	registerIdnitsCommand(context)
+	// Register Diagnostic Collection
+	let diagnosticCollection
+	diagnosticCollection = vscode.languages.createDiagnosticCollection('draftforgeChecks')
+	context.subscriptions.push(diagnosticCollection)
 
-	activateChecksView(context)
+	registerSetupCommands(context)
+	registerCheckPlaceholdersCommand(context, diagnosticCollection)
+	registerIdnitsCommand(context, diagnosticCollection)
+
+	activateChecksView(context, diagnosticCollection)
 	activateToolsView(context)
 	activateSnippetsView(context)
 

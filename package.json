@@ -16,6 +16,10 @@
   "contributes": {
     "commands": [
       {
+        "command": "draftforge.checkPlaceholders",
+        "title": "Check for common placeholders"
+      },
+      {
         "command": "draftforge.idnits",
         "title": "Run idnits on document"
       },
