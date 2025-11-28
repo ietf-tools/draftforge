@@ -3,7 +3,12 @@
 test/**
 .gitignore
 .yarnrc
+.npmrc
+commands
+node_modules
+views
 vsc-extension-quickstart.md
+**/rollup.config.mjs
 **/jsconfig.json
 **/*.map
 **/eslint.config.mjs

@@ -2,8 +2,13 @@
   "name": "draftforge",
   "displayName": "DraftForge",
   "description": "Write, review, refine and submit Internet-Drafts",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
+  "publisher": "ietf",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ietf-tools/draftforge-ext.git"
+  },
   "engines": {
     "vscode": "^1.106.1"
   },
@@ -12,20 +17,28 @@
     "Formatters",
     "Other"
   ],
+  "keywords": ["drafts", "internet-drafts", "ietf", "rfc-editor", "rfc"],
+  "preview": true,
+  "pricing": "Free",
+  "icon": "media/logo.png",
+  "galleryBanner": {
+    "color": "#00243D",
+    "theme": "dark"
+  },
   "activationEvents": [],
-  "main": "./extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-				"title": "Internet Draft - Markdown",
-				"shortTitle": "Internet Draft - Markdown",
-				"command": "draftforge.newFileMarkdown"
-			},
+        "title": "Internet Draft - Markdown",
+        "shortTitle": "Internet Draft - Markdown",
+        "command": "draftforge.newFileMarkdown"
+      },
       {
-				"title": "Internet Draft - XML",
-				"shortTitle": "Internet Draft - XML",
-				"command": "draftforge.newFileXml"
-			},
+        "title": "Internet Draft - XML",
+        "shortTitle": "Internet Draft - XML",
+        "command": "draftforge.newFileXml"
+      },
       {
         "command": "draftforge.checkPlaceholders",
         "title": "Check for common placeholders"
@@ -51,12 +64,12 @@
     "menus": {
       "file/newFile": [
         {
-					"command": "draftforge.newFileMarkdown"
-				},
-				{
-					"command": "draftforge.newFileXml"
-				}
-			],
+          "command": "draftforge.newFileMarkdown"
+        },
+        {
+          "command": "draftforge.newFileXml"
+        }
+      ],
       "view/title": [
         {
           "command": "draftforge.runAllChecks",
@@ -64,6 +77,28 @@
           "group": "navigation"
         }
       ]
+    },
+    "configuration": {
+      "title": "IETF DraftForge",
+      "properties": {
+        "draftforge.experience": {
+          "type": "string",
+          "enum": [
+            "author",
+            "rpc"
+          ],
+          "enumItemLabels": [
+            "Author",
+            "RPC staff"
+          ],
+          "markdownEnumDescriptions": [
+            "Author-centric experience",
+            "RFC Production Center staff-centric experience"
+          ],
+          "default": "author",
+          "description": "The presentation experience"
+        }
+      }
     },
     "viewsContainers": {
       "activitybar": [
@@ -111,39 +146,43 @@
         "description": "Getting Started",
         "steps": [
           {
-						"id": "runcommand",
-						"title": "Run Command",
-						"description": "This step will run a command and check off once it has been run.\n[Run Command](command:draftforge.checkPlaceholders)",
-						"completionEvents": [
-							"onCommand:draftforge.checkPlaceholders"
-						]
-					},
+            "id": "runcommand",
+            "title": "Run Command",
+            "description": "This step will run a command and check off once it has been run.\n[Run Command](command:draftforge.checkPlaceholders)",
+            "completionEvents": [
+              "onCommand:draftforge.checkPlaceholders"
+            ]
+          },
           {
             "id": "draftforgelogin",
             "title": "Login",
             "description": "Yes yes yes"
           },
           {
-						"id": "linux",
-						"title": "UI Platform: Linux",
-						"description": "This step will only show on Linux"
-					}
+            "id": "linux",
+            "title": "UI Platform: Linux",
+            "description": "This step will only show on Linux"
+          }
         ]
       }
     ]
   },
   "scripts": {
+    "compile": "rollup -c rollup.config.mjs",
     "lint": "eslint .",
     "pretest": "npm run lint",
     "test": "vscode-test"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "29.0.0",
+    "@rollup/plugin-node-resolve": "16.0.3",
     "@types/mocha": "10.0.10",
     "@types/node": "22.x",
     "@types/vscode": "1.106.1",
     "@vscode/test-cli": "0.0.12",
     "@vscode/test-electron": "2.5.2",
-    "eslint": "9.39.1"
+    "eslint": "9.39.1",
+    "rollup": "4.53.3"
   },
   "dependencies": {
     "@ietf-tools/idnits": "3.0.0-alpha.70"
