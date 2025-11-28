@@ -9,12 +9,23 @@
   },
   "categories": [
     "Linters",
-    "Formatters"
+    "Formatters",
+    "Other"
   ],
   "activationEvents": [],
   "main": "./extension.js",
   "contributes": {
     "commands": [
+      {
+				"title": "Internet Draft - Markdown",
+				"shortTitle": "Internet Draft - Markdown",
+				"command": "draftforge.newFileMarkdown"
+			},
+      {
+				"title": "Internet Draft - XML",
+				"shortTitle": "Internet Draft - XML",
+				"command": "draftforge.newFileXml"
+			},
       {
         "command": "draftforge.checkPlaceholders",
         "title": "Check for common placeholders"
@@ -38,6 +49,14 @@
       }
     ],
     "menus": {
+      "file/newFile": [
+        {
+					"command": "draftforge.newFileMarkdown"
+				},
+				{
+					"command": "draftforge.newFileXml"
+				}
+			],
       "view/title": [
         {
           "command": "draftforge.runAllChecks",
@@ -57,31 +76,61 @@
     },
     "viewsWelcome": [
       {
-        "view": "draftforge-setup",
-        "contents": "In order to use online features, you must connect your IETF account.\n[Login with an IETF Account](command:draftforge.login)\n[Create an IETF Account](command:draftforge.register)\nFor questions and bug reports, [open an issue](https://github.com/ietf-tools/draftforge/issues) on the IETF DraftForge GitHub repository or send an email to support@ietf.org."
+        "view": "draftforge-loading",
+        "contents": "$(loading~spin) Initializing..."
       }
     ],
     "views": {
       "draftforge": [
         {
-          "id": "draftforge-setup",
-          "name": "Setup",
-          "when": "!draftforge.isSetup"
+          "id": "draftforge-loading",
+          "name": "IETF DraftForge",
+          "when": "!draftforge.isReady"
         },
         {
           "id": "draftforge-checks",
-          "name": "Validation Checks"
+          "name": "Validation Checks",
+          "when": "draftforge.isReady"
         },
         {
           "id": "draftforge-tools",
-          "name": "Tools"
+          "name": "Tools",
+          "when": "draftforge.isReady"
         },
         {
           "id": "draftforge-snippets",
-          "name": "Snippets"
+          "name": "Snippets",
+          "when": "draftforge.isReady"
         }
       ]
-    }
+    },
+    "walkthroughs": [
+      {
+        "id": "draftforge",
+        "title": "IETF DraftForge Setup",
+        "description": "Getting Started",
+        "steps": [
+          {
+						"id": "runcommand",
+						"title": "Run Command",
+						"description": "This step will run a command and check off once it has been run.\n[Run Command](command:draftforge.checkPlaceholders)",
+						"completionEvents": [
+							"onCommand:draftforge.checkPlaceholders"
+						]
+					},
+          {
+            "id": "draftforgelogin",
+            "title": "Login",
+            "description": "Yes yes yes"
+          },
+          {
+						"id": "linux",
+						"title": "UI Platform: Linux",
+						"description": "This step will only show on Linux"
+					}
+        ]
+      }
+    ]
   },
   "scripts": {
     "lint": "eslint .",

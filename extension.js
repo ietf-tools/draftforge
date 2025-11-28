@@ -13,8 +13,6 @@ import { registerCheckPlaceholdersCommand } from './commands/placeholders.js'
 export function activate(context) {
 	console.log('Initializing DraftForge...')
 
-	vscode.commands.executeCommand('setContext', 'draftforge.isSetup', false)
-
 	// Register Diagnostic Collection
 	let diagnosticCollection
 	diagnosticCollection = vscode.languages.createDiagnosticCollection('draftforgeChecks')
@@ -28,6 +26,7 @@ export function activate(context) {
 	activateToolsView(context)
 	activateSnippetsView(context)
 
+	vscode.commands.executeCommand('setContext', 'draftforge.isReady', true)
 	console.log('DraftForge initialized.')
 }
 
