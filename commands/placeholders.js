@@ -7,8 +7,10 @@ import * as vscode from 'vscode'
 export function registerCheckPlaceholdersCommand (context, diagnosticCollection) {
   const ignores = [] // TODO: implement ignoes
   
-  context.subscriptions.push(vscode.commands.registerCommand('draftforge.checkPlaceholders', async function () {
-    diagnosticCollection.clear()
+  context.subscriptions.push(vscode.commands.registerCommand('draftforge.checkPlaceholders', async function (clearFirst = true) {
+    if (clearFirst) {
+      diagnosticCollection.clear()
+    }
 
     try {
       const activeDoc = vscode.window.activeTextEditor.document
@@ -44,8 +46,13 @@ export function registerCheckPlaceholdersCommand (context, diagnosticCollection)
       }
 
       if (diags?.length > 0) {
-        diagnosticCollection.set(activeDoc.uri, diags)
-        await vscode.commands.executeCommand('workbench.actions.view.problems')
+        if (diagnosticCollection.has(activeDoc.uri)) {
+          diagnosticCollection.set(activeDoc.uri, [...diagnosticCollection.get(activeDoc.uri), ...diags])
+        } else {
+          diagnosticCollection.set(activeDoc.uri, diags)
+        }
+        
+        await vscode.commands.executeCommand('workbench.action.problems.focus')
       } else {
         vscode.window.showInformationMessage('No common placeholders found in this document.')
       }

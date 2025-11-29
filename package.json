@@ -40,6 +40,10 @@
         "command": "draftforge.newFileXml"
       },
       {
+        "command": "draftforge.checkArticles",
+        "title": "Check for bad article usage"
+      },
+      {
         "command": "draftforge.checkPlaceholders",
         "title": "Check for common placeholders"
       },

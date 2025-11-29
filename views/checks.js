@@ -43,24 +43,28 @@ let checksStatusBarItem
 
 /**
  * @param {vscode.ExtensionContext} context
+ * @param {vscode.DiagnosticCollection} diagnosticCollection
  */
 export function activateChecksView (context, diagnosticCollection) {
     const checksProvider = new ChecksProvider()
     const checksView = vscode.window.createTreeView('draftforge-checks', { treeDataProvider: checksProvider })
     context.subscriptions.push(checksView)
   
-    context.subscriptions.push(vscode.commands.registerCommand('draftforge.runCheck', async (check) => {
+    context.subscriptions.push(vscode.commands.registerCommand('draftforge.runCheck', async (check, clearFirst = true) => {
       try {
         if (!vscode.window.activeTextEditor) {
           return vscode.window.showInformationMessage('No active editor to run checks on.')
         }
   
         switch (check.id) {
-          case 'idnits':
-            await vscode.commands.executeCommand('draftforge.idnits')
+          case 'articles':
+            await vscode.commands.executeCommand('draftforge.checkArticles', clearFirst)
             break
+          // case 'idnits':
+          //   await vscode.commands.executeCommand('draftforge.idnits', clearFirst)
+          //   break
           case 'placeholders':
-            await vscode.commands.executeCommand('draftforge.checkPlaceholders')
+            await vscode.commands.executeCommand('draftforge.checkPlaceholders', clearFirst)
             break
           default:
             vscode.window.showWarningMessage(`Unknown check: ${check.id}`)
@@ -81,6 +85,8 @@ export function activateChecksView (context, diagnosticCollection) {
         if (checks.length === 0) {
           return vscode.window.showInformationMessage('No checks configured.')
         }
+
+        diagnosticCollection.clear()
   
         await vscode.window.withProgress({
           location: vscode.ProgressLocation.Notification,
@@ -91,7 +97,7 @@ export function activateChecksView (context, diagnosticCollection) {
             const check = checks[i]
             progress.report({ message: `Running ${check.label}...`, increment: 100 / checks.length })
             // delegate to the single-check command so existing logic is reused
-            await vscode.commands.executeCommand('draftforge.runCheck', check)
+            await vscode.commands.executeCommand('draftforge.runCheck', check, false)
           }
         })
   

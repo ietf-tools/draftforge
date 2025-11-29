@@ -1,10 +1,11 @@
-![IETF DraftForge](media/logo-text-light.png)
-
-# IETF DraftForge
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="media/logo-text-dark.png">
+  <img alt="DraftForge" src="media/logo-text-light.png" height="175">
+</picture>
 
 > Warning ⚠️ - This is alpha release that should only be used for testing and development purposes by IETF / RFC-Editor staff.
 
-DraftForge provide tools, validation and snippets for both Internet Drafts authors and the RFC Production Center.
+IETF DraftForge provide tools, validation checks and snippets for both Internet-Drafts authors and the RFC Production Center.
 
 ## Features
 

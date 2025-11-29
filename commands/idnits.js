@@ -16,12 +16,14 @@ export async function checkIdnits (text, filename, mode = MODES.NORMAL, offline 
  * @param {vscode.DiagnosticCollection} diagnosticCollection
  */
 export function registerIdnitsCommand (context, diagnosticCollection) {
-	diagnosticCollection.clear()
-  
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with  registerCommand
 	// The commandId parameter must match the command field in package.json
-	context.subscriptions.push(vscode.commands.registerCommand('draftforge.idnits', async function () {
+	context.subscriptions.push(vscode.commands.registerCommand('draftforge.idnits', async function (clearFirst = true) {
+		if (clearFirst) {
+			diagnosticCollection.clear()
+		}
+
 		try {
 			const activeUri = vscode.window.activeTextEditor.document.uri
 			const activeFilename = path.parse(vscode.window.activeTextEditor.document.fileName).base
