@@ -2,7 +2,7 @@
   "name": "draftforge",
   "displayName": "DraftForge",
   "description": "Write, review, refine and submit Internet-Drafts",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "publisher": "ietf",
   "repository": {
@@ -22,11 +22,11 @@
   "pricing": "Free",
   "icon": "media/logo.png",
   "galleryBanner": {
-    "color": "#00243D",
+    "color": "#8D0E2E",
     "theme": "dark"
   },
   "activationEvents": [],
-  "main": "./dist/extension.js",
+  "main": "./extension.js",
   "contributes": {
     "commands": [
       {

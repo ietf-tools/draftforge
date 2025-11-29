@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"module": "Node16",
+		"module": "node20",
 		"target": "ES2022",
 		"checkJs": true,  /* Typecheck .js files. */
 		"lib": [

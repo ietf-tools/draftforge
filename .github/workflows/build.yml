@@ -1,0 +1,80 @@
+name: Build + Publish
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Use Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Get Next Version
+        id: semver
+        uses: ietf-tools/semver-action@v1
+        with:
+          token: ${{ github.token }}
+          branch: main
+          skipInvalidTags: true
+          patchList: fix, bugfix, perf, refactor, test, tests, chore
+
+      - name: Install vsce
+        run: npm install -g vsce
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile extension
+        run: |
+          yq -i -o=json -p=json '.version="${{ steps.semver.outputs.nextStrict }}" | .main="./dist/extension.js"' package.json
+          npm run compile
+          vsce package
+
+      - name: Publish to Visual Studio Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: vsce publish --pat $VSCE_PAT
+
+      - name: Create Draft Release
+        uses: ncipollo/release-action@v1.20.0
+        with:
+          prerelease: true
+          draft: false
+          owner: ietf-tools
+          repo: draftforge-ext
+          commit: ${{ github.sha }}
+          tag: ${{ steps.semver.outputs.nextStrict }}
+          name: ${{ steps.semver.outputs.nextStrict }}
+          body: '*pending*'
+          token: ${{ github.token }}
+
+      - name: Generate CHANGELOG
+        id: changelog
+        uses: Requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          fromTag: ${{ steps.semver.outputs.nextStrict }}
+          toTag: ${{ steps.semver.outputs.current }}
+          writeToFile: false
+
+      - name: Finalize Release
+        uses: ncipollo/release-action@v1.20.0
+        with:
+          allowUpdates: true
+          makeLatest: true
+          draft: false
+          owner: ietf-tools
+          repo: draftforge-ext
+          tag: ${{ steps.semver.outputs.nextStrict }}
+          name: ${{ steps.semver.outputs.nextStrict }}
+          body: ${{ steps.changelog.outputs.changes }}
+          token: ${{ github.token }}

@@ -5,7 +5,7 @@ export default {
 	input: 'extension.js',
 	output: {
 		file: 'dist/extension.js',
-		format: 'cjs',
+		format: 'es',
     inlineDynamicImports: true
 	},
   external: ['vscode'],
