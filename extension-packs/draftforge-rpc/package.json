@@ -1,0 +1,40 @@
+{
+  "name": "draftforge-rpc",
+  "displayName": "DraftForge for the RFC Production Center",
+  "description": "An extension pack for the RFC Production Center",
+  "version": "0.0.1",
+  "publisher": "ietf",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ietf-tools/draftforge-ext.git"
+  },
+  "engines": {
+    "vscode": "^1.106.1"
+  },
+  "categories": [
+    "Extension Packs"
+  ],
+  "keywords": [
+    "drafts",
+    "internet-drafts",
+    "ietf",
+    "rfc-editor",
+    "rfc"
+  ],
+  "preview": true,
+  "pricing": "Free",
+  "icon": "media/logo-rpc.png",
+  "galleryBanner": {
+    "color": "#8D0E2E",
+    "theme": "dark"
+  },
+  "extensionPack": [ 
+    "ietf.draftforge",
+    "redhat.vscode-xml"
+  ],
+  "contributes": {
+    "configurationDefaults": {
+      "draftforge.experience": "rpc"
+    }
+  }
+}
