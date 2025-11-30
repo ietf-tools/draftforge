@@ -1,7 +1,6 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="media/logo-text-dark.png">
-  <img alt="DraftForge" src="media/logo-text-light.png" height="175">
-</picture>
+![DraftForge](media/logo-text.png)
+
+# IETF DraftForge
 
 > Warning ⚠️ - This is alpha release that should only be used for testing and development purposes by IETF / RFC-Editor staff.
 
