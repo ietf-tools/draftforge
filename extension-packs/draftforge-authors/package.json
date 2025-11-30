@@ -2,7 +2,7 @@
   "name": "draftforge-authors",
   "displayName": "DraftForge for Internet-Draft Authors",
   "description": "An extension pack for Internet-Draft Authors",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "ietf",
   "repository": {
     "type": "git",
@@ -31,5 +31,10 @@
   "extensionPack": [ 
     "ietf.draftforge",
     "redhat.vscode-xml"
-  ]
+  ],
+  "contributes": {
+    "configurationDefaults": {
+      "draftforge.experience": "author"
+    }
+  }
 }
