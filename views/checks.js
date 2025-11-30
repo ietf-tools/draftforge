@@ -60,11 +60,26 @@ export function activateChecksView (context, diagnosticCollection) {
           case 'articles':
             await vscode.commands.executeCommand('draftforge.checkArticles', clearFirst)
             break
-          // case 'idnits':
-          //   await vscode.commands.executeCommand('draftforge.idnits', clearFirst)
-          //   break
+          case 'hyphenation':
+            await vscode.commands.executeCommand('draftforge.checkHyphenation', clearFirst)
+            break
+          case 'inclusiveLanguage':
+            await vscode.commands.executeCommand('draftforge.checkInclusiveLanguage', clearFirst)
+            break
+          case 'nonAscii':
+            await vscode.commands.executeCommand('draftforge.checkNonAscii', clearFirst)
+            break
+          case 'idnits':
+            // await vscode.commands.executeCommand('draftforge.idnits', clearFirst)
+            break
           case 'placeholders':
             await vscode.commands.executeCommand('draftforge.checkPlaceholders', clearFirst)
+            break
+          case 'repeatedWords':
+            await vscode.commands.executeCommand('draftforge.checkRepeatedWords', clearFirst)
+            break
+          case 'typos':
+            await vscode.commands.executeCommand('draftforge.checkTypos', clearFirst)
             break
           default:
             vscode.window.showWarningMessage(`Unknown check: ${check.id}`)

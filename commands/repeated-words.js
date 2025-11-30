@@ -4,10 +4,8 @@ import * as vscode from 'vscode'
  * @param {vscode.ExtensionContext} context
  * @param {vscode.DiagnosticCollection} diagnosticCollection
  */
-export function registerCheckPlaceholdersCommand (context, diagnosticCollection) {
-  const ignores = [] // TODO: implement ignores
-  
-  context.subscriptions.push(vscode.commands.registerCommand('draftforge.checkPlaceholders', async function (clearFirst = true) {
+export function registerCheckRepeatedWordsCommand (context, diagnosticCollection) {
+  context.subscriptions.push(vscode.commands.registerCommand('draftforge.checkRepeatedWords', async function (clearFirst = true) {
     if (clearFirst) {
       diagnosticCollection.clear()
     }
@@ -15,7 +13,7 @@ export function registerCheckPlaceholdersCommand (context, diagnosticCollection)
     try {
       const activeDoc = vscode.window.activeTextEditor.document
 
-      const matchRgx = /(?:[^a-z0-9]|RFC)(?<term>TBD|TBA|XX|YY|NN|MM|0000|TODO)(?:[^a-z0-9])/gi
+      const matchRgx = /\b(\w+)\s+\1\b/gi
 
       const diags = []
       const occurences = []
@@ -24,17 +22,14 @@ export function registerCheckPlaceholdersCommand (context, diagnosticCollection)
         const line = activeDoc.lineAt(lineIdx)
         for (const match of line.text.matchAll(matchRgx)) {
           const term = match[1].toLowerCase()
-          if (ignores.includes(term)) {
-            continue
-          }
           const termStartIndex = match[0].indexOf(match[1])
           let occIdx = occurences.indexOf(term)
           if (occIdx < 0) {
             occIdx = occurences.push(term) - 1
           }
           diags.push(new vscode.Diagnostic(
-            new vscode.Range(lineIdx, match.index + termStartIndex, lineIdx, match.index + termStartIndex + match[1].length),
-            `Common placeholder term ${match[1]} detected.`,
+            new vscode.Range(lineIdx, match.index + termStartIndex, lineIdx, match.index + termStartIndex + match[0].length),
+            `Repeated term "${match[1]}" detected.`,
             vscode.DiagnosticSeverity.Warning
           ))
           if (termCount[term]) {
@@ -54,7 +49,7 @@ export function registerCheckPlaceholdersCommand (context, diagnosticCollection)
         
         await vscode.commands.executeCommand('workbench.action.problems.focus')
       } else {
-        vscode.window.showInformationMessage('No common placeholders found in this document.')
+        vscode.window.showInformationMessage('No repeated words found in this document.')
       }
     } catch (err) {
       console.warn(err)

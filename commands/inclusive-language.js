@@ -1,13 +1,14 @@
 import * as vscode from 'vscode'
+import { find, flatten } from 'lodash-es'
 
 /**
  * @param {vscode.ExtensionContext} context
  * @param {vscode.DiagnosticCollection} diagnosticCollection
  */
-export function registerCheckPlaceholdersCommand (context, diagnosticCollection) {
+export function registerCheckInclusiveLanguageCommand (context, diagnosticCollection) {
   const ignores = [] // TODO: implement ignores
   
-  context.subscriptions.push(vscode.commands.registerCommand('draftforge.checkPlaceholders', async function (clearFirst = true) {
+  context.subscriptions.push(vscode.commands.registerCommand('draftforge.checkInclusiveLanguage', async function (clearFirst = true) {
     if (clearFirst) {
       diagnosticCollection.clear()
     }
@@ -15,7 +16,41 @@ export function registerCheckPlaceholdersCommand (context, diagnosticCollection)
     try {
       const activeDoc = vscode.window.activeTextEditor.document
 
-      const matchRgx = /(?:[^a-z0-9]|RFC)(?<term>TBD|TBA|XX|YY|NN|MM|0000|TODO)(?:[^a-z0-9])/gi
+      const dictionnary = [
+        {
+          triggers: ['whitelist'],
+          suggestion: 'allowlist or passlist'
+        },
+        {
+          triggers: ['blacklist'],
+          suggestion: 'denylist or blocklist'
+        },
+        {
+          triggers: ['master'],
+          suggestion: 'primary, main, host, leader or orchestrator'
+        },
+        {
+          triggers: ['slave'],
+          suggestion: 'secondary, replica, target, follower or worker'
+        },
+        {
+          triggers: ['native'],
+          suggestion: 'built-in'
+        },
+        {
+          triggers: ['grandfather'],
+          suggestion: 'exemption or approve'
+        },
+        {
+          triggers: ['he/she', 'he or she'],
+          suggestion: 'they'
+        },
+        {
+          triggers: ['cripple', 'handicap'],
+          suggestion: 'impair or impeded'
+        }
+      ]
+      const matchRgx = new RegExp(`[<> "'.:;=([{-](${flatten(dictionnary.map(d => d.triggers)).join('|')})`, 'gi')
 
       const diags = []
       const occurences = []
@@ -28,13 +63,14 @@ export function registerCheckPlaceholdersCommand (context, diagnosticCollection)
             continue
           }
           const termStartIndex = match[0].indexOf(match[1])
+          const dictEntry = find(dictionnary, d => d.triggers.includes(term))
           let occIdx = occurences.indexOf(term)
           if (occIdx < 0) {
             occIdx = occurences.push(term) - 1
           }
           diags.push(new vscode.Diagnostic(
             new vscode.Range(lineIdx, match.index + termStartIndex, lineIdx, match.index + termStartIndex + match[1].length),
-            `Common placeholder term ${match[1]} detected.`,
+            `Inclusive Language: Consider using ${dictEntry.suggestion} instead of "${term}".`,
             vscode.DiagnosticSeverity.Warning
           ))
           if (termCount[term]) {
