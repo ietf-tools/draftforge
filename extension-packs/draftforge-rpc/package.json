@@ -34,7 +34,8 @@
   ],
   "contributes": {
     "configurationDefaults": {
-      "draftforge.experience": "rpc"
+      "draftforge.experience": "rpc",
+      "xml.validation.xInclude.enabled": true
     }
   }
 }

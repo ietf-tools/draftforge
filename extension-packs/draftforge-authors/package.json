@@ -34,7 +34,8 @@
   ],
   "contributes": {
     "configurationDefaults": {
-      "draftforge.experience": "author"
+      "draftforge.experience": "author",
+      "xml.validation.xInclude.enabled": true
     }
   }
 }

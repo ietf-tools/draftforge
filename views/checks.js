@@ -8,7 +8,6 @@ class ChecksProvider {
     this.checks = [
       { id: 'articles', label: 'Articles Check', description: 'Check for bad indefinite articles usage', icon: 'repo' },
       { id: 'hyphenation', label: 'Hyphenation Check', description: 'Check for consistent usage of hyphenation', icon: 'diff-removed' },
-      { id: 'idnits', label: 'IDNits', description: 'Run idnits on the current document', icon: 'tasklist' },
       { id: 'inclusiveLanguage', label: 'Inclusive Language Check', description: 'Check for usage of non-inclusive terms', icon: 'heart' },
       { id: 'nonAscii', label: 'Non-ASCII Check', description: 'Check for non-ASCII characters', icon: 'symbol-key' },
       { id: 'placeholders', label: 'Placeholders Check', description: 'Check for common placeholders', icon: 'bracket' },
@@ -68,9 +67,6 @@ export function activateChecksView (context, diagnosticCollection) {
             break
           case 'nonAscii':
             await vscode.commands.executeCommand('draftforge.checkNonAscii', clearFirst)
-            break
-          case 'idnits':
-            // await vscode.commands.executeCommand('draftforge.idnits', clearFirst)
             break
           case 'placeholders':
             await vscode.commands.executeCommand('draftforge.checkPlaceholders', clearFirst)
