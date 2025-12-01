@@ -30,12 +30,6 @@ class SnippetsProvider {
         label: 'Simple Markdown Table',
         description: 'Insert a simple markdown table',
         body: '| Col1 | Col2 |\n| --- | --- |\n| ${1:cell1} | ${2:cell2} |\n'
-      },
-      {
-        id: 'exampleInline',
-        label: 'Inline Example',
-        description: 'Insert an inline example placeholder',
-        body: 'Example: ${1:text}'
       }
     ]
   }

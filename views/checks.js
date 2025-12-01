@@ -7,7 +7,7 @@ class ChecksProvider {
 
     this.checks = [
       { id: 'articles', label: 'Articles Check', description: 'Check for bad indefinite articles usage', icon: 'repo' },
-      { id: 'hyphenation', label: 'Hyphenation Check', description: 'Check for consistent usage of hyphenation', icon: 'diff-removed' },
+      { id: 'hyphenation', label: 'Hyphenation Check', description: 'Check for inconsistent hyphenation usage', icon: 'diff-removed' },
       { id: 'inclusiveLanguage', label: 'Inclusive Language Check', description: 'Check for usage of non-inclusive terms', icon: 'heart' },
       { id: 'nonAscii', label: 'Non-ASCII Check', description: 'Check for non-ASCII characters', icon: 'symbol-key' },
       { id: 'placeholders', label: 'Placeholders Check', description: 'Check for common placeholders', icon: 'bracket' },

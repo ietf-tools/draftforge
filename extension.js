@@ -4,6 +4,7 @@ import { registerIdnitsCommand } from './commands/idnits.js'
 import { activateChecksView } from './views/checks.js'
 import { activateToolsView } from './views/tools.js'
 import { activateSnippetsView } from './views/snippets.js'
+import { activateReferenceView } from './views/reference.js'
 import { registerAddXmlModelsCommand } from './commands/add-xml-models.js'
 import { registerCheckArticlesCommand } from './commands/articles.js'
 import { registerCheckHyphenationCommand } from './commands/hyphenation.js'
@@ -43,6 +44,7 @@ export function activate(context) {
 	activateChecksView(context, diagnosticCollection)
 	activateToolsView(context)
 	activateSnippetsView(context)
+	activateReferenceView(context)
 
 	vscode.commands.executeCommand('setContext', 'draftforge.isReady', true)
 	console.log('DraftForge initialized.')

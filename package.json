@@ -46,12 +46,40 @@
         "command": "draftforge.newFileXml"
       },
       {
+        "command": "draftforge.addXmlModels",
+        "title": "Add XML Models"
+      },
+      {
         "command": "draftforge.checkArticles",
         "title": "Check for bad article usage"
       },
       {
+        "command": "draftforge.checkHyphenation",
+        "title": "Check for inconsistent hyphenation usage"
+      },
+      {
+        "command": "draftforge.checkInclusiveLanguage",
+        "title": "Check for usage of non-inclusive terms"
+      },
+      {
+        "command": "draftforge.checkNonAscii",
+        "title": "Check for non-ASCII characters"
+      },
+      {
         "command": "draftforge.checkPlaceholders",
         "title": "Check for common placeholders"
+      },
+      {
+        "command": "draftforge.checkRepeatedWords",
+        "title": "Check for accidental repeated terms"
+      },
+      {
+        "command": "draftforge.checkTypos",
+        "title": "Check for common typos"
+      },
+      {
+        "command": "draftforge.extractComments",
+        "title": "Extract [rfced] comments"
       },
       {
         "command": "draftforge.idnits",
@@ -69,6 +97,10 @@
         "command": "draftforge.runAllChecks",
         "title": "Run All Checks",
         "icon": "$(run-all)"
+      },
+      {
+        "command": "draftforge.stripMLineEndings",
+        "title": "Strip ^M Line Endings"
       }
     ],
     "menus": {
@@ -145,6 +177,11 @@
         {
           "id": "draftforge-snippets",
           "name": "Snippets",
+          "when": "draftforge.isReady"
+        },
+        {
+          "id": "draftforge-reference",
+          "name": "Reference",
           "when": "draftforge.isReady"
         }
       ]

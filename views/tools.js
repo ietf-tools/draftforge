@@ -57,12 +57,18 @@ export function activateToolsView (context) {
 
       const doc = vscode.window.activeTextEditor.document
       switch (tool.id) {
-        case 'extractComments': {
-          await vscode.commands.executeCommand('draftforge.extractComments')
+        case 'addXmlModels':
+          await vscode.commands.executeCommand('draftforge.addXmlModels')
           break
-        }
+        case 'exportPdf':
+          vscode.window.showInformationMessage('Export to PDF not implemented yet.')
+          break
         case 'extractCodeComponents': {
           vscode.window.showInformationMessage('Not yet implemented.')
+          break
+        }
+        case 'extractComments': {
+          await vscode.commands.executeCommand('draftforge.extractComments')
           break
         }
         case 'formatDocument':
@@ -75,12 +81,6 @@ export function activateToolsView (context) {
           } else {
             vscode.window.showInformationMessage('Preview not available for this document type.')
           }
-          break
-        case 'exportPdf':
-          vscode.window.showInformationMessage('Export to PDF not implemented yet.')
-          break
-        case 'addXmlModels':
-          await vscode.commands.executeCommand('draftforge.addXmlModels')
           break
         case 'stripMLineEndings': {
           await vscode.commands.executeCommand('draftforge.stripMLineEndings')
