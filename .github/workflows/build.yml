@@ -81,4 +81,5 @@ jobs:
           tag: ${{ steps.semver.outputs.nextStrict }}
           name: ${{ steps.semver.outputs.nextStrict }}
           body: ${{ steps.changelog.outputs.changes }}
+          artifacts: "*.vsix"
           token: ${{ github.token }}
