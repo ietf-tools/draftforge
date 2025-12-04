@@ -37,7 +37,7 @@ export function activate(context) {
 	registerCheckRepeatedWordsCommand(context, diagnosticCollection)
 	registerCheckTyposCommand(context, diagnosticCollection)
 	registerExtractCommentsCommand(context)
-	registerIdnitsCommand(context, diagnosticCollection)
+	registerIdnitsCommand(context)
 	registerStripMLineEndingsCommand(context)
 	registerSetupCommands(context)
 

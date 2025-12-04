@@ -74,6 +74,9 @@ export function activateToolsView (context) {
         case 'formatDocument':
           await vscode.commands.executeCommand('editor.action.formatDocument')
           break
+        case 'idnits':
+          await vscode.commands.executeCommand('draftforge.idnits')
+          break
         case 'openPreview':
           // try Markdown preview or show a message if unsupported
           if (doc.languageId === 'markdown') {

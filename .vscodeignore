@@ -4,10 +4,10 @@ test/**
 .gitignore
 .yarnrc
 .npmrc
-commands
 extension-packs
 node_modules
-views
+src
+webviews
 vsc-extension-quickstart.md
 **/rollup.config.mjs
 **/jsconfig.json
