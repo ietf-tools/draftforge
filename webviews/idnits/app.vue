@@ -31,11 +31,11 @@
             <div v-for="(nit, idx) of task.nits" :key="idx" class="bg-white/50 dark:bg-black/20 rounded-md p-4">
               <div class="flex items-center justify-between">
                 <div class="flex items-center pr-2">
-                  <UBadge :label="getNitType(nit).name" variant="soft" :color="getNitType(nit).color" class="mr-2 font-bold" />
-                  <UBadge :label="nit.name" variant="soft" color="error" class="mr-2 text-red-800 dark:text-red-200" />
+                  <UBadge :label="getNitType(nit).name" :class="'mr-2 font-bold ' + getNitType(nit).css" bold />
+                  <UBadge :label="nit.name" class="mr-2 bg-red-500/10 text-red-800 dark:text-red-200" />
                   <span>{{ nit.message }}</span>
                 </div>
-                <button v-if="nit.refUrl" :to="nit.refUrl" target="_blank" class="rounded-md font-medium inline-flex items-center text-sm bg-neutral-800 hover:bg-neutral-800/75 gap-1.5 px-2.5 py-1.5 ring ring-inset ring-neutral-800">
+                <button v-if="nit.refUrl" @click="viewRef(nit.refUrl)" class="cursor-pointer rounded-md font-medium inline-flex items-center text-sm bg-neutral-800 hover:bg-neutral-800/75 gap-1.5 px-2.5 py-1.5 ring ring-inset ring-neutral-800">
                   <IconLucideBookText />
                   Ref
                   <IconLucideArrowUpRight />
@@ -72,43 +72,46 @@ import IconLucideCircleDashed from '~icons/lucide/circle-dashed'
 import IconLucideBookText from '~icons/lucide/book-text'
 import IconLucideArrowUpRight from '~icons/lucide/arrow-up-right'
 
+const vscode = acquireVsCodeApi()
+
 const state = reactive({
   results: []
 })
 
-function test() {
+function viewRef(url) {
   vscode.postMessage({
     command: 'openRef',
-    url: Date.now()
+    url
   })
 }
-window.addEventListener('message', event => {
-  state.results = event.data.results ?? []
-})
 
 function getNitType(nit) {
   if (nit.result === 'comment') {
     return {
       name: 'Comment',
-      color: 'info'
+      css: 'bg-blue-500/10 text-blue-400'
     }
   } else if (nit.result === 'error') {
     return {
       name: 'Error',
-      color: 'error'
+      css: 'bg-red-500/10 text-red-400'
     }
   } else if (nit.result === 'warning') {
     return {
       name: 'Warning',
-      color: 'warning'
+      css: 'bg-amber-500/10 text-amber-400'
     }
   } else {
     return {
       name: 'Unknown',
-      color: 'neutral'
+      css: ''
     }
   }
 }
+
+window.addEventListener('message', event => {
+  state.results = event.data.results ?? []
+})
 
 </script>
 

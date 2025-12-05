@@ -24,7 +24,7 @@ function getLoadingContent(scriptUri, cssUri) {
  * @param {vscode.ExtensionContext} context
  */
 export function registerIdnitsCommand (context) {
-  let resultsPanel = null
+  let resultsPanels = {}
 
   const jsDiskPath = vscode.Uri.joinPath(context.extensionUri, 'media/webviews/idnits', 'app.js')
   const cssDiskPath = vscode.Uri.joinPath(context.extensionUri, 'media/webviews/idnits', 'app.css')
@@ -32,6 +32,7 @@ export function registerIdnitsCommand (context) {
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.idnits', async function () {
     try {
       const activeDoc = vscode.window.activeTextEditor.document
+      const activeUri = activeDoc.uri.toString()
       const activeFilename = path.parse(activeDoc.fileName).base
       const enc = new TextEncoder()
       const results = []
@@ -45,8 +46,8 @@ export function registerIdnitsCommand (context) {
 
       // Setup webview
 
-      if (!resultsPanel) {
-        resultsPanel = vscode.window.createWebviewPanel(
+      if (!resultsPanels[activeUri]) {
+        resultsPanels[activeUri] = vscode.window.createWebviewPanel(
           'idnitsResults',
           `IDNits Results - ${activeFilename}`,
           vscode.ViewColumn.Two,
@@ -55,17 +56,22 @@ export function registerIdnitsCommand (context) {
             retainContextWhenHidden: true
           }
         )
-        resultsPanel.onDidDispose(() => {
-          resultsPanel = null
+
+        resultsPanels[activeUri].onDidDispose(() => {
+          resultsPanels[activeUri] = null
         })
-        resultsPanel.webview.onDidReceiveMessage(msg => {
-          console.log(msg)
+        resultsPanels[activeUri].webview.onDidReceiveMessage(msg => {
+          if (msg?.command === 'openRef') {
+            vscode.env.openExternal(vscode.Uri.parse(msg.url))
+          } else {
+            console.warn(`Invalid command: ${msg}`)
+          }
         })
       }
 
-      const jsSrc = resultsPanel.webview.asWebviewUri(jsDiskPath)
-      const cssSrc = resultsPanel.webview.asWebviewUri(cssDiskPath)
-      resultsPanel.webview.html = getLoadingContent(jsSrc, cssSrc)
+      const jsSrc = resultsPanels[activeUri].webview.asWebviewUri(jsDiskPath)
+      const cssSrc = resultsPanels[activeUri].webview.asWebviewUri(cssDiskPath)
+      resultsPanels[activeUri].webview.html = getLoadingContent(jsSrc, cssSrc)
 
       // Create context
       const ext = activeFilename.endsWith('.xml') ? 'xml' : 'txt'
@@ -167,12 +173,11 @@ export function registerIdnitsCommand (context) {
 
       // Show results
       if (results?.length > 0) {
-        console.log(JSON.stringify(resultGroups, null, 2))
-        resultsPanel.webview.postMessage({
+        resultsPanels[activeUri].webview.postMessage({
           command: 'results',
           results: resultGroups
         })
-        vscode.window.showInformationMessage(`Found ${nitsTotal} nits. See the results pane for details.`)
+        resultsPanels[activeUri].reveal()
       } else {
         vscode.window.showInformationMessage('idnits', {
           detail: 'No nits found on this document.',
