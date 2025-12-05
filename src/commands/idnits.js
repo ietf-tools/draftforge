@@ -127,18 +127,22 @@ export function registerIdnitsCommand (context) {
                 results.push(taskObj)
                 const taskResults = await valTask.task(ctx)
                 if (!valTask.isVoid && Array.isArray(taskResults)) {
-                  results[taskIdx].nits.push(...taskResults)
                   resultGroups[grpIdx].nitsTotal += taskResults.length
 
                   nitsTotal++
                   for (const nit of taskResults) {
+                    let result = 'unknown'
                     if (nit instanceof ValidationComment) {
+                      result = 'comment'
                       nitsByType.comment++
                     } else if (nit instanceof ValidationError) {
+                      result = 'error'
                       nitsByType.error++
                     } else if (nit instanceof ValidationWarning) {
+                      result = 'warning'
                       nitsByType.warning++
                     }
+                    results[taskIdx].nits.push(Object.assign({ message: nit.message , result }, nit))
                   }
                 }
                 results[taskIdx].state = 'completed'
@@ -163,6 +167,7 @@ export function registerIdnitsCommand (context) {
 
       // Show results
       if (results?.length > 0) {
+        console.log(JSON.stringify(resultGroups, null, 2))
         resultsPanel.webview.postMessage({
           command: 'results',
           results: resultGroups
