@@ -2,7 +2,7 @@
   "name": "draftforge-rpc",
   "displayName": "DraftForge for the RFC Production Center",
   "description": "An extension pack for the RFC Production Center",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "ietf",
   "repository": {
     "type": "git",
@@ -28,8 +28,9 @@
     "color": "#8D0E2E",
     "theme": "dark"
   },
-  "extensionPack": [ 
+  "extensionPack": [
     "ietf.draftforge",
+    "ban.spellright",
     "redhat.vscode-xml"
   ],
   "contributes": {
