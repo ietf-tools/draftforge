@@ -30,6 +30,11 @@ jobs:
       - name: Install vsce
         run: npm install -g vsce
 
+      - name: Replace README
+        run: |
+          rm README.md
+          mv README-vscode.md README.md
+
       - name: Compile webviews (idnits)
         working-directory: webviews/idnits
         run: |
