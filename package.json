@@ -139,6 +139,28 @@
           ],
           "default": "author",
           "description": "The presentation experience"
+        },
+        "draftforge.idnitsMode": {
+          "type": "string",
+          "enum": [
+            "prompt",
+            "normal",
+            "forgive",
+            "submission"
+          ],
+          "enumItemLabels": [
+            "Prompt",
+            "Normal",
+            "Forgive Checklist",
+            "Submission"
+          ],
+          "default": "prompt",
+          "description": "The default validation mode to use when running IDNits."
+        },
+        "draftforge.idnitsOffline": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to run IDNits in offline mode. Any check that requires an internet connection will be skipped."
         }
       }
     },

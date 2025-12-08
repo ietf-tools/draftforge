@@ -29,7 +29,13 @@ export function registerIdnitsCommand (context) {
   const jsDiskPath = vscode.Uri.joinPath(context.extensionUri, 'media/webviews/idnits', 'app.js')
   const cssDiskPath = vscode.Uri.joinPath(context.extensionUri, 'media/webviews/idnits', 'app.css')
 
-  context.subscriptions.push(vscode.commands.registerCommand('draftforge.idnits', async function () {
+  const modeMapping = {
+    normal: MODES.NORMAL,
+    forgive: MODES.FORGIVE_CHECKLIST,
+    submission: MODES.SUBMISSION
+  }
+
+  context.subscriptions.push(vscode.commands.registerCommand('draftforge.idnits', async function (mode = 'normal') {
     try {
       const activeDoc = vscode.window.activeTextEditor.document
       const activeUri = activeDoc.uri.toString()
@@ -79,8 +85,8 @@ export function registerIdnitsCommand (context) {
         raw: Buffer.from(enc.encode(activeDoc.getText())),
         filename: activeFilename,
         options: {
-          mode: MODES.NORMAL,
-          offline: false,
+          mode: modeMapping[mode] ?? MODES.NORMAL,
+          offline: vscode.workspace.getConfiguration('draftforge').get('idnitsOffline') ?? false,
           year: new Date().getFullYear()
         }
       }

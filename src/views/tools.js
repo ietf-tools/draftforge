@@ -75,11 +75,27 @@ export function activateToolsView (context) {
           await vscode.commands.executeCommand('editor.action.formatDocument')
           break
         case 'idnits':
-          await vscode.commands.executeCommand('draftforge.idnits')
+          let selectedMode = 'normal'
+          const defaultMode = vscode.workspace.getConfiguration('draftforge').get('idnitsMode')
+          if (defaultMode === 'prompt') {
+            const selectedModeRaw = await vscode.window.showQuickPick([
+              { label: 'Normal', picked: true, value: 'normal' },
+              { label: 'Forgive Checklist', value: 'forgive' },
+              { label: 'Submission', value: 'submission' }
+            ], {
+              ignoreFocusOut: true,
+              title: 'Select Validation Mode'
+            })
+            selectedMode = selectedModeRaw?.value || 'normal'
+          } else {
+            selectedMode = defaultMode || 'normal'
+          }
+          await vscode.commands.executeCommand('draftforge.idnits', selectedMode)
           break
         case 'openPreview':
-          // try Markdown preview or show a message if unsupported
-          if (doc.languageId === 'markdown') {
+          if (doc.languageId === 'xml') {
+            await vscode.commands.executeCommand('draftforge.xmlShowPreview')
+          } else if (doc.languageId === 'markdown') {
             await vscode.commands.executeCommand('markdown.showPreview')
           } else {
             vscode.window.showInformationMessage('Preview not available for this document type.')
