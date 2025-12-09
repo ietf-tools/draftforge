@@ -60,8 +60,32 @@ export function activateToolsView (context) {
         case 'addXmlModels':
           await vscode.commands.executeCommand('draftforge.addXmlModels')
           break
+        case 'exportHtml':
+          if (doc.languageId === 'xml') {
+            await vscode.commands.executeCommand('draftforge.xmlOutput', 'html')
+          } else if (doc.languageId === 'markdown') {
+            await vscode.window.showInformationMessage('Export to HTML from Markdown not implemented yet.')
+          } else {
+            await vscode.window.showInformationMessage('Export to HTML not available for this document type.')
+          }
+          break
         case 'exportPdf':
-          vscode.window.showInformationMessage('Export to PDF not implemented yet.')
+          if (doc.languageId === 'xml') {
+            await vscode.commands.executeCommand('draftforge.xmlOutput', 'pdf')
+          } else if (doc.languageId === 'markdown') {
+            await vscode.window.showInformationMessage('Export to PDF from Markdown not implemented yet.')
+          } else {
+            await vscode.window.showInformationMessage('Export to PDF not available for this document type.')
+          }
+          break
+        case 'exportTxt':
+          if (doc.languageId === 'xml') {
+            await vscode.commands.executeCommand('draftforge.xmlOutput', 'txt')
+          } else if (doc.languageId === 'markdown') {
+            await vscode.window.showInformationMessage('Export to TXT from Markdown not implemented yet.')
+          } else {
+            await vscode.window.showInformationMessage('Export to TXT not available for this document type.')
+          }
           break
         case 'extractCodeComponents': {
           vscode.window.showInformationMessage('Not yet implemented.')
@@ -76,7 +100,7 @@ export function activateToolsView (context) {
           break
         case 'idnits':
           let selectedMode = 'normal'
-          const defaultMode = vscode.workspace.getConfiguration('draftforge').get('idnitsMode')
+          const defaultMode = vscode.workspace.getConfiguration('draftforge.idnits').get('mode')
           if (defaultMode === 'prompt') {
             const selectedModeRaw = await vscode.window.showQuickPick([
               { label: 'Normal', picked: true, value: 'normal' },
@@ -94,7 +118,7 @@ export function activateToolsView (context) {
           break
         case 'openPreview':
           if (doc.languageId === 'xml') {
-            await vscode.commands.executeCommand('draftforge.xmlShowPreview')
+            await vscode.commands.executeCommand('draftforge.xmlPreview')
           } else if (doc.languageId === 'markdown') {
             await vscode.commands.executeCommand('markdown.showPreview')
           } else {

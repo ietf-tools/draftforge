@@ -7,7 +7,7 @@
   "publisher": "ietf",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ietf-tools/draftforge-ext.git"
+    "url": "git+https://github.com/ietf-tools/draftforge.git"
   },
   "engines": {
     "vscode": "^1.106.1"
@@ -22,7 +22,8 @@
     "internet-drafts",
     "ietf",
     "rfc-editor",
-    "rfc"
+    "rfc",
+    "xml2rfc"
   ],
   "preview": true,
   "pricing": "Free",
@@ -101,9 +102,21 @@
       {
         "command": "draftforge.stripMLineEndings",
         "title": "Strip ^M Line Endings"
+      },
+      {
+        "command": "draftforge.xmlPreview",
+        "title": "RFCXML Preview",
+        "icon": "$(open-preview)"
       }
     ],
     "menus": {
+      "editor/title": [
+        {
+          "command": "draftforge.xmlPreview",
+          "when": "resourceLangId == xml",
+          "group": "navigation@100"
+        }
+      ],
       "file/newFile": [
         {
           "command": "draftforge.newFileMarkdown"
@@ -140,7 +153,7 @@
           "default": "author",
           "description": "The presentation experience"
         },
-        "draftforge.idnitsMode": {
+        "draftforge.idnits.mode": {
           "type": "string",
           "enum": [
             "prompt",
@@ -157,10 +170,35 @@
           "default": "prompt",
           "description": "The default validation mode to use when running IDNits."
         },
-        "draftforge.idnitsOffline": {
+        "draftforge.idnits.offline": {
           "type": "boolean",
           "default": false,
           "description": "Whether to run IDNits in offline mode. Any check that requires an internet connection will be skipped."
+        },
+        "draftforge.xml2rfc.executablePath": {
+          "type": "string",
+          "default": "xml2rfc",
+          "description": "XML2RFC executable name or path"
+        },
+        "draftforge.xml2rfc.previewFlags": {
+          "type": "string",
+          "default": "--v3 --no-dtd --no-network --id-is-work-in-progress",
+          "description": "The flags to provide to xml2rfc for the live preview of XMLRFC documents. Do not include the output format / paths flags."
+        },
+        "draftforge.xml2rfc.htmlOutputFlags": {
+          "type": "string",
+          "default": "--v3 --id-reference-base-url=\"https://datatracker.ietf.org/doc/html/\" --rfc-reference-base-url=\"https://www.rfc-editor.org/rfc/\" --metadata-js-url=\"https://www.rfc-editor.org/js/metadata.min.js\" --id-is-work-in-progress",
+          "description": "The flags to provide to xml2rfc when generating HTML outputs of XMLRFC documents. Do not include the output format / paths flags."
+        },
+        "draftforge.xml2rfc.txtOutputFlags": {
+          "type": "string",
+          "default": "--v3 --bom --id-reference-base-url=\"https://datatracker.ietf.org/doc/html/\" --id-is-work-in-progress",
+          "description": "The flags to provide to xml2rfc when generating TXT outputs of XMLRFC documents. Do not include the output format / paths flags."
+        },
+        "draftforge.xml2rfc.pdfOutputFlags": {
+          "type": "string",
+          "default": "--v3 --id-reference-base-url=\"https://datatracker.ietf.org/doc/html/\" --rfc-reference-base-url=\"https://www.rfc-editor.org/rfc/\" --id-is-work-in-progress",
+          "description": "The flags to provide to xml2rfc when generating PDF outputs of XMLRFC documents. Do not include the output format / paths flags."
         }
       }
     },

@@ -86,7 +86,7 @@ export function registerIdnitsCommand (context) {
         filename: activeFilename,
         options: {
           mode: modeMapping[mode] ?? MODES.NORMAL,
-          offline: vscode.workspace.getConfiguration('draftforge').get('idnitsOffline') ?? false,
+          offline: vscode.workspace.getConfiguration('draftforge.idnits').get('offline') ?? false,
           year: new Date().getFullYear()
         }
       }

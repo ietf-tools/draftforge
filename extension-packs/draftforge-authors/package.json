@@ -6,7 +6,7 @@
   "publisher": "ietf",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ietf-tools/draftforge-ext.git"
+    "url": "git+https://github.com/ietf-tools/draftforge.git"
   },
   "engines": {
     "vscode": "^1.106.1"
@@ -28,7 +28,7 @@
     "color": "#8D0E2E",
     "theme": "dark"
   },
-  "extensionPack": [ 
+  "extensionPack": [
     "ietf.draftforge",
     "redhat.vscode-xml"
   ],

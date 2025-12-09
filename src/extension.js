@@ -16,7 +16,8 @@ import { registerCheckTyposCommand } from './commands/typos.js'
 import { registerExtractCommentsCommand } from './commands/extract-comments.js'
 import { registerStripMLineEndingsCommand } from './commands/strip-mline-endings.js'
 import { registerSetupCommands } from './commands/setup.js'
-import { registerXmlShowPreviewCommand } from './commands/xml-preview.js'
+import { registerXmlOutputCommand } from './commands/xml-output.js'
+import { registerXmlPreviewCommand, unregisterXmlPreviewCommand } from './commands/xml-preview.js'
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -41,7 +42,8 @@ export function activate(context) {
 	registerIdnitsCommand(context)
 	registerStripMLineEndingsCommand(context)
 	registerSetupCommands(context)
-  registerXmlShowPreviewCommand(context)
+  registerXmlOutputCommand(context)
+  registerXmlPreviewCommand(context)
 
 	activateChecksView(context, diagnosticCollection)
 	activateToolsView(context)
@@ -52,5 +54,7 @@ export function activate(context) {
 	console.log('DraftForge initialized.')
 }
 
-export function deactivate() {}
+export function deactivate() {
+  unregisterXmlPreviewCommand()
+}
 
