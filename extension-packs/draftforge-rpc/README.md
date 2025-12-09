@@ -2,5 +2,6 @@
 
 This extension pack includes the necessary extensions for the work of the RPC Production Center:
 
-- **IETF DraftForge** - *The core extension* (`ietf.draftforge`)
-- **XML** - *XML Language Support by Red Hat* (`redhat.vscode-xml`)
+- [**IETF DraftForge**](https://marketplace.visualstudio.com/items?itemName=ietf.draftforge) - *The core extension* (`ietf.draftforge`)
+- [**Spell Right**](https://marketplace.visualstudio.com/items?itemName=ban.spellright) - *Multilingual, Offline and Lightweight Spellchecker* (`ban.spellright`)
+- [**XML**](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-xml) - *XML Language Support by Red Hat* (`redhat.vscode-xml`)
