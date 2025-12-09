@@ -59,7 +59,7 @@ jobs:
           prerelease: true
           draft: false
           owner: ietf-tools
-          repo: draftforge-ext
+          repo: draftforge
           commit: ${{ github.sha }}
           tag: ${{ steps.semver.outputs.nextStrict }}
           name: ${{ steps.semver.outputs.nextStrict }}
@@ -82,7 +82,7 @@ jobs:
           makeLatest: true
           draft: false
           owner: ietf-tools
-          repo: draftforge-ext
+          repo: draftforge
           tag: ${{ steps.semver.outputs.nextStrict }}
           name: ${{ steps.semver.outputs.nextStrict }}
           body: ${{ steps.changelog.outputs.changes }}
