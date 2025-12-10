@@ -32,6 +32,10 @@
     "color": "#8D0E2E",
     "theme": "dark"
   },
+  "qna": false,
+  "extensionKind": [
+    "workspace"
+  ],
   "activationEvents": [],
   "main": "./src/extension.js",
   "contributes": {

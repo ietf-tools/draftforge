@@ -4,6 +4,7 @@ test/**
 .gitignore
 .yarnrc
 .npmrc
+docs
 extension-packs
 node_modules
 src
