@@ -101,6 +101,8 @@ class DocumentPreview {
       // console.log('ERR:')
       // console.log(stderr)
       this.panel.webview.html = await fs.readFile(outputPath, 'utf8')
+      fs.rm(inputPath, { force: true })
+      fs.rm(outputPath, { force: true })
     } catch (err) {
       console.warn(err)
       this.panel.webview.html = getErrorContent(err.message)
