@@ -39,9 +39,16 @@ function getErrorContent(errorMsg) {
 }
 
 class DocumentPreview {
-  constructor(documentUri, fileName) {
+  /**
+   *
+   * @param {vscode.Uri} documentUri
+   * @param {string} fileName
+   * @param {vscode.OutputChannel} outputChannel
+   */
+  constructor(documentUri, fileName, outputChannel) {
     this.documentUri = documentUri
     this.documentFilename = path.parse(fileName).base
+    this.outputChannel = outputChannel
 
     this.setupPanel()
     this.generateDebounced = debounce(this.generate, 500)
@@ -75,16 +82,15 @@ class DocumentPreview {
    * @param {string} inputContent Content to transform
    */
   async generate (inputContent) {
+    const now = Date.now().toString()
+    const inputPath = path.join(tmpPath, `${now}.xml`)
     try {
-      const now = Date.now().toString()
-
       // Ensure panel is setup
       if (!this.panel) {
         this.setupPanel()
       }
 
       // Write input
-      const inputPath = path.join(tmpPath, `${now}.xml`)
       await fs.writeFile(inputPath, inputContent, 'utf8')
 
       // Run xml2rfc
@@ -92,22 +98,41 @@ class DocumentPreview {
       const execPath = vscode.workspace.getConfiguration('draftforge.xml2rfc').get('executablePath')
       const flags = vscode.workspace.getConfiguration('draftforge.xml2rfc').get('previewFlags')
       const cmd = `${execPath} ${flags} --html -o "${outputPath}" "${inputPath}"`
-      const { stdout, stderr } = await execAsync(cmd, {
+      const { stderr } = await execAsync(cmd, {
         timeout: 30000, // 30s
         windowsHide: true
       })
-      // console.log('OUT:')
-      // console.log(stdout)
-      // console.log('ERR:')
-      // console.log(stderr)
+      this.parseOutput(stderr)
       this.panel.webview.html = await fs.readFile(outputPath, 'utf8')
-      fs.rm(inputPath, { force: true })
       fs.rm(outputPath, { force: true })
     } catch (err) {
       console.warn(err)
       this.panel.webview.html = getErrorContent(err.message)
     }
     this.panel.reveal(null, true)
+    fs.rm(inputPath, { force: true })
+  }
+
+  /**
+   * Parse xml2rfc output
+   *
+   * @param {string} stderr xml2rfc stderr output
+   */
+  parseOutput (stderr) {
+    const diagRgx = /(.xml\((?<line>[0-9]+)\): )?(?<kind>Warning|Error): (?<msg>.*)/i
+    this.outputChannel.clear()
+    for(const line of stderr.split('\n')) {
+      const match = line.match(diagRgx)
+      if (match) {
+        const lineParts = [match.groups.kind]
+        if (match.groups.line) {
+          lineParts.push(`Line ${match.groups.line}`)
+        }
+        lineParts.push(match.groups.msg)
+        this.outputChannel.appendLine(lineParts.join(' - '))
+      }
+    }
+    this.outputChannel.show(true)
   }
 }
 
@@ -116,6 +141,9 @@ class DocumentPreview {
  */
 export function registerXmlPreviewCommand (context) {
   let previews = {}
+
+  const outputChannel = vscode.window.createOutputChannel('xml2rfc')
+  context.subscriptions.push(outputChannel)
 
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.xmlPreview', async function () {
     try {
@@ -126,7 +154,7 @@ export function registerXmlPreviewCommand (context) {
 
       const activeUri = activeDoc.uri.toString()
       if (!previews[activeUri]) {
-        previews[activeUri] = new DocumentPreview(activeUri, activeDoc.fileName)
+        previews[activeUri] = new DocumentPreview(activeDoc.uri, activeDoc.fileName, outputChannel)
       }
 
       // Get temp dir
@@ -150,9 +178,10 @@ export function registerXmlPreviewCommand (context) {
   }))
 }
 
-export function unregisterXmlPreviewCommand (context) {
+export function unregisterXmlPreviewCommand () {
   if (tmpPath) {
     console.log(`Cleaning up ${tmpPath}...`)
     fs.rm(tmpPath, { recursive: true, force: true })
+    tmpPath = ''
   }
 }

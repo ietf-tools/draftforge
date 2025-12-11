@@ -39,6 +39,7 @@ IETF DraftForge provide tools, validation checks and snippets for both Internet-
   - IDNits
   - Open Preview
   - Strip `^M` Line Endings
+  - SVGCheck
 - Snippets
   - Author Block
   - Date Element
@@ -53,6 +54,8 @@ This extension contributes the following settings:
 - `draftforge.experience`: Set to `author` *(default)* for an author-centric experience or `rpc` for a RPC staff-centric experience.
 - `draftforge.idnits.mode`: The default validation mode to use when running IDNits. Set to `prompt` *(default)* to be prompted every time or to `normal`, `forgive`, `submission`.
 - `draftforge.idnits.offline`: Whether to run IDNits in offline mode. Any check that requires an internet connection will be skipped. (Defaults to `false`)
+- `draftforge.svgcheck.executablePath`: svgcheck executable name or path. (Defaults to `svgcheck`)
+- `draftforge.svgcheck.flags`: The flags to provide to svgcheck. Do not include the output format / paths flags. (Defaults to *empty*)
 - `draftforge.xml2rfc.executablePath`: XML2RFC executable name or path. (Defaults to `xml2rfc`)
 - `draftforge.xml2rfc.previewFlags`: The flags to provide to xml2rfc for the live preview of XMLRFC documents. Do not include the output format / paths flags. (Defaults to `--v3 --no-dtd --no-network --id-is-work-in-progress`)
 - `draftforge.xml2rfc.htmlOutputFlags`: The flags to provide to xml2rfc when generating HTML outputs of XMLRFC documents. Do not include the output format / paths flags. (Defaults to `--v3 --id-reference-base-url="https://datatracker.ietf.org/doc/html/" --rfc-reference-base-url="https://www.rfc-editor.org/rfc/" --metadata-js-url="https://www.rfc-editor.org/js/metadata.min.js" --id-is-work-in-progress`)
