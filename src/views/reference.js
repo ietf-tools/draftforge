@@ -7,24 +7,31 @@ class ReferenceProvider {
 
     this.refs = [
       {
+        id: 'userguide',
+        label: 'User Guide',
+        description: 'How to use DraftForge',
+        kind: 'link',
+        href: 'https://github.com/ietf-tools/draftforge/blob/main/docs/README.md#usage'
+      },
+      {
         id: 'general',
         label: 'General',
         description: 'Content guidelines',
-        kind: 'format',
+        kind: 'collection',
         children: []
       },
       {
         id: 'markdown',
         label: 'Markdown',
         description: 'kramdown-rfc',
-        kind: 'format',
+        kind: 'collection',
         children: []
       },
       {
         id: 'RFCXMLv3',
         label: 'RFCXML',
         description: 'v3',
-        kind: 'format',
+        kind: 'collection',
         children: [
           {
             id: 'lists',
@@ -46,27 +53,31 @@ class ReferenceProvider {
               {
                 id: 'abstract',
                 label: 'abstract',
-                tooltip: 'Contains the Abstract of the document.'
+                tooltip: 'Contains the Abstract of the document.',
+                href: 'https://authors.ietf.org/en/rfcxml-vocabulary#abstract'
               },
               {
                 id: 'address',
                 label: 'address',
-                tooltip: 'Provides address information for the author.'
+                tooltip: 'Provides address information for the author.',
+                href: 'https://authors.ietf.org/en/rfcxml-vocabulary#address'
               },
               {
                 id: 'annotation',
                 label: 'annotation',
-                tooltip: 'Provides additional prose augmenting a bibliographic reference.'
+                tooltip: 'Provides additional prose augmenting a bibliographic reference.',
+                href: 'https://authors.ietf.org/en/rfcxml-vocabulary#annotation'
               },
               {
                 id: 'area',
                 label: 'area',
-                tooltip: 'Provides information about the IETF area to which this document relates (currently not used when generating documents).'
+                tooltip: 'Provides information about the IETF area to which this document relates (currently not used when generating documents).',
+                href: 'https://authors.ietf.org/en/rfcxml-vocabulary#area'
               }
             ]
           }
         ]
-        
+
       },
     ]
   }
@@ -79,13 +90,16 @@ class ReferenceProvider {
     let itemCollapsibleState = vscode.TreeItemCollapsibleState.None
     let itemIconPath = null
     switch (ref.kind) {
-      case 'format':
+      case 'collection':
         itemCollapsibleState = vscode.TreeItemCollapsibleState.Expanded
         itemIconPath = new vscode.ThemeIcon('library')
         break
       case 'topic':
         itemCollapsibleState = vscode.TreeItemCollapsibleState.Collapsed
         itemIconPath = new vscode.ThemeIcon('notebook')
+        break
+      case 'link':
+        itemIconPath = new vscode.ThemeIcon('book')
         break
       default:
         itemIconPath = new vscode.ThemeIcon('info')
@@ -95,11 +109,11 @@ class ReferenceProvider {
     item.description = ref.description ?? false
     item.tooltip = ref.tooltip
     item.iconPath = itemIconPath
-    if (!ref.children) {
+    if (ref.href) {
       item.command = {
         command: 'vscode.open',
         title: 'View Reference',
-        arguments: [vscode.Uri.parse(`https://authors.ietf.org/en/rfcxml-vocabulary#${ref.id}`)]
+        arguments: [vscode.Uri.parse(ref.href)]
       }
     }
     item.contextValue = ref.id

@@ -1,37 +1,51 @@
 import * as vscode from 'vscode'
 
 class SnippetsProvider {
-  constructor() {
+  constructor(context) {
     this._onDidChangeTreeData = new vscode.EventEmitter()
     this.onDidChangeTreeData = this._onDidChangeTreeData.event
 
+    this.populateSnippets()
+
+    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(ev => {
+      this.populateSnippets()
+      this.refresh()
+    }))
+  }
+
+  populateSnippets () {
+    const currentLanguage = vscode.window.activeTextEditor.document.languageId
     this.snippets = [
       {
         id: 'xmlAuthorBlock',
         label: 'Author Block',
         description: 'Insert an author block',
-        body: '<author fullname="${1:Full Name}" initials="${2:Initials}" surname="${3:Surname}">\n\t<organization>${4:Organization}</organization>\n\t\t<address>\n\t\t\t<postal>\n\t\t\t\t<country>${5:Country Name}</country>\n\t\t\t</postal>\n\t\t\t<email>${6:Email Address}</email>\n\t</address>\n</author>'
+        body: '<author fullname="${1:Full Name}" initials="${2:Initials}" surname="${3:Surname}">\n\t<organization>${4:Organization}</organization>\n\t\t<address>\n\t\t\t<postal>\n\t\t\t\t<country>${5:Country Name}</country>\n\t\t\t</postal>\n\t\t\t<email>${6:Email Address}</email>\n\t</address>\n</author>',
+        targetLanguage: 'xml'
       },
       {
         id: 'xmlDateElement',
         label: 'Date Element',
         description: 'Insert a date element',
-        body: '<date day="${1:DD}" month="${2:Month}" year="${3:YYYY}" />'
+        body: '<date day="${1:DD}" month="${2:Month}" year="${3:YYYY}" />',
+        targetLanguage: 'xml'
       },
       {
         id: 'fencedCode',
         label: 'Fenced Code Block',
         description: 'Insert a fenced code block',
         // use tildes to avoid embedding triple-backticks in this file
-        body: '~~~${1:language}\n${2:code}\n~~~\n'
+        body: '~~~${1:language}\n${2:code}\n~~~\n',
+        targetLanguage: 'markdown'
       },
       {
         id: 'mdTable',
         label: 'Simple Markdown Table',
         description: 'Insert a simple markdown table',
-        body: '| Col1 | Col2 |\n| --- | --- |\n| ${1:cell1} | ${2:cell2} |\n'
+        body: '| Col1 | Col2 |\n| --- | --- |\n| ${1:cell1} | ${2:cell2} |\n',
+        targetLanguage: 'markdown'
       }
-    ]
+    ].filter(s => s.targetLanguage === currentLanguage)
   }
 
   refresh() {
@@ -60,7 +74,7 @@ class SnippetsProvider {
  * @param {vscode.ExtensionContext} context
  */
 export function activateSnippetsView (context) {
-  const snippetsProvider = new SnippetsProvider()
+  const snippetsProvider = new SnippetsProvider(context)
   const snippetsView = vscode.window.createTreeView('draftforge-snippets', { treeDataProvider: snippetsProvider })
   context.subscriptions.push(snippetsView)
 
