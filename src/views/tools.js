@@ -13,22 +13,32 @@ class ToolsProvider {
         this.refresh()
       }
     }))
+
+    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(ev => {
+      this.populateTools()
+      this.refresh()
+    }))
   }
 
   populateTools() {
-    const rpcOnly = vscode.workspace.getConfiguration('draftforge').get('experience') === 'rpc'
+    const flags = {
+      rpc: vscode.workspace.getConfiguration('draftforge').get('experience') === 'rpc',
+      xml: vscode.window.activeTextEditor.document.languageId === 'xml',
+      md: vscode.window.activeTextEditor.document.languageId === 'markdown'
+    }
 
     this.tools = [
-      { id: 'addXmlModels', label: 'Add XML Models', description: 'Download and add RelaxNG schema files to the document directory', icon: 'cloud-download' },
+      flags.xml && { id: 'addXmlModels', label: 'Add XML Models', description: 'Download and add RelaxNG schema files to the document directory', icon: 'cloud-download' },
       { id: 'exportHtml', label: 'Export as HTML', description: 'Generate HTML output of the current document', icon: 'file-symlink-file' },
       { id: 'exportPdf', label: 'Export as PDF', description: 'Generate PDF output of the current document', icon: 'file-pdf' },
       { id: 'exportTxt', label: 'Export as TXT', description: 'Generate TXT output of the current document', icon: 'file-text' },
-      rpcOnly && { id: 'extractComments', label: 'Extract [rfced] comments', description: 'List all comments for the RPC staff', icon: 'comment' },
+      flags.rpc && { id: 'extractComments', label: 'Extract [rfced] comments', description: 'List all comments for the RPC staff', icon: 'comment' },
       { id: 'extractCodeComponents', label: 'Extract Code Components', description: 'List all sourcecode blocks', icon: 'file-code' },
       { id: 'formatDocument', label: 'Format Document', description: 'Reformat document and fix indentation', icon: 'list-flat' },
       { id: 'idnits', label: 'IDNits', description: 'Run idnits on the current document', icon: 'tasklist' },
       { id: 'openPreview', label: 'Open Preview', description: 'Open a preview of the current document', icon: 'open-preview' },
-      { id: 'stripMLineEndings', label: 'Strip ^M Line Endings', description: 'Clean Document from ^M Line Endings', icon: 'no-newline' }
+      { id: 'stripMLineEndings', label: 'Strip ^M Line Endings', description: 'Clean Document from ^M Line Endings', icon: 'no-newline' },
+      flags.xml && { id: 'svgcheck', label: 'SVG Check', description: 'Validate SVGs in the current document', icon: 'circuit-board' }
     ].filter(t => t)
   }
 
@@ -140,6 +150,14 @@ export function activateToolsView (context) {
           break
         case 'stripMLineEndings': {
           await vscode.commands.executeCommand('draftforge.stripMLineEndings')
+          break
+        }
+        case 'svgcheck': {
+          if (doc.languageId === 'xml') {
+            await vscode.commands.executeCommand('draftforge.svgcheck')
+          } else {
+            vscode.window.showInformationMessage('Document must be XML or SVG.')
+          }
           break
         }
         default:

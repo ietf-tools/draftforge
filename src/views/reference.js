@@ -133,5 +133,5 @@ export function activateReferenceView (context) {
   const referenceView = vscode.window.createTreeView('draftforge-reference', { treeDataProvider: referenceProvider })
   context.subscriptions.push(referenceView)
 
-  context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => referenceProvider.refresh()))
+  // context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => referenceProvider.refresh()))
 }

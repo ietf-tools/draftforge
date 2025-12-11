@@ -48,13 +48,13 @@ export function activateChecksView (context, diagnosticCollection) {
     const checksProvider = new ChecksProvider()
     const checksView = vscode.window.createTreeView('draftforge-checks', { treeDataProvider: checksProvider })
     context.subscriptions.push(checksView)
-  
+
     context.subscriptions.push(vscode.commands.registerCommand('draftforge.runCheck', async (check, clearFirst = true) => {
       try {
         if (!vscode.window.activeTextEditor) {
           return vscode.window.showInformationMessage('No active editor to run checks on.')
         }
-  
+
         switch (check.id) {
           case 'articles':
             await vscode.commands.executeCommand('draftforge.checkArticles', clearFirst)
@@ -85,20 +85,20 @@ export function activateChecksView (context, diagnosticCollection) {
         vscode.window.showErrorMessage(err.message)
       }
     }))
-  
+
     context.subscriptions.push(vscode.commands.registerCommand('draftforge.runAllChecks', async () => {
       try {
         if (!vscode.window.activeTextEditor) {
           return vscode.window.showInformationMessage('No active editor to run checks on.')
         }
-  
+
         const checks = Array.isArray(checksProvider?.checks) ? checksProvider.checks : []
         if (checks.length === 0) {
           return vscode.window.showInformationMessage('No checks configured.')
         }
 
         diagnosticCollection.clear()
-  
+
         await vscode.window.withProgress({
           location: vscode.ProgressLocation.Notification,
           title: 'DraftForge — Running all checks',
@@ -111,16 +111,16 @@ export function activateChecksView (context, diagnosticCollection) {
             await vscode.commands.executeCommand('draftforge.runCheck', check, false)
           }
         })
-  
+
         vscode.window.showInformationMessage(`Completed running ${checks.length} checks.`)
       } catch (err) {
         console.warn(err)
         vscode.window.showErrorMessage(err.message)
       }
     }))
-  
+
     // Refresh the tree when the active editor changes
-    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => checksProvider.refresh()))
+    // context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => checksProvider.refresh()))
 
     // Register check StatusBarItem
     checksStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10)

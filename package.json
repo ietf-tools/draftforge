@@ -179,6 +179,16 @@
           "default": false,
           "description": "Whether to run IDNits in offline mode. Any check that requires an internet connection will be skipped."
         },
+        "draftforge.svgcheck.executablePath": {
+          "type": "string",
+          "default": "svgcheck",
+          "description": "svgcheck executable name or path"
+        },
+        "draftforge.svgcheck.flags": {
+          "type": "string",
+          "default": "",
+          "description": "The flags to provide to svgcheck. Do not include the output format / paths flags."
+        },
         "draftforge.xml2rfc.executablePath": {
           "type": "string",
           "default": "xml2rfc",

@@ -15,6 +15,7 @@ import { registerCheckRepeatedWordsCommand } from './commands/repeated-words.js'
 import { registerCheckTyposCommand } from './commands/typos.js'
 import { registerExtractCommentsCommand } from './commands/extract-comments.js'
 import { registerStripMLineEndingsCommand } from './commands/strip-mline-endings.js'
+import { registerSvgcheckCommand } from './commands/svgcheck.js'
 import { registerSetupCommands } from './commands/setup.js'
 import { registerXmlOutputCommand } from './commands/xml-output.js'
 import { registerXmlPreviewCommand, unregisterXmlPreviewCommand } from './commands/xml-preview.js'
@@ -41,6 +42,7 @@ export function activate(context) {
 	registerExtractCommentsCommand(context)
 	registerIdnitsCommand(context)
 	registerStripMLineEndingsCommand(context)
+  registerSvgcheckCommand(context, diagnosticCollection)
 	registerSetupCommands(context)
   registerXmlOutputCommand(context)
   registerXmlPreviewCommand(context)
