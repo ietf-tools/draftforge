@@ -39,6 +39,12 @@
   "activationEvents": [],
   "main": "./src/extension.js",
   "contributes": {
+    "authentication": [
+      {
+        "label": "IETF Account",
+        "id": "ietf"
+      }
+    ],
     "commands": [
       {
         "title": "Internet Draft - Markdown",
@@ -305,6 +311,7 @@
   },
   "dependencies": {
     "@ietf-tools/idnits": "3.0.0-alpha.70",
-    "lodash-es": "4.17.21"
+    "lodash-es": "4.17.21",
+    "uuid": "13.0.0"
   }
 }

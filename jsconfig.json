@@ -1,10 +1,10 @@
 {
 	"compilerOptions": {
 		"module": "node20",
-		"target": "ES2022",
+		"target": "ES2024",
 		"checkJs": true,  /* Typecheck .js files. */
 		"lib": [
-			"ES2022"
+			"ES2024"
 		]
 	},
 	"exclude": [

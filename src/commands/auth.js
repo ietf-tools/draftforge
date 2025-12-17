@@ -1,9 +1,9 @@
 import * as vscode from 'vscode'
 
-export function registerSetupCommands (context) {
+export function registerAuthCommands (context) {
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.login', async function () {
     try {
-      await vscode.env.openExternal(vscode.Uri.parse('https://account.ietf.org'))
+      const session = await vscode.authentication.getSession('ietf', [], { createIfNone: true })
     } catch (err) {
       console.warn(err)
       vscode.window.showErrorMessage(err.message)

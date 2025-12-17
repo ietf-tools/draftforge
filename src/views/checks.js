@@ -38,7 +38,7 @@ class ChecksProvider {
   }
 }
 
-let checksStatusBarItem
+// let checksStatusBarItem
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -123,21 +123,21 @@ export function activateChecksView (context, diagnosticCollection) {
     // context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => checksProvider.refresh()))
 
     // Register check StatusBarItem
-    checksStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10)
-    checksStatusBarItem.command = 'draftforge.runAllChecks'
-    checksStatusBarItem.show()
-    context.subscriptions.push(checksStatusBarItem)
-    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => updateStatusBarItem))
+    // checksStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10)
+    // checksStatusBarItem.command = 'draftforge.runAllChecks'
+    // checksStatusBarItem.show()
+    // context.subscriptions.push(checksStatusBarItem)
+    // context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => updateStatusBarItem))
 
-    updateStatusBarItem()
+    // updateStatusBarItem()
 }
 
-export function updateStatusBarItem(isRunning = false) {
-	if (!isRunning) {
-		checksStatusBarItem.text = '$(check-all) Validation Passed'
-    checksStatusBarItem.tooltip = 'Click to run all validation checks'
-	} else {
-    checksStatusBarItem.text = '$(loading~spin) Running Validation Checks...'
-    checksStatusBarItem.tooltip = 'Please wait'
-	}
-}
+// export function updateStatusBarItem(isRunning = false) {
+// 	if (!isRunning) {
+// 		checksStatusBarItem.text = '$(check-all) Validation Passed'
+//     checksStatusBarItem.tooltip = 'Click to run all validation checks'
+// 	} else {
+//     checksStatusBarItem.text = '$(loading~spin) Running Validation Checks...'
+//     checksStatusBarItem.tooltip = 'Please wait'
+// 	}
+// }
