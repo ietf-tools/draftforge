@@ -30,6 +30,7 @@ IETF DraftForge provide tools, validation checks and snippets for both Internet-
 - Snippets
   - Author Block
   - Date Element
+  - Table
 - Reference
   - RFCXML
     - Vocabulary
