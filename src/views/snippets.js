@@ -27,7 +27,14 @@ class SnippetsProvider {
         id: 'xmlDateElement',
         label: 'Date Element',
         description: 'Insert a date element',
-        body: '<date day="${1:DD}" month="${2:Month}" year="${3:YYYY}" />',
+        body: '<date day="${1:$CURRENT_DATE}" month="${2:$CURRENT_MONTH_NAME}" year="${3:$CURRENT_YEAR}" />',
+        targetLanguage: 'xml'
+      },
+      {
+        id: 'xmlTable',
+        label: 'Table',
+        description: 'Insert a custom table',
+        body: () => { return generateXmlTable() },
         targetLanguage: 'xml'
       },
       {
@@ -70,6 +77,51 @@ class SnippetsProvider {
   }
 }
 
+async function generateXmlTable () {
+  const includeHeaders = await vscode.window.showQuickPick([
+    { label: 'Yes, include a header row', picked: true, value: 'yes' },
+    { label: 'No, don\'t include a header row', value: 'no' }
+  ], {
+    ignoreFocusOut: true,
+    title: 'Include a table header row?',
+    placeHolder: 'Choose...'
+  })
+  if (!includeHeaders) { return }
+  const columnsStr = await vscode.window.showInputBox({
+    title: 'How many columns to generate?',
+    value: '4'
+  })
+  if (!columnsStr) { return }
+  const cols = parseInt(columnsStr)
+  const rowsStr = await vscode.window.showInputBox({
+    title: 'How many rows to generate?',
+    value: '3'
+  })
+  if (!rowsStr) { return }
+  const rows = parseInt(rowsStr)
+
+  let output = `<table>\n`
+  let placeholderIdx = 1
+  if (includeHeaders.value === 'yes') {
+    output += `  <thead>\n    <tr>\n${repeatWithIndex('      <th>${IDX:Header IDX Name}</th>\n', cols, placeholderIdx)}    </tr>\n  </thead>\n`
+    placeholderIdx += cols
+  }
+  output += '  <tbody>\n'
+  for (let rowIdx = 1; rowIdx <= rows; rowIdx++) {
+    output += `    <tr>\n${repeatWithIndex('      <td>${IDX:Cell IDX Value}</td>\n', cols, placeholderIdx)}    </tr>\n`
+    placeholderIdx += cols
+  }
+  return `${output}  </tbody>\n</table>`
+}
+
+function repeatWithIndex (input, times, startIdx = 1) {
+  let output = ''
+  for (let idx = startIdx; idx < startIdx + times; idx++) {
+    output += input.replaceAll('IDX', idx)
+  }
+  return output
+}
+
 /**
  * @param {vscode.ExtensionContext} context
  */
@@ -84,7 +136,9 @@ export function activateSnippetsView (context) {
       if (!editor) {
         return vscode.window.showInformationMessage('No active editor to insert snippet into.')
       }
-      const snippetString = new vscode.SnippetString(snippet.body || '')
+      const body = (typeof snippet.body === 'function') ? await snippet.body() : snippet.body
+      if (!body) { return }
+      const snippetString = new vscode.SnippetString(body || '')
       await editor.insertSnippet(snippetString, editor.selection.start)
     } catch (err) {
       console.warn(err)

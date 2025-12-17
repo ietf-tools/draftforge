@@ -111,7 +111,10 @@ export class IetfAuthenticationProvider {
       console.log('Requesting access token...')
       const res = await fetch(TOKEN_URL, {
         method: 'POST',
-        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
         body: new URLSearchParams({
           grant_type: 'authorization_code',
           client_id: CLIENT_ID,
@@ -161,13 +164,64 @@ export class IetfAuthenticationProvider {
       return
     }
 
-    const res = await fetch(`${USERINFO_URL}?access_token=${this.accessToken}`).then(res => { return res.json() })
+    const res = await fetch(`${USERINFO_URL}?access_token=${this.accessToken}`, {
+      method: 'GET',
+      headers: {
+        'Cache-Control': 'no-cache'
+      }
+    }).then(res => { return res.json() })
     if (res) {
       console.log('User info fetched successfully.')
       this.profile = res
     }
 
     return this.profile
+  }
+
+  /**
+   * Refresh access token using refresh token
+   */
+  async refreshAccessToken () {
+    try {
+      console.log('Renewing access token...')
+      const res = await fetch(TOKEN_URL, {
+        method: 'POST',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          client_id: CLIENT_ID,
+          refresh_token: this.refreshToken,
+          redirect_uri: this.redirectUri
+        })
+      }).then(res => res.json())
+
+      if (res.error) {
+        throw new Error(`${res.error}: ${res.error_description}`)
+      }
+
+      // @ts-ignore
+      this.accessToken = res.access_token
+      // @ts-ignore
+      this.refreshToken = res.refresh_token
+      // @ts-ignore
+      this.expiresAt = Math.floor(Date.now() / 1000) + (res.expires_in || 0)
+      // @ts-ignore
+      this.idToken = res.id_token
+
+      await this.secretStorage.store('draftforge.ietf.tokens', JSON.stringify({
+        accessToken: this.accessToken,
+        refreshToken: this.refreshToken,
+        expiresAt: this.expiresAt
+      }))
+
+      console.log('Access token refreshed successfully.')
+    } catch (err) {
+      console.log(`Failed to renew access token: ${err.message}`)
+      throw err
+    }
   }
 
   /**
@@ -266,10 +320,32 @@ export class IetfAuthenticationProvider {
    * @returns {Promise<Array<vscode.AuthenticationSession>>}
    */
   async getSessions (scopes, options) {
-    const allSessions = await this.secretStorage.get(SESSIONS_SECRET_KEY)
+    try {
+      const allSessions = await this.secretStorage.get(SESSIONS_SECRET_KEY)
 
-    if (allSessions) {
-      return JSON.parse(allSessions)
+      if (allSessions) {
+        const sessions = JSON.parse(allSessions)
+
+        if (sessions.length > 0) {
+          if (this.isExpired) {
+            await this.refreshAccessToken()
+            const session = sessions[0]
+            session.accessToken = this.accessToken
+            this._onDidChangeSessions.fire({ added: [], changed: [session], removed: [] })
+            return [session]
+          } else {
+            return sessions
+          }
+        }
+
+        return []
+      }
+    } catch (err) {
+      console.log(err)
+      await this.secretStorage.store(SESSIONS_SECRET_KEY, JSON.stringify([]))
+      this.accessToken = null
+      this.refreshToken = null
+      this.expiresAt = 0
     }
 
     return []
