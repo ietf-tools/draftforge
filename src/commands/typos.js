@@ -4,10 +4,9 @@ import { find, flatten } from 'lodash-es'
 /**
  * @param {vscode.ExtensionContext} context
  * @param {vscode.DiagnosticCollection} diagnosticCollection
+ * @param {Object} ignores
  */
-export function registerCheckTyposCommand (context, diagnosticCollection) {
-  const ignores = [] // TODO: implement ignores
-
+export function registerCheckTyposCommand (context, diagnosticCollection, ignores) {
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.checkTypos', async function (clearFirst = true) {
     if (clearFirst) {
       diagnosticCollection.clear()
@@ -15,6 +14,8 @@ export function registerCheckTyposCommand (context, diagnosticCollection) {
 
     try {
       const activeDoc = vscode.window.activeTextEditor.document
+
+      const eligibleIgnores = ignores[activeDoc.uri.toString()]?.typos ?? []
 
       // TODO: special cases:
       // https://github.com/rfc-editor/editorial-tools/blob/main/typos
@@ -297,11 +298,18 @@ export function registerCheckTyposCommand (context, diagnosticCollection) {
           occIdx = occurences.push(term) - 1
         }
         const startColumnAdjusted = match.index === 0 ? match.index : match.index + 1
-        diags.push(new vscode.Diagnostic(
+
+        const diag = new vscode.Diagnostic(
           new vscode.Range(lineIdx, startColumnAdjusted, lineIdx, startColumnAdjusted + match[1].length),
           caseSensitive ? `Possible typo: ${term}. Did you mean "${dictEntry.suggestion}"? (case sensitive)` : `Possible typo: ${term}. Did you mean "${dictEntry.suggestion}"?`,
           vscode.DiagnosticSeverity.Warning
-        ))
+        )
+        diag.source = 'DraftForge'
+        diag.code = 'typos'
+        // @ts-ignore
+        diag.match = term
+        diags.push(diag)
+
         if (termCount[term]) {
           termCount[term]++
         } else {
@@ -321,7 +329,7 @@ export function registerCheckTyposCommand (context, diagnosticCollection) {
             continue
           }
           const term = match[1].toLowerCase()
-          if (ignores.includes(term)) {
+          if (eligibleIgnores.includes(term)) {
             // Skip matches in the ignore list
             continue
           }
@@ -334,7 +342,7 @@ export function registerCheckTyposCommand (context, diagnosticCollection) {
             // Skip matches in the second combined line
             continue
           }
-          if (ignores.includes(match[1].toLowerCase())) {
+          if (eligibleIgnores.includes(match[1].toLowerCase())) {
             // Skip matches in the ignore list
             continue
           }
@@ -348,7 +356,7 @@ export function registerCheckTyposCommand (context, diagnosticCollection) {
         } else {
           diagnosticCollection.set(activeDoc.uri, diags)
         }
-        
+
         await vscode.commands.executeCommand('workbench.action.problems.focus')
       } else {
         vscode.window.showInformationMessage('No typos found in this document.')

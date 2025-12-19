@@ -4,7 +4,7 @@ import * as vscode from 'vscode'
  * @param {vscode.ExtensionContext} context
  * @param {vscode.DiagnosticCollection} diagnosticCollection
  */
-export function registerCheckNonAsciiCommand (context, diagnosticCollection) { 
+export function registerCheckNonAsciiCommand (context, diagnosticCollection) {
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.checkNonAscii', async function (clearFirst = true) {
     if (clearFirst) {
       diagnosticCollection.clear()
@@ -19,11 +19,14 @@ export function registerCheckNonAsciiCommand (context, diagnosticCollection) {
       for (let lineIdx = 0; lineIdx < activeDoc.lineCount; lineIdx++) {
         const line = activeDoc.lineAt(lineIdx)
         for (const match of line.text.matchAll(matchRgx)) {
-          diags.push(new vscode.Diagnostic(
+          const diag = new vscode.Diagnostic(
             new vscode.Range(lineIdx, match.index, lineIdx, match.index + match[0].length),
             `Non-ASCII character(s) detected.`,
             vscode.DiagnosticSeverity.Warning
-          ))
+          )
+          diag.source = 'DraftForge'
+          diag.code = 'nonAscii'
+          diags.push(diag)
         }
       }
 
@@ -33,7 +36,7 @@ export function registerCheckNonAsciiCommand (context, diagnosticCollection) {
         } else {
           diagnosticCollection.set(activeDoc.uri, diags)
         }
-        
+
         await vscode.commands.executeCommand('workbench.action.problems.focus')
       } else {
         vscode.window.showInformationMessage('No non-ascii characters found in this document.')

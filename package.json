@@ -45,6 +45,7 @@
         "id": "ietf"
       }
     ],
+    "codeActionProvider" : "true",
     "commands": [
       {
         "title": "Internet Draft - Markdown",

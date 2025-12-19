@@ -4,10 +4,9 @@ import { repeat } from 'lodash-es'
 /**
  * @param {vscode.ExtensionContext} context
  * @param {vscode.DiagnosticCollection} diagnosticCollection
+ * @param {Object} ignores
  */
-export function registerCheckHyphenationCommand (context, diagnosticCollection) {
-  const ignores = [] // TODO: implement ignores
-  
+export function registerCheckHyphenationCommand (context, diagnosticCollection, ignores) {
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.checkHyphenation', async function (clearFirst = true) {
     if (clearFirst) {
       diagnosticCollection.clear()
@@ -15,6 +14,8 @@ export function registerCheckHyphenationCommand (context, diagnosticCollection) 
 
     try {
       const activeDoc = vscode.window.activeTextEditor.document
+
+      const eligibleIgnores = ignores[activeDoc.uri.toString()]?.hyphenation ?? []
 
       const hyphenTermRgx = /[a-z]+(?:-[a-z]+)+/gi
       const targetPropRgx = / target="([^"]+?)"/gi
@@ -31,7 +32,7 @@ export function registerCheckHyphenationCommand (context, diagnosticCollection) 
         for (const match of sanitizedLine.matchAll(hyphenTermRgx)) {
           if (match[0].length > 3) {
             const termLower = match[0].toLowerCase()
-            if (ignores.includes(termLower)) {
+            if (eligibleIgnores.includes(termLower)) {
               continue
             }
             if (!hyphenTerms.includes(termLower)) {
@@ -57,18 +58,29 @@ export function registerCheckHyphenationCommand (context, diagnosticCollection) 
               if (occIdx < 0) {
                 occIdx = occurences.push(term) - 1
                 for (const termOcc of hyphenTermsOccurences.filter(t => t.term === term)) {
-                  diags.push(new vscode.Diagnostic(
+                  const diag = new vscode.Diagnostic(
                     termOcc.range,
                     `Inconsistent Hyphenation (${term} is alternate of ${altTerm})`,
                     vscode.DiagnosticSeverity.Warning
-                  ))
+                  )
+                  diag.source = 'DraftForge'
+                  diag.code = 'hyphenation'
+                  // @ts-ignore
+                  diag.match = term
+                  diags.push(diag)
                 }
               }
-              diags.push(new vscode.Diagnostic(
+
+              const diag = new vscode.Diagnostic(
                 new vscode.Range(lineIdx, match.index + 1, lineIdx, match.index + match[0].length - 1),
                 `Inconsistent Hyphenation (${matchLower} is alternate of ${term})`,
                 vscode.DiagnosticSeverity.Warning
-              ))
+              )
+              diag.source = 'DraftForge'
+              diag.code = 'hyphenation'
+              // @ts-ignore
+              diag.match = matchLower
+              diags.push(diag)
             }
           }
         }
@@ -80,7 +92,7 @@ export function registerCheckHyphenationCommand (context, diagnosticCollection) 
         } else {
           diagnosticCollection.set(activeDoc.uri, diags)
         }
-        
+
         await vscode.commands.executeCommand('workbench.action.problems.focus')
       } else {
         vscode.window.showInformationMessage('No hyphenation issues found in this document.')

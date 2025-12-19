@@ -3,10 +3,9 @@ import * as vscode from 'vscode'
 /**
  * @param {vscode.ExtensionContext} context
  * @param {vscode.DiagnosticCollection} diagnosticCollection
+ * @param {Object} ignores
  */
-export function registerCheckArticlesCommand (context, diagnosticCollection) {
-  const ignores = [] // TODO: implement ignoes
-  
+export function registerCheckArticlesCommand (context, diagnosticCollection, ignores) {
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.checkArticles', async function (clearFirst = true) {
     if (clearFirst) {
       diagnosticCollection.clear()
@@ -14,6 +13,8 @@ export function registerCheckArticlesCommand (context, diagnosticCollection) {
 
     try {
       const activeDoc = vscode.window.activeTextEditor.document
+
+      const eligibleIgnores = ignores[activeDoc.uri.toString()]?.articles ?? []
 
       const partARgx = /(?<!(?:[aA]ppendix|[cC]onnection|[lL]ink|[nN]ode|Operator)) (?!(?:[aA] (?:AAA|Europe|[oO]ne|U[A-Z]|U-label|[uU]biquitous|[uU]nicast|[uU]nicode|[uU]nidir|[uU]nif|[uU]nion|[uU]nique|[uU]nit|[uU]nivers|[uU]sable|[uU]sability|[uU]sage|[uU]se|[uU]tility)|a uCDN|A and))[aA] [aeiouAEIOU]/g
       const partARRgx = /(?!(?:[aA] (?:RADIUS|RECEIVE|RECOMMENDED|REFER|RELOAD|RST|REALM|RESERVATION|REQUEST|RESET|ROUTE|RPL)))[aA] R[A-Z]/g
@@ -25,54 +26,80 @@ export function registerCheckArticlesCommand (context, diagnosticCollection) {
       for (let lineIdx = 0; lineIdx < activeDoc.lineCount; lineIdx++) {
         const line = activeDoc.lineAt(lineIdx)
         for (const match of line.text.matchAll(partARgx)) {
-          if (ignores.includes(match[0])) {
+          if (eligibleIgnores.includes(match[0])) {
             continue
           }
-          diags.push(new vscode.Diagnostic(
+          const diag = new vscode.Diagnostic(
             new vscode.Range(lineIdx, match.index + 1, lineIdx, match.index + match[0].length),
             'Bad indefinite article usage detected. Consider using "an" instead of "a".',
             vscode.DiagnosticSeverity.Warning
-          ))
+          )
+          diag.source = 'DraftForge'
+          diag.code = 'articles'
+          // @ts-ignore
+          diag.match = match[0]
+          diags.push(diag)
         }
         for (const match of line.text.matchAll(partARRgx)) {
-          if (ignores.includes(match[0])) {
+          if (eligibleIgnores.includes(match[0])) {
             continue
           }
-          diags.push(new vscode.Diagnostic(
+          const diag = new vscode.Diagnostic(
             new vscode.Range(lineIdx, match.index + 1, lineIdx, match.index + match[0].length),
             'Bad indefinite article usage detected. Consider using "an" instead of "a".',
             vscode.DiagnosticSeverity.Warning
-          ))
+          )
+          diag.source = 'DraftForge'
+          diag.code = 'articles'
+          // @ts-ignore
+          diag.match = match[0]
+          diags.push(diag)
         }
         for (const match of line.text.matchAll(partBRgx)) {
-          if (ignores.includes(match[0])) {
+          if (eligibleIgnores.includes(match[0])) {
             continue
           }
-          diags.push(new vscode.Diagnostic(
+          const diag = new vscode.Diagnostic(
             new vscode.Range(lineIdx, match.index + 1, lineIdx, match.index + match[0].length),
             'Bad indefinite article usage detected. Consider using "a" instead of "an".',
             vscode.DiagnosticSeverity.Warning
-          ))
+          )
+
+          diag.source = 'DraftForge'
+          diag.code = 'articles'
+          // @ts-ignore
+          diag.match = match[0]
+          diags.push(diag)
         }
         for (const match of line.text.matchAll(partCRgx)) {
-          if (ignores.includes(match[0])) {
+          if (eligibleIgnores.includes(match[0])) {
             continue
           }
-          diags.push(new vscode.Diagnostic(
+          const diag = new vscode.Diagnostic(
             new vscode.Range(lineIdx, match.index + 1, lineIdx, match.index + match[0].length),
             'Bad indefinite article usage detected. Consider using "a" instead of "an".',
             vscode.DiagnosticSeverity.Warning
-          ))
+          )
+          diag.source = 'DraftForge'
+          diag.code = 'articles'
+          // @ts-ignore
+          diag.match = match[0]
+          diags.push(diag)
         }
         for (const match of line.text.matchAll(partCLFRgx)) {
-          if (ignores.includes(match[0])) {
+          if (eligibleIgnores.includes(match[0])) {
             continue
           }
-          diags.push(new vscode.Diagnostic(
+          const diag = new vscode.Diagnostic(
             new vscode.Range(lineIdx, match.index, lineIdx, match.index + match[0].length - 1),
             'Bad indefinite article usage detected. Consider using "a LF" instead of "an LF".',
             vscode.DiagnosticSeverity.Warning
-          ))
+          )
+          diag.source = 'DraftForge'
+          diag.code = 'articles'
+          // @ts-ignore
+          diag.match = match[0]
+          diags.push(diag)
         }
       }
 

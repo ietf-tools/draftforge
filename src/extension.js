@@ -8,13 +8,6 @@ import { activateSnippetsView } from './views/snippets.js'
 import { activateReferenceView } from './views/reference.js'
 import { registerAddXmlModelsCommand } from './commands/add-xml-models.js'
 import { registerAuthCommands } from './commands/auth.js'
-import { registerCheckArticlesCommand } from './commands/articles.js'
-import { registerCheckHyphenationCommand } from './commands/hyphenation.js'
-import { registerCheckPlaceholdersCommand } from './commands/placeholders.js'
-import { registerCheckInclusiveLanguageCommand } from './commands/inclusive-language.js'
-import { registerCheckNonAsciiCommand } from './commands/non-ascii.js'
-import { registerCheckRepeatedWordsCommand } from './commands/repeated-words.js'
-import { registerCheckTyposCommand } from './commands/typos.js'
 import { registerExtractCommentsCommand } from './commands/extract-comments.js'
 import { registerStripMLineEndingsCommand } from './commands/strip-mline-endings.js'
 import { registerSvgcheckCommand } from './commands/svgcheck.js'
@@ -38,13 +31,7 @@ export function activate(context) {
   // Register commands
 	registerAddXmlModelsCommand(context)
   registerAuthCommands(context)
-	registerCheckArticlesCommand(context, diagnosticCollection)
-	registerCheckHyphenationCommand(context, diagnosticCollection)
-	registerCheckInclusiveLanguageCommand(context, diagnosticCollection)
-	registerCheckNonAsciiCommand(context, diagnosticCollection)
-	registerCheckPlaceholdersCommand(context, diagnosticCollection)
-	registerCheckRepeatedWordsCommand(context, diagnosticCollection)
-	registerCheckTyposCommand(context, diagnosticCollection)
+
 	registerExtractCommentsCommand(context)
 	registerIdnitsCommand(context)
 	registerStripMLineEndingsCommand(context)

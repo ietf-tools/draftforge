@@ -1,13 +1,16 @@
 import * as vscode from 'vscode'
 
 class SnippetsProvider {
+  /**
+   * @param {vscode.ExtensionContext} context
+   */
   constructor(context) {
     this._onDidChangeTreeData = new vscode.EventEmitter()
     this.onDidChangeTreeData = this._onDidChangeTreeData.event
 
     this.populateSnippets()
 
-    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(ev => {
+    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(_ev => {
       this.populateSnippets()
       this.refresh()
     }))
@@ -77,6 +80,10 @@ class SnippetsProvider {
   }
 }
 
+/**
+ * Generate a table by prompting the user for header, columns and rows count
+ * @returns {Promise<String>} Snippet Body
+ */
 async function generateXmlTable () {
   const includeHeaders = await vscode.window.showQuickPick([
     { label: 'Yes, include a header row', picked: true, value: 'yes' },
@@ -114,10 +121,17 @@ async function generateXmlTable () {
   return `${output}  </tbody>\n</table>`
 }
 
+/**
+ *
+ * @param {String} input Text to repeat
+ * @param {Number} times Number of times to repeat
+ * @param {Number} startIdx Starting index number
+ * @returns {String} Output
+ */
 function repeatWithIndex (input, times, startIdx = 1) {
   let output = ''
   for (let idx = startIdx; idx < startIdx + times; idx++) {
-    output += input.replaceAll('IDX', idx)
+    output += input.replaceAll('IDX', idx.toString())
   }
   return output
 }

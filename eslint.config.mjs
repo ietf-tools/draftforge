@@ -18,7 +18,7 @@ export default [{
         "no-this-before-super": "warn",
         "no-undef": "warn",
         "no-unreachable": "warn",
-        "no-unused-vars": "warn",
+        "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" } ],
         "constructor-super": "warn",
         "valid-typeof": "warn"
     }
