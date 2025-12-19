@@ -32,7 +32,7 @@ export function registerExtractCodeComponentsCommand (context) {
       const doc = editor.document
       const workspacePath = vscode.workspace.getWorkspaceFolder(doc.uri).uri.fsPath
 
-      const codeRgx = /<sourcecode ?(?<attr>[a-z0-9=\.\-_ "]+)?>\n?(?<code>[\s\S]+?)\n?<\/sourcecode>/gmi
+      const codeRgx = /<sourcecode ?(?<attr>[a-z0-9=@\.\-_ "]+)?>\n?(?<code>[\s\S]+?)\n?<\/sourcecode>/gmi
       const contents = doc.getText()
 
       const output = vscode.window.createOutputChannel('DraftForge')
