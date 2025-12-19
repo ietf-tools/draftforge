@@ -10,6 +10,7 @@ import { registerCheckInclusiveLanguageCommand } from '../commands/inclusive-lan
 import { registerCheckNonAsciiCommand } from '../commands/non-ascii.js'
 import { registerCheckRepeatedWordsCommand } from '../commands/repeated-words.js'
 import { registerCheckTyposCommand } from '../commands/typos.js'
+import { registerCheckRfcTermsCommand } from '../commands/rfc-terms.js'
 
 const ignores = {}
 
@@ -24,6 +25,7 @@ class ChecksProvider {
       { id: 'inclusiveLanguage', label: 'Inclusive Language Check', description: 'Check for usage of non-inclusive terms', icon: 'heart' },
       { id: 'nonAscii', label: 'Non-ASCII Check', description: 'Check for non-ASCII characters', icon: 'symbol-key' },
       { id: 'placeholders', label: 'Placeholders Check', description: 'Check for common placeholders', icon: 'bracket' },
+      { id: 'rfcTerms', label: 'RFC-specific Terms Check', description: 'Check for RFC-specific terms usage', icon: 'coffee' },
       { id: 'repeatedWords', label: 'Repeated Words Check', description: 'Check for accidental repeated terms', icon: 'layers' },
       { id: 'typos', label: 'Typos Check', description: 'Check for common typos', icon: 'debug' }
     ]
@@ -67,6 +69,7 @@ export async function activateChecksView (context, diagnosticCollection) {
     registerCheckNonAsciiCommand(context, diagnosticCollection)
     registerCheckPlaceholdersCommand(context, diagnosticCollection, ignores)
     registerCheckRepeatedWordsCommand(context, diagnosticCollection, ignores)
+    registerCheckRfcTermsCommand(context, diagnosticCollection, ignores)
     registerCheckTyposCommand(context, diagnosticCollection, ignores)
 
     // Run Single Check
@@ -91,6 +94,9 @@ export async function activateChecksView (context, diagnosticCollection) {
             break
           case 'placeholders':
             await vscode.commands.executeCommand('draftforge.checkPlaceholders', clearFirst)
+            break
+          case 'rfcTerms':
+            await vscode.commands.executeCommand('draftforge.checkRfcTerms', clearFirst)
             break
           case 'repeatedWords':
             await vscode.commands.executeCommand('draftforge.checkRepeatedWords', clearFirst)

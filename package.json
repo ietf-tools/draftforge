@@ -82,6 +82,10 @@
         "title": "Check for common placeholders"
       },
       {
+        "command": "draftforge.checkRfcTerms",
+        "title": "Check for RFC-specific terms"
+      },
+      {
         "command": "draftforge.checkRepeatedWords",
         "title": "Check for accidental repeated terms"
       },
