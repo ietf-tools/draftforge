@@ -33,7 +33,7 @@ class ToolsProvider {
       { id: 'exportPdf', label: 'Export as PDF', description: 'Generate PDF output of the current document', icon: 'file-pdf' },
       { id: 'exportTxt', label: 'Export as TXT', description: 'Generate TXT output of the current document', icon: 'file-text' },
       flags.rpc && { id: 'extractComments', label: 'Extract [rfced] comments', description: 'List all comments for the RPC staff', icon: 'comment' },
-      { id: 'extractCodeComponents', label: 'Extract Code Components', description: 'List all sourcecode blocks', icon: 'file-code' },
+      { id: 'extractCodeComponents', label: 'Extract Code Components', description: 'Extract all or some sourcecode blocks', icon: 'file-code' },
       { id: 'formatDocument', label: 'Format Document', description: 'Reformat document and fix indentation', icon: 'list-flat' },
       { id: 'idnits', label: 'IDNits', description: 'Run idnits on the current document', icon: 'tasklist' },
       { id: 'openPreview', label: 'Open Preview', description: 'Open a preview of the current document', icon: 'open-preview' },
@@ -111,7 +111,7 @@ export function activateToolsView (context) {
           }
           break
         case 'extractCodeComponents': {
-          vscode.window.showInformationMessage('Not yet implemented.')
+          await vscode.commands.executeCommand('draftforge.extractCodeComponents')
           break
         }
         case 'extractComments': {

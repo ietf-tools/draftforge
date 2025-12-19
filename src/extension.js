@@ -13,6 +13,7 @@ import { registerStripMLineEndingsCommand } from './commands/strip-mline-endings
 import { registerSvgcheckCommand } from './commands/svgcheck.js'
 import { registerXmlOutputCommand } from './commands/xml-output.js'
 import { registerXmlPreviewCommand, unregisterXmlPreviewCommand } from './commands/xml-preview.js'
+import { registerExtractCodeComponentsCommand } from './commands/extract-code-components.js'
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -31,7 +32,7 @@ export function activate(context) {
   // Register commands
 	registerAddXmlModelsCommand(context)
   registerAuthCommands(context)
-
+  registerExtractCodeComponentsCommand(context)
 	registerExtractCommentsCommand(context)
 	registerIdnitsCommand(context)
 	registerStripMLineEndingsCommand(context)

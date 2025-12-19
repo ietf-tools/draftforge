@@ -94,6 +94,10 @@
         "title": "Check for common typos"
       },
       {
+        "command": "draftforge.extractCodeComponents",
+        "title": "Extract Code Components"
+      },
+      {
         "command": "draftforge.extractComments",
         "title": "Extract [rfced] comments"
       },
