@@ -10,6 +10,7 @@ export function registerExtractCodeComponentsCommand (context) {
       return vscode.window.showInformationMessage('Open a document first.')
     }
 
+    // -> Prompt the user for types to include
     const includeTypesPrompt = await vscode.window.showQuickPick([
       { label: 'All code components of any type', picked: true, value: 'all' },
       { label: 'ABNF', value: 'abnf' },
@@ -28,6 +29,7 @@ export function registerExtractCodeComponentsCommand (context) {
     }
     const includeTypes = includeTypesPrompt.value.split('|')
 
+    // -> Process document
     try {
       const doc = editor.document
       const workspacePath = vscode.workspace.getWorkspaceFolder(doc.uri).uri.fsPath
@@ -68,6 +70,7 @@ export function registerExtractCodeComponentsCommand (context) {
           }
         }
 
+        // -> Ensure type is allowed
         if (!includeTypes.includes('all')) {
           let isAllowed = false
           for (const allowedType of includeTypes) {
