@@ -27,6 +27,7 @@ IETF DraftForge provide tools, validation checks and snippets for both Internet-
   - Inclusive Language Check
   - Non-ASCII Check
   - Placeholders Check
+  - RFC-specific Terms Check
   - Repeated Words Check
   - Typos Check
 - Tools
@@ -35,16 +36,18 @@ IETF DraftForge provide tools, validation checks and snippets for both Internet-
   - Export as PDF
   - Export as TXT
   - Extract `[rfced]` comments
+  - Extract Code Components
   - Format Document
   - IDNits
   - Open Preview
   - Strip `^M` Line Endings
-  - SVGCheck
+  - SVG Check
 - Snippets
   - Author Block
   - Date Element
   - Table
 - Reference
+  - User Guide
   - RFCXML
     - Vocabulary
 
