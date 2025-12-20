@@ -7,6 +7,7 @@ import { registerCheckArticlesCommand } from '../commands/articles.js'
 import { registerCheckHyphenationCommand } from '../commands/hyphenation.js'
 import { registerCheckPlaceholdersCommand } from '../commands/placeholders.js'
 import { registerCheckInclusiveLanguageCommand } from '../commands/inclusive-language.js'
+import { registerCheckNamesCommand } from '../commands/names.js'
 import { registerCheckNonAsciiCommand } from '../commands/non-ascii.js'
 import { registerCheckRepeatedWordsCommand } from '../commands/repeated-words.js'
 import { registerCheckTyposCommand } from '../commands/typos.js'
@@ -23,6 +24,7 @@ class ChecksProvider {
       { id: 'articles', label: 'Articles Check', description: 'Check for bad indefinite articles usage', icon: 'repo' },
       { id: 'hyphenation', label: 'Hyphenation Check', description: 'Check for inconsistent hyphenation usage', icon: 'diff-removed' },
       { id: 'inclusiveLanguage', label: 'Inclusive Language Check', description: 'Check for usage of non-inclusive terms', icon: 'heart' },
+      { id: 'names', label: 'Names Check', description: 'Check for author names preferences', icon: 'account' },
       { id: 'nonAscii', label: 'Non-ASCII Check', description: 'Check for non-ASCII characters', icon: 'symbol-key' },
       { id: 'placeholders', label: 'Placeholders Check', description: 'Check for common placeholders', icon: 'bracket' },
       { id: 'rfcTerms', label: 'RFC-specific Terms Check', description: 'Check for RFC-specific terms usage', icon: 'coffee' },
@@ -66,6 +68,7 @@ export async function activateChecksView (context, diagnosticCollection) {
     registerCheckArticlesCommand(context, diagnosticCollection, ignores)
     registerCheckHyphenationCommand(context, diagnosticCollection, ignores)
     registerCheckInclusiveLanguageCommand(context, diagnosticCollection, ignores)
+    registerCheckNamesCommand(context, diagnosticCollection, ignores)
     registerCheckNonAsciiCommand(context, diagnosticCollection)
     registerCheckPlaceholdersCommand(context, diagnosticCollection, ignores)
     registerCheckRepeatedWordsCommand(context, diagnosticCollection, ignores)
@@ -88,6 +91,9 @@ export async function activateChecksView (context, diagnosticCollection) {
             break
           case 'inclusiveLanguage':
             await vscode.commands.executeCommand('draftforge.checkInclusiveLanguage', clearFirst)
+            break
+          case 'names':
+            await vscode.commands.executeCommand('draftforge.checkNames', clearFirst)
             break
           case 'nonAscii':
             await vscode.commands.executeCommand('draftforge.checkNonAscii', clearFirst)
