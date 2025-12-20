@@ -126,9 +126,18 @@
         "command": "draftforge.xmlPreview",
         "title": "RFCXML Preview",
         "icon": "$(open-preview)"
+      },
+      {
+        "command": "draftforge.lookupSelectionAcrossDocs",
+        "title": "Lookup selection across all opened documents"
       }
     ],
     "menus": {
+      "editor/context": [
+        {
+          "command": "draftforge.lookupSelectionAcrossDocs"
+        }
+      ],
       "editor/title": [
         {
           "command": "draftforge.xmlPreview",

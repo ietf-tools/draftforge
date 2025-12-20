@@ -32,10 +32,11 @@ class ToolsProvider {
       { id: 'exportHtml', label: 'Export as HTML', description: 'Generate HTML output of the current document', icon: 'file-symlink-file' },
       { id: 'exportPdf', label: 'Export as PDF', description: 'Generate PDF output of the current document', icon: 'file-pdf' },
       { id: 'exportTxt', label: 'Export as TXT', description: 'Generate TXT output of the current document', icon: 'file-text' },
-      flags.rpc && { id: 'extractComments', label: 'Extract [rfced] comments', description: 'List all comments for the RPC staff', icon: 'comment' },
+      flags.rpc && { id: 'extractComments', label: 'Extract [rfced] Comments', description: 'List all comments for the RPC staff', icon: 'comment' },
       { id: 'extractCodeComponents', label: 'Extract Code Components', description: 'Extract all or some sourcecode blocks', icon: 'file-code' },
       { id: 'formatDocument', label: 'Format Document', description: 'Reformat document and fix indentation', icon: 'list-flat' },
       { id: 'idnits', label: 'IDNits', description: 'Run idnits on the current document', icon: 'tasklist' },
+      { id: 'lookupSelectionAcrossDocs', label: 'Lookup Selection Across Docs', description: 'In opened documents', icon: 'search' },
       { id: 'openPreview', label: 'Open Preview', description: 'Open a preview of the current document', icon: 'open-preview' },
       { id: 'stripMLineEndings', label: 'Strip ^M Line Endings', description: 'Clean Document from ^M Line Endings', icon: 'no-newline' },
       flags.xml && { id: 'svgcheck', label: 'SVG Check', description: 'Validate SVGs in the current document', icon: 'circuit-board' }
@@ -138,6 +139,9 @@ export function activateToolsView (context) {
             selectedMode = defaultMode || 'normal'
           }
           await vscode.commands.executeCommand('draftforge.idnits', selectedMode)
+          break
+        case 'lookupSelectionAcrossDocs':
+          await vscode.commands.executeCommand('draftforge.lookupSelectionAcrossDocs')
           break
         case 'openPreview':
           if (doc.languageId === 'xml') {
