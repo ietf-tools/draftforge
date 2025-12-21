@@ -43,15 +43,62 @@ export function registerCheckInclusiveLanguageCommand (context, diagnosticCollec
           suggestion: 'exemption or approve'
         },
         {
-          triggers: ['he/she', 'he or she'],
+          triggers: ['he/she', 'he / she', 'he or she'],
           suggestion: 'they'
         },
         {
-          triggers: ['cripple', 'handicap'],
-          suggestion: 'impair or impeded'
+          triggers: [
+            'black',
+            'white',
+            'sanity',
+            'dummy',
+            'dark',
+            'tradition',
+            'traditional',
+            'traditionally',
+            'totem pole',
+            'manmade',
+            'elderly',
+            'fireman',
+            'firemen',
+            'policeman',
+            'policemen',
+            'immature',
+            'crazy',
+            'dumb',
+            'cripple',
+            'handicap',
+            'wheelchair',
+            'impair',
+            'impaired',
+            'needy',
+            'homeless',
+            'jumping off',
+            'right answer',
+            'out in the left field',
+            'male',
+            'female',
+            'he',
+            'his',
+            'him',
+            'himself',
+            'she',
+            'her',
+            'hers',
+            'herself',
+            'man-in-the-middle',
+            'man in the middle',
+            'hear',
+            'hearing',
+            'visual',
+            'visually',
+            'deficient',
+            'deficiently',
+            'deficiency'
+          ]
         }
       ]
-      const matchRgx = new RegExp(`[<> "'.:;=([{-](${flatten(dictionnary.map(d => d.triggers)).join('|')})`, 'gi')
+      const matchRgx = new RegExp(`(?:^|[<> "'.:;=([{-])(?<term>${flatten(dictionnary.map(d => d.triggers)).join('|')})(?:[^a-z0-9]|$)`, 'gi')
 
       const diags = []
       const occurences = []
@@ -59,11 +106,11 @@ export function registerCheckInclusiveLanguageCommand (context, diagnosticCollec
       for (let lineIdx = 0; lineIdx < activeDoc.lineCount; lineIdx++) {
         const line = activeDoc.lineAt(lineIdx)
         for (const match of line.text.matchAll(matchRgx)) {
-          const term = match[1].toLowerCase()
+          const term = match.groups.term.toLowerCase()
           if (eligibleIgnores.includes(term)) {
             continue
           }
-          const termStartIndex = match[0].indexOf(match[1])
+          const termStartIndex = match[0].indexOf(match.groups.term)
           const dictEntry = find(dictionnary, d => d.triggers.includes(term))
           let occIdx = occurences.indexOf(term)
           if (occIdx < 0) {
@@ -71,8 +118,8 @@ export function registerCheckInclusiveLanguageCommand (context, diagnosticCollec
           }
 
           const diag = new vscode.Diagnostic(
-            new vscode.Range(lineIdx, match.index + termStartIndex, lineIdx, match.index + termStartIndex + match[1].length),
-            `Inclusive Language: Consider using ${dictEntry.suggestion} instead of "${term}".`,
+            new vscode.Range(lineIdx, match.index + termStartIndex, lineIdx, match.index + termStartIndex + match.groups.term.length),
+            dictEntry.suggestion ? `Inclusive Language: Consider using ${dictEntry.suggestion} instead of "${term}".` : `Inclusive Language: "${term}" is potentially biased or ambiguous.`,
             vscode.DiagnosticSeverity.Warning
           )
           diag.source = 'DraftForge'
