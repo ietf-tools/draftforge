@@ -39,6 +39,8 @@ IETF DraftForge provide tools, validation checks and snippets for both Internet-
   - Extract Code Components
   - Format Document
   - IDNits
+  - List Inconsistent Capitalization
+  - Lookup Selection Across Docs
   - Open Preview
   - Strip `^M` Line Endings
   - SVG Check
