@@ -6,6 +6,16 @@
 
 IETF DraftForge provide tools, validation checks and snippets for both Internet-Drafts authors and the RFC Production Center.
 
+## Install
+
+Follow the [User Guide](https://github.com/ietf-tools/draftforge/blob/main/docs/README.md) for installation instructions.
+
+Some features of this extension relies on several dependencies that must also be installed, depending on your workflow.
+This extension should almost never be installed standalone. Install one of these extension packs instead:
+
+- [DraftForge for Internet-Draft Authors](https://marketplace.visualstudio.com/items?itemName=ietf.draftforge-authors)
+- [DraftForge for the RFC Production Center](https://marketplace.visualstudio.com/items?itemName=ietf.draftforge-rpc)
+
 ## Features
 
 - Validation Checks
