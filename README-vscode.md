@@ -12,6 +12,7 @@ IETF DraftForge provide tools, validation checks and snippets for both Internet-
   - Articles Check
   - Hyphenation Check
   - Inclusive Language Check
+  - Names Check
   - Non-ASCII Check
   - Placeholders Check
   - RFC-specific Terms Check
