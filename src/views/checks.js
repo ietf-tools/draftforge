@@ -163,7 +163,7 @@ export async function activateChecksView (context, diagnosticCollection) {
             // @ts-ignore
             if(diag.match && diag.range.contains(range)) {
               // Repo scope
-              const actRepo = new vscode.CodeAction('Ignore this warning across the repo', vscode.CodeActionKind.QuickFix)
+              const actRepo = new vscode.CodeAction('Ignore warnings of this term across the repo', vscode.CodeActionKind.QuickFix)
               actRepo.diagnostics = [diag]
               actRepo.command = {
                 title: 'Ignore this warning',
@@ -173,7 +173,7 @@ export async function activateChecksView (context, diagnosticCollection) {
               codeActions.push(actRepo)
 
               // Document scope
-              const actDoc = new vscode.CodeAction('Ignore this warning for this document only', vscode.CodeActionKind.QuickFix)
+              const actDoc = new vscode.CodeAction('Ignore warnings of this term for this document only', vscode.CodeActionKind.QuickFix)
               actDoc.diagnostics = [diag]
               actDoc.command = {
                 title: 'Ignore this warning',

@@ -17,21 +17,6 @@ export function registerCheckTyposCommand (context, diagnosticCollection, ignore
 
       const eligibleIgnores = ignores[activeDoc.uri.toString()]?.typos ?? []
 
-      // TODO: special cases:
-      // https://github.com/rfc-editor/editorial-tools/blob/main/typos
-      // Faucheur (#442)
-      // Brandenburg (#448)
-      // RFC[0-9] (#482,488,494)
-      // Farrel, Farel (#513,514)
-      // described [RFC<#>] (#573)
-      // ly- (#618)
-      // -ed Figure <#> (#625)
-      // -ed Table  <#> (#632)
-      // extra commas / periods (#645-648)
-      // RFCs 2119 and 8174 keywords (#658-668)
-      // (see ... (#674-676)
-      // {# (#698)
-
       const dictionnary = [
         {
           triggers: ['though'],
@@ -286,11 +271,26 @@ export function registerCheckTyposCommand (context, diagnosticCollection, ignore
       ]
       const matchRgxCI = new RegExp(`(?:^|[<> "'.:;=([{-])(${flatten(dictionnary.filter(d => !d.caseSensitive).map(d => d.triggers)).join('|')})(?:[^a-z0-9]|$)`, 'gi')
       const matchRgxCS = new RegExp(`(?:^|[<> "'.:;=([{-])(${flatten(dictionnary.filter(d => d.caseSensitive).map(d => d.triggers)).join('|')})(?:[^a-zA-Z0-9]|$)`, 'g')
+      const matchRgxRFC = /\sRFC[0-9]+|\(RFC[0-9]+|RFC-[0-9]+/gi
+      const matchRgxDescribedRFC = /described \[RFC[0-9]+\]/gi
+      const matchRgxAdverbLy = /[a-z]+ly-/gi
+      const matchRgxEdFigureTable = /[a-z]+ed (Figure|Table)/gi
+      const matchRgxPunct = / ,|,,| \./g
+      const matchRgxBCP14 = /(MUST not|SHOULD not|SHALL not|MAY not|MAY NOT|not RECOMMENDED|OPTIONALLY|RECOMMEND|RECOMMENDS|RECOMMENDING)(?:[^a-zA-Z0-9]|$)/g
+      const matchRgxSee = /[a-zA-Z0-9] \(See /g
+      const matchRgxDashRef = /{#[a-z0-9-_@.:;=]+}/gi
 
       const diags = []
       const occurences = []
       const termCount = {}
 
+      /**
+       * Process match from the typos dictionnary
+       * @param {String} term Matched term
+       * @param {Object} match The regex match object
+       * @param {Number} lineIdx Line Number
+       * @param {Boolean} caseSensitive Is a case sensitive match
+       */
       function processMatch (term, match, lineIdx, caseSensitive = false) {
         const dictEntry = find(dictionnary, d => d.triggers.includes(term))
         let occIdx = occurences.indexOf(term)
@@ -299,9 +299,30 @@ export function registerCheckTyposCommand (context, diagnosticCollection, ignore
         }
         const startColumnAdjusted = match.index === 0 ? match.index : match.index + 1
 
-        const diag = new vscode.Diagnostic(
+        addDiag(
           new vscode.Range(lineIdx, startColumnAdjusted, lineIdx, startColumnAdjusted + match[1].length),
           caseSensitive ? `Possible typo: ${term}. Did you mean "${dictEntry.suggestion}"? (case sensitive)` : `Possible typo: ${term}. Did you mean "${dictEntry.suggestion}"?`,
+          term
+        )
+
+        if (termCount[term]) {
+          termCount[term]++
+        } else {
+          termCount[term] = 1
+        }
+      }
+
+      /**
+       * Add new Diagnostic
+       * @param {vscode.Range} range Diagnostic Range
+       * @param {string} msg Diagnostic Message
+       * @param {string} term Matched Term
+       * @returns {void}
+       */
+      function addDiag(range, msg, term) {
+        const diag = new vscode.Diagnostic(
+          range,
+          msg,
           vscode.DiagnosticSeverity.Warning
         )
         diag.source = 'DraftForge'
@@ -309,12 +330,6 @@ export function registerCheckTyposCommand (context, diagnosticCollection, ignore
         // @ts-ignore
         diag.match = term
         diags.push(diag)
-
-        if (termCount[term]) {
-          termCount[term]++
-        } else {
-          termCount[term] = 1
-        }
       }
 
       for (let lineIdx = 0; lineIdx < activeDoc.lineCount; lineIdx++) {
@@ -347,6 +362,123 @@ export function registerCheckTyposCommand (context, diagnosticCollection, ignore
             continue
           }
           processMatch(match[1], match, lineIdx, true)
+        }
+
+        // RFC[x] formatting typos
+        for (const match of lineTrimmed.matchAll(matchRgxRFC)) {
+          if (eligibleIgnores.includes(match[0].toLowerCase())) {
+            // Skip matches in the ignore list
+            continue
+          }
+          addDiag(
+            new vscode.Range(lineIdx, match.index, lineIdx, match.index + match[0].length),
+            `"${match[0]}" should be bracketed and non-hyphenated.`,
+            match[0]
+          )
+        }
+
+        // Described RFC[x] typos
+        for (const match of combinedLine.matchAll(matchRgxDescribedRFC)) {
+          if (match.index >= lineTrimmed.length) {
+            // Skip matches in the second combined line
+            continue
+          }
+          if (eligibleIgnores.includes(match[0].toLowerCase())) {
+            // Skip matches in the ignore list
+            continue
+          }
+          addDiag(
+            new vscode.Range(lineIdx, match.index, lineIdx, match.index + match[0].length),
+            `"${match[0]}" should be "${match[0].replace('ed [R', 'ed in [R')}".`,
+            match[0]
+          )
+        }
+
+        // Adverbs ending in "ly-" typos
+        for (const match of lineTrimmed.matchAll(matchRgxAdverbLy)) {
+          if (eligibleIgnores.includes(match[0].toLowerCase())) {
+            // Skip matches in the ignore list
+            continue
+          }
+          addDiag(
+            new vscode.Range(lineIdx, match.index, lineIdx, match.index + match[0].length),
+            `"${match[0]}" is potentially incorrect. Hyphens after adverbs ending in "ly" should be avoided.`,
+            match[0]
+          )
+        }
+
+        // -ed Figure / -ed Table typos
+        for (const match of combinedLine.matchAll(matchRgxEdFigureTable)) {
+          if (match.index >= lineTrimmed.length) {
+            // Skip matches in the second combined line
+            continue
+          }
+          if (eligibleIgnores.includes(match[0].toLowerCase())) {
+            // Skip matches in the ignore list
+            continue
+          }
+          addDiag(
+            new vscode.Range(lineIdx, match.index, lineIdx, match.index + match[0].length),
+            `"${match[0]}" should be "${match[0].replace('ed Figure', 'ed in Figure').replace('ed Table', 'ed in Table')}".`,
+            match[0]
+          )
+        }
+
+        // Extra spaces before commas and periods + double commas
+        for (const match of lineTrimmed.matchAll(matchRgxPunct)) {
+          if (eligibleIgnores.includes(match[0])) {
+            // Skip matches in the ignore list
+            continue
+          }
+          addDiag(
+            new vscode.Range(lineIdx, match.index, lineIdx, match.index + match[0].length),
+            `Potential extra space before comma/period or double commas typo.`,
+            match[0]
+          )
+        }
+
+        // Extra spaces before commas and periods + double commas
+        for (const match of combinedLine.matchAll(matchRgxBCP14)) {
+          if (match.index >= lineTrimmed.length) {
+            // Skip matches in the second combined line
+            continue
+          }
+          if (eligibleIgnores.includes(match[1])) {
+            // Skip matches in the ignore list
+            continue
+          }
+          addDiag(
+            new vscode.Range(lineIdx, match.index, lineIdx, match.index + match[1].length),
+            `"${match[1]}" is an invalid BCP 14 keyword or has improper casing.`,
+            match[1]
+          )
+        }
+        // ... (See ) typos
+        for (const match of lineTrimmed.matchAll(matchRgxSee)) {
+          if (eligibleIgnores.includes(match[0])) {
+            // Skip matches in the ignore list
+            continue
+          }
+          addDiag(
+            new vscode.Range(lineIdx, match.index, lineIdx, match.index + match[0].length),
+            `"...${match[0]}": The term "see" should be lowercase when used mid-sentence.`,
+            match[0]
+          )
+        }
+
+        // {# that should be <xref...>
+        if (activeDoc.languageId === 'xml') {
+          for (const match of lineTrimmed.matchAll(matchRgxDashRef)) {
+            if (eligibleIgnores.includes(match[0])) {
+              // Skip matches in the ignore list
+              continue
+            }
+            addDiag(
+              new vscode.Range(lineIdx, match.index, lineIdx, match.index + match[0].length),
+              `"${match[0]}" is potentially incorrect and should be replaced by <xref ...>`,
+              match[0]
+            )
+          }
         }
       }
 
