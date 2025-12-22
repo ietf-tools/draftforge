@@ -9,7 +9,6 @@ export function registerListInconsistentCapitalizationCommand (context) {
       const activeDoc = vscode.window.activeTextEditor.document
 
       const results = findInconsistentCapitalization(activeDoc.getText())
-      console.log(results)
 
       const output = vscode.window.createOutputChannel('DraftForge')
       output.clear()
