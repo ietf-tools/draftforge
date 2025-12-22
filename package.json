@@ -106,12 +106,16 @@
         "title": "Run idnits on document"
       },
       {
+        "command": "draftforge.listInconsistentCapitalization",
+        "title": "List inconsistent use of capitalization"
+      },
+      {
         "command": "draftforge.login",
         "title": "Login with an IETF Account"
       },
       {
         "command": "draftforge.register",
-        "title": "Create an IETF Account"
+        "title": "Create / Register an IETF Account"
       },
       {
         "command": "draftforge.runAllChecks",

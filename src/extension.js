@@ -9,6 +9,7 @@ import { activateReferenceView } from './views/reference.js'
 import { registerAddXmlModelsCommand } from './commands/add-xml-models.js'
 import { registerAuthCommands } from './commands/auth.js'
 import { registerExtractCommentsCommand } from './commands/extract-comments.js'
+import { registerListInconsistentCapitalizationCommand } from './commands/inconsistent-capitalization.js'
 import { registerLookupSelectionAcrossDocsCommand } from './commands/lookup-selection-across-docs.js'
 import { registerStripMLineEndingsCommand } from './commands/strip-mline-endings.js'
 import { registerSvgcheckCommand } from './commands/svgcheck.js'
@@ -36,6 +37,7 @@ export function activate(context) {
   registerExtractCodeComponentsCommand(context)
 	registerExtractCommentsCommand(context)
 	registerIdnitsCommand(context)
+  registerListInconsistentCapitalizationCommand(context)
   registerLookupSelectionAcrossDocsCommand(context)
 	registerStripMLineEndingsCommand(context)
   registerSvgcheckCommand(context, diagnosticCollection)
