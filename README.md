@@ -54,6 +54,7 @@ This extension should almost never be installed standalone. Install one of these
   - Lookup Selection Across Docs
   - Open Preview
   - Strip `^M` Line Endings
+  - Surround BCP 14 Keywords
   - SVG Check
 - Snippets
   - Author Block

@@ -14,7 +14,7 @@ class ToolsProvider {
       }
     }))
 
-    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(ev => {
+    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(_ev => {
       this.populateTools()
       this.refresh()
     }))
