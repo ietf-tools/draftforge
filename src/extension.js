@@ -8,6 +8,8 @@ import { activateSnippetsView } from './views/snippets.js'
 import { activateReferenceView } from './views/reference.js'
 import { registerAddXmlModelsCommand } from './commands/add-xml-models.js'
 import { registerAuthCommands } from './commands/auth.js'
+import { registerExpandIncludesCommands } from './commands/expand-includes.js'
+import { registerExtractCodeComponentsCommand } from './commands/extract-code-components.js'
 import { registerExtractCommentsCommand } from './commands/extract-comments.js'
 import { registerListInconsistentCapitalizationCommand } from './commands/inconsistent-capitalization.js'
 import { registerLookupSelectionAcrossDocsCommand } from './commands/lookup-selection-across-docs.js'
@@ -15,7 +17,6 @@ import { registerStripMLineEndingsCommand } from './commands/strip-mline-endings
 import { registerSvgcheckCommand } from './commands/svgcheck.js'
 import { registerXmlOutputCommand } from './commands/xml-output.js'
 import { registerXmlPreviewCommand, unregisterXmlPreviewCommand } from './commands/xml-preview.js'
-import { registerExtractCodeComponentsCommand } from './commands/extract-code-components.js'
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -34,6 +35,7 @@ export function activate(context) {
   // Register commands
 	registerAddXmlModelsCommand(context)
   registerAuthCommands(context)
+  registerExpandIncludesCommands(context)
   registerExtractCodeComponentsCommand(context)
 	registerExtractCommentsCommand(context)
 	registerIdnitsCommand(context)

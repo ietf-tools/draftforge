@@ -46,6 +46,9 @@
       }
     ],
     "codeActionProvider" : "true",
+    "codeLensProvider" : {
+      "resolveProvider": "true"
+    },
     "commands": [
       {
         "title": "Internet Draft - Markdown",
