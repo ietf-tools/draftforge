@@ -15,7 +15,7 @@ export function registerSurroundBcp14KeywordsCommand (context) {
     const text = doc.getText()
 
     const matchRgx = /<bcp14>[\s\S]*?<\/bcp14>|(?<term>MUST\sNOT|MUST|SHOULD\sNOT|SHOULD|SHALL\sNOT|SHALL|RECOMMENDED|NOT\sRECOMMENDED|MAY|OPTIONAL|REQUIRED)/g
-    const sourcecodeRgx = /<sourcecode>[\s\S]*?<\/sourcecode>/g
+    const sourcecodeRgx = /<sourcecode[^>]*>[\s\S]*?<\/sourcecode>/g
     const sourcecodeRanges = []
     const keywordsReplaces = []
     let match
