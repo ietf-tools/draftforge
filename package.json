@@ -62,7 +62,8 @@
       },
       {
         "command": "draftforge.addXmlModels",
-        "title": "Add XML Models"
+        "title": "Add XML Models",
+        "when": "editorLangId == xml"
       },
       {
         "command": "draftforge.checkArticles",
@@ -130,9 +131,15 @@
         "title": "Strip ^M Line Endings"
       },
       {
+        "command": "draftforge.surroundBcp14Keywords",
+        "title": "Surround BCP 14 Keywords",
+        "when": "editorLangId == xml"
+      },
+      {
         "command": "draftforge.xmlPreview",
         "title": "RFCXML Preview",
-        "icon": "$(open-preview)"
+        "icon": "$(open-preview)",
+        "when": "editorLangId == xml"
       },
       {
         "command": "draftforge.lookupSelectionAcrossDocs",

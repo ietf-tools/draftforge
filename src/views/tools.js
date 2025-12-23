@@ -40,6 +40,7 @@ class ToolsProvider {
       { id: 'lookupSelectionAcrossDocs', label: 'Lookup Selection Across Docs', description: 'In opened documents', icon: 'search' },
       { id: 'openPreview', label: 'Open Preview', description: 'Open a preview of the current document', icon: 'open-preview' },
       { id: 'stripMLineEndings', label: 'Strip ^M Line Endings', description: 'Clean Document from ^M Line Endings', icon: 'no-newline' },
+      { id: 'surroundBcp14Keywords', label: 'Surround BCP 14 Keywords', description: 'Ensure all BCP 14 keywords are enclosed with <bcp14> tags', icon: 'bold' },
       flags.xml && { id: 'svgcheck', label: 'SVG Check', description: 'Validate SVGs in the current document', icon: 'circuit-board' }
     ].filter(t => t)
   }
@@ -50,7 +51,8 @@ class ToolsProvider {
 
   getTreeItem(tool) {
     const item = new vscode.TreeItem(tool.label, vscode.TreeItemCollapsibleState.None)
-    item.description = tool.description
+    item.description = `> ${tool.description}`
+    item.tooltip = tool.description
     item.iconPath = new vscode.ThemeIcon(tool.icon ?? 'tools')
     item.command = {
       command: 'draftforge.runTool',
@@ -82,10 +84,11 @@ export function activateToolsView (context) {
 
       const doc = vscode.window.activeTextEditor.document
       switch (tool.id) {
-        case 'addXmlModels':
+        case 'addXmlModels': {
           await vscode.commands.executeCommand('draftforge.addXmlModels')
           break
-        case 'exportHtml':
+        }
+        case 'exportHtml': {
           if (doc.languageId === 'xml') {
             await vscode.commands.executeCommand('draftforge.xmlOutput', 'html')
           } else if (doc.languageId === 'markdown') {
@@ -94,7 +97,8 @@ export function activateToolsView (context) {
             await vscode.window.showInformationMessage('Export to HTML not available for this document type.')
           }
           break
-        case 'exportPdf':
+        }
+        case 'exportPdf': {
           if (doc.languageId === 'xml') {
             await vscode.commands.executeCommand('draftforge.xmlOutput', 'pdf')
           } else if (doc.languageId === 'markdown') {
@@ -103,7 +107,8 @@ export function activateToolsView (context) {
             await vscode.window.showInformationMessage('Export to PDF not available for this document type.')
           }
           break
-        case 'exportTxt':
+        }
+        case 'exportTxt': {
           if (doc.languageId === 'xml') {
             await vscode.commands.executeCommand('draftforge.xmlOutput', 'txt')
           } else if (doc.languageId === 'markdown') {
@@ -112,6 +117,7 @@ export function activateToolsView (context) {
             await vscode.window.showInformationMessage('Export to TXT not available for this document type.')
           }
           break
+        }
         case 'extractCodeComponents': {
           await vscode.commands.executeCommand('draftforge.extractCodeComponents')
           break
@@ -120,10 +126,11 @@ export function activateToolsView (context) {
           await vscode.commands.executeCommand('draftforge.extractComments')
           break
         }
-        case 'formatDocument':
+        case 'formatDocument': {
           await vscode.commands.executeCommand('editor.action.formatDocument')
           break
-        case 'idnits':
+        }
+        case 'idnits': {
           let selectedMode = 'normal'
           const defaultMode = vscode.workspace.getConfiguration('draftforge.idnits').get('mode')
           if (defaultMode === 'prompt') {
@@ -141,23 +148,31 @@ export function activateToolsView (context) {
           }
           await vscode.commands.executeCommand('draftforge.idnits', selectedMode)
           break
-        case 'inconsistentCapitalization':
+        }
+        case 'inconsistentCapitalization': {
           await vscode.commands.executeCommand('draftforge.listInconsistentCapitalization')
           break
-        case 'lookupSelectionAcrossDocs':
+        }
+        case 'lookupSelectionAcrossDocs': {
           await vscode.commands.executeCommand('draftforge.lookupSelectionAcrossDocs')
           break
-        case 'openPreview':
+        }
+        case 'openPreview': {
           if (doc.languageId === 'xml') {
             await vscode.commands.executeCommand('draftforge.xmlPreview')
           } else if (doc.languageId === 'markdown') {
-            await vscode.commands.executeCommand('markdown.showPreview')
+            await vscode.commands.executeCommand('markdown.showPreviewToSide')
           } else {
             vscode.window.showInformationMessage('Preview not available for this document type.')
           }
           break
+        }
         case 'stripMLineEndings': {
           await vscode.commands.executeCommand('draftforge.stripMLineEndings')
+          break
+        }
+        case 'surroundBcp14Keywords': {
+          await vscode.commands.executeCommand('draftforge.surroundBcp14Keywords')
           break
         }
         case 'svgcheck': {
@@ -168,8 +183,9 @@ export function activateToolsView (context) {
           }
           break
         }
-        default:
+        default: {
           vscode.window.showWarningMessage(`Unknown tool: ${tool.id}`)
+        }
       }
     } catch (err) {
       console.warn(err)

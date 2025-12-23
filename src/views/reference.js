@@ -106,7 +106,7 @@ class ReferenceProvider {
         break
     }
     const item = new vscode.TreeItem(ref.label, itemCollapsibleState)
-    item.description = ref.description ?? false
+    item.description = ref.description ? `- ${ref.description}` : false
     item.tooltip = ref.tooltip
     item.iconPath = itemIconPath
     if (ref.href) {

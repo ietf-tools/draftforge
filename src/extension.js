@@ -14,6 +14,7 @@ import { registerExtractCommentsCommand } from './commands/extract-comments.js'
 import { registerListInconsistentCapitalizationCommand } from './commands/inconsistent-capitalization.js'
 import { registerLookupSelectionAcrossDocsCommand } from './commands/lookup-selection-across-docs.js'
 import { registerStripMLineEndingsCommand } from './commands/strip-mline-endings.js'
+import { registerSurroundBcp14KeywordsCommand } from './commands/surround-bcp14-keywords.js'
 import { registerSvgcheckCommand } from './commands/svgcheck.js'
 import { registerXmlOutputCommand } from './commands/xml-output.js'
 import { registerXmlPreviewCommand, unregisterXmlPreviewCommand } from './commands/xml-preview.js'
@@ -42,6 +43,7 @@ export function activate(context) {
   registerListInconsistentCapitalizationCommand(context)
   registerLookupSelectionAcrossDocsCommand(context)
 	registerStripMLineEndingsCommand(context)
+  registerSurroundBcp14KeywordsCommand(context)
   registerSvgcheckCommand(context, diagnosticCollection)
   registerXmlOutputCommand(context)
   registerXmlPreviewCommand(context)

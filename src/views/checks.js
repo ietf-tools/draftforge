@@ -39,7 +39,8 @@ class ChecksProvider {
 
   getTreeItem(check) {
     const item = new vscode.TreeItem(check.label, vscode.TreeItemCollapsibleState.None)
-    item.description = check.description
+    item.description = `> ${check.description}`
+    item.tooltip = check.description
     item.iconPath = new vscode.ThemeIcon(check.icon ?? 'debug-alt')
     item.command = {
       command: 'draftforge.runCheck',

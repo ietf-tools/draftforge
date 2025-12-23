@@ -64,7 +64,8 @@ class SnippetsProvider {
 
   getTreeItem(snippet) {
     const item = new vscode.TreeItem(snippet.label, vscode.TreeItemCollapsibleState.None)
-    item.description = snippet.description
+    item.description = `> ${snippet.description}`
+    item.tooltip = snippet.description
     item.iconPath = new vscode.ThemeIcon('symbol-method')
     item.command = {
       command: 'draftforge.insertSnippet',
