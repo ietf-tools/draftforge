@@ -38,6 +38,7 @@ This extension should almost never be installed standalone. Install one of these
   - Format Document
   - IDNits
   - List Inconsistent Capitalization
+  - List Inconsistent Formatting
   - Lookup Selection Across Docs
   - Open Preview
   - Strip `^M` Line Endings
