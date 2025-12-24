@@ -15,21 +15,36 @@ import { registerCheckRfcTermsCommand } from '../commands/rfc-terms.js'
 
 const ignores = {}
 
+class CheckItem {
+  /**
+   * @param {String} id
+   * @param {String} label
+   * @param {String} description
+   * @param {String} icon
+   */
+  constructor (id, label, description, icon) {
+    this.id = id
+    this.label = label
+    this.description = description
+    this.icon = icon
+  }
+}
+
 class ChecksProvider {
   constructor() {
     this._onDidChangeTreeData = new vscode.EventEmitter()
     this.onDidChangeTreeData = this._onDidChangeTreeData.event
 
     this.checks = [
-      { id: 'articles', label: 'Articles Check', description: 'Check for bad indefinite articles usage', icon: 'repo' },
-      { id: 'hyphenation', label: 'Hyphenation Check', description: 'Check for inconsistent hyphenation usage', icon: 'diff-removed' },
-      { id: 'inclusiveLanguage', label: 'Inclusive Language Check', description: 'Check for usage of non-inclusive terms', icon: 'heart' },
-      { id: 'names', label: 'Names Check', description: 'Check for author names preferences', icon: 'account' },
-      { id: 'nonAscii', label: 'Non-ASCII Check', description: 'Check for non-ASCII characters', icon: 'symbol-key' },
-      { id: 'placeholders', label: 'Placeholders Check', description: 'Check for common placeholders', icon: 'bracket' },
-      { id: 'rfcTerms', label: 'RFC-specific Terms Check', description: 'Check for RFC-specific terms usage', icon: 'coffee' },
-      { id: 'repeatedWords', label: 'Repeated Words Check', description: 'Check for accidental repeated terms', icon: 'layers' },
-      { id: 'typos', label: 'Typos Check', description: 'Check for common typos', icon: 'debug' }
+      new CheckItem('articles', 'Articles Check', 'Check for bad indefinite articles usage', 'repo'),
+      new CheckItem('hyphenation', 'Hyphenation Check', 'Check for inconsistent hyphenation usage', 'diff-removed'),
+      new CheckItem('inclusiveLanguage', 'Inclusive Language Check', 'Check for usage of non-inclusive terms', 'heart'),
+      new CheckItem('names', 'Names Check', 'Check for author names preferences', 'account'),
+      new CheckItem('nonAscii', 'Non-ASCII Check', 'Check for non-ASCII characters', 'symbol-key'),
+      new CheckItem('placeholders', 'Placeholders Check', 'Check for common placeholders', 'bracket'),
+      new CheckItem('rfcTerms', 'RFC-specific Terms Check', 'Check for RFC-specific terms usage', 'coffee'),
+      new CheckItem('repeatedWords', 'Repeated Words Check', 'Check for accidental repeated terms', 'layers'),
+      new CheckItem('typos', 'Typos Check', 'Check for common typos', 'debug')
     ]
   }
 
@@ -37,6 +52,11 @@ class ChecksProvider {
     this._onDidChangeTreeData.fire()
   }
 
+  /**
+   *
+   * @param {CheckItem} check
+   * @returns {vscode.TreeItem}
+   */
   getTreeItem(check) {
     const item = new vscode.TreeItem(check.label, vscode.TreeItemCollapsibleState.None)
     item.description = `> ${check.description}`
@@ -79,8 +99,11 @@ export async function activateChecksView (context, diagnosticCollection) {
     // Run Single Check
     context.subscriptions.push(vscode.commands.registerCommand('draftforge.runCheck', async (check, clearFirst = true) => {
       try {
-        if (!vscode.window.activeTextEditor) {
-          return vscode.window.showInformationMessage('No active editor to run checks on.')
+        const activeDoc = vscode.window.activeTextEditor?.document
+        if (!activeDoc) {
+          return vscode.window.showErrorMessage('No active editor to run check on.')
+        } else if (activeDoc.uri.scheme === 'output') {
+          return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
         }
 
         switch (check.id) {
@@ -123,8 +146,11 @@ export async function activateChecksView (context, diagnosticCollection) {
     // Run All Checks
     context.subscriptions.push(vscode.commands.registerCommand('draftforge.runAllChecks', async () => {
       try {
-        if (!vscode.window.activeTextEditor) {
-          return vscode.window.showInformationMessage('No active editor to run checks on.')
+        const activeDoc = vscode.window.activeTextEditor?.document
+        if (!activeDoc) {
+          return vscode.window.showErrorMessage('No active editor to run checks on.')
+        } else if (activeDoc.uri.scheme === 'output') {
+          return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
         }
 
         const checks = Array.isArray(checksProvider?.checks) ? checksProvider.checks : []

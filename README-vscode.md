@@ -37,6 +37,7 @@ This extension should almost never be installed standalone. Install one of these
   - Extract Code Components
   - Format Document
   - IDNits
+  - List Abbreviations
   - List Inconsistent Capitalization
   - List Inconsistent Formatting
   - Lookup Selection Across Docs

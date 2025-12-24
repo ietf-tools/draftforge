@@ -3,15 +3,19 @@ import * as vscode from 'vscode'
 export function registerStripMLineEndingsCommand (context) {
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.stripMLineEndings', async function () {
     const editor = vscode.window.activeTextEditor
-    if (!editor) {
-      return vscode.window.showInformationMessage('Open an XML document first.')
+    const activeDoc = editor?.document
+
+    if (!activeDoc) {
+      return vscode.window.showErrorMessage('Open a document first.')
+    } else if (activeDoc.uri.scheme === 'output') {
+      return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
+    } else if (!['xml', 'markdown', 'plaintext'].includes(activeDoc.languageId)) {
+      return vscode.window.showErrorMessage('Unsupported Document Type.')
     }
 
-    const doc = editor.document
-
     const ranges = []
-    for (let i = 0; i < doc.lineCount; i++) {
-      const text = doc.lineAt(i).text
+    for (let i = 0; i < activeDoc.lineCount; i++) {
+      const text = activeDoc.lineAt(i).text
       if (text.endsWith('^4')) {
         const start = new vscode.Position(i, text.length - 2)
         const end = new vscode.Position(i, text.length)

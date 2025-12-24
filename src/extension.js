@@ -11,6 +11,7 @@ import { registerAuthCommands } from './commands/auth.js'
 import { registerExpandIncludesCommands } from './commands/expand-includes.js'
 import { registerExtractCodeComponentsCommand } from './commands/extract-code-components.js'
 import { registerExtractCommentsCommand } from './commands/extract-comments.js'
+import { registerListAbbreviationsCommand } from './commands/abbreviations.js'
 import { registerListInconsistentCapitalizationCommand } from './commands/inconsistent-capitalization.js'
 import { registerListInconsistentFormattingCommand } from './commands/inconsistent-formatting.js'
 import { registerLookupSelectionAcrossDocsCommand } from './commands/lookup-selection-across-docs.js'
@@ -26,29 +27,34 @@ import { registerXmlPreviewCommand, unregisterXmlPreviewCommand } from './comman
 export function activate(context) {
 	console.log('Initializing DraftForge...')
 
+  // Create DraftForge Output channel
+  let outputChannel = vscode.window.createOutputChannel('DraftForge')
+  context.subscriptions.push(outputChannel)
+
 	// Register Diagnostic Collection
-	let diagnosticCollection
-	diagnosticCollection = vscode.languages.createDiagnosticCollection('draftforgeChecks')
+	let diagnosticCollection = vscode.languages.createDiagnosticCollection('draftforgeChecks')
 	context.subscriptions.push(diagnosticCollection)
 
   // Register auth provider
   context.subscriptions.push(new IetfAuthenticationProvider(context))
 
   // Register commands
+  // -> Note: Validation checks commands are registered in the Checks view
 	registerAddXmlModelsCommand(context)
   registerAuthCommands(context)
   registerExpandIncludesCommands(context)
-  registerExtractCodeComponentsCommand(context)
-	registerExtractCommentsCommand(context)
+  registerExtractCodeComponentsCommand(context, outputChannel)
+	registerExtractCommentsCommand(context, outputChannel)
 	registerIdnitsCommand(context)
-  registerListInconsistentCapitalizationCommand(context)
-  registerListInconsistentFormattingCommand(context)
-  registerLookupSelectionAcrossDocsCommand(context)
+  registerListAbbreviationsCommand(context, outputChannel)
+  registerListInconsistentCapitalizationCommand(context, outputChannel)
+  registerListInconsistentFormattingCommand(context, outputChannel)
+  registerLookupSelectionAcrossDocsCommand(context, outputChannel)
 	registerStripMLineEndingsCommand(context)
   registerSurroundBcp14KeywordsCommand(context)
   registerSvgcheckCommand(context, diagnosticCollection)
   registerXmlOutputCommand(context)
-  registerXmlPreviewCommand(context)
+  registerXmlPreviewCommand(context, outputChannel)
 
   // Activate views
 	activateChecksView(context, diagnosticCollection)

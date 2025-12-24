@@ -12,7 +12,15 @@ export function registerCheckRfcTermsCommand (context, diagnosticCollection, ign
     }
 
     try {
-      const activeDoc = vscode.window.activeTextEditor.document
+      const activeDoc = vscode.window.activeTextEditor?.document
+
+      if (!activeDoc) {
+        return vscode.window.showErrorMessage('Open a document first.')
+      } else if (activeDoc.uri.scheme === 'output') {
+        return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
+      } else if (!['xml', 'markdown', 'plaintext'].includes(activeDoc.languageId)) {
+        return vscode.window.showErrorMessage('Unsupported Document Type.')
+      }
 
       const eligibleIgnores = ignores[activeDoc.uri.toString()]?.rfcTerms ?? []
 

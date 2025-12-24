@@ -3,16 +3,17 @@ import * as vscode from 'vscode'
 export function registerSurroundBcp14KeywordsCommand (context) {
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.surroundBcp14Keywords', async function () {
     const editor = vscode.window.activeTextEditor
-    if (!editor) {
-      return vscode.window.showInformationMessage('Open an XML document first.')
+    const activeDoc = editor?.document
+
+    if (!activeDoc) {
+      return vscode.window.showErrorMessage('Open a document first.')
+    } else if (activeDoc.uri.scheme === 'output') {
+      return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
+    } else if (!['xml', 'markdown'].includes(activeDoc.languageId)) {
+      return vscode.window.showErrorMessage('Unsupported Document Type.')
     }
 
-    const doc = editor.document
-    if (doc.languageId !== 'xml') {
-      return vscode.window.showInformationMessage('Only XML documents are supported.')
-    }
-
-    const text = doc.getText()
+    const text = activeDoc.getText()
 
     const matchRgx = /<bcp14>[\s\S]*?<\/bcp14>|(?<term>MUST\sNOT|MUST|SHOULD\sNOT|SHOULD|SHALL\sNOT|SHALL|RECOMMENDED|NOT\sRECOMMENDED|MAY|OPTIONAL|REQUIRED)/g
     const sourcecodeRgx = /<sourcecode[^>]*>[\s\S]*?<\/sourcecode>/g
@@ -22,15 +23,15 @@ export function registerSurroundBcp14KeywordsCommand (context) {
 
     // List all sourcecode blocks first to exclude them
     while ((match = sourcecodeRgx.exec(text)) !== null) {
-      sourcecodeRanges.push(new vscode.Range(doc.positionAt(match.index), doc.positionAt(match.index + match[0].length)))
+      sourcecodeRanges.push(new vscode.Range(activeDoc.positionAt(match.index), activeDoc.positionAt(match.index + match[0].length)))
     }
 
     // Match all BCP 14 keywords
     while ((match = matchRgx.exec(text)) !== null) {
       if (match.groups?.term) {
         const term = match.groups.term
-        const startPos = doc.positionAt(match.index)
-        const endPos = doc.positionAt(match.index + match[0].length)
+        const startPos = activeDoc.positionAt(match.index)
+        const endPos = activeDoc.positionAt(match.index + match[0].length)
 
         // -> Ensure it's not within a sourcecode block range
         if (sourcecodeRanges.some(rg => rg.contains(startPos))) {

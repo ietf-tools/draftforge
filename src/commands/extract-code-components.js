@@ -3,11 +3,20 @@ import { posix } from 'node:path'
 
 const EXTRACT_DIR = 'code-extracts'
 
-export function registerExtractCodeComponentsCommand (context) {
+/**
+ * @param {vscode.ExtensionContext} context
+ * @param {vscode.OutputChannel} outputChannel
+ */
+export function registerExtractCodeComponentsCommand (context, outputChannel) {
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.extractCodeComponents', async function () {
-    const editor = vscode.window.activeTextEditor
-    if (!editor) {
-      return vscode.window.showInformationMessage('Open a document first.')
+    const activeDoc = vscode.window.activeTextEditor?.document
+
+    if (!activeDoc) {
+      return vscode.window.showErrorMessage('Open a document first.')
+    } else if (activeDoc.uri.scheme === 'output') {
+      return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
+    } else if (!['xml', 'markdown'].includes(activeDoc.languageId)) {
+      return vscode.window.showErrorMessage('Unsupported Document Type.')
     }
 
     // -> Prompt the user for types to include
@@ -31,15 +40,13 @@ export function registerExtractCodeComponentsCommand (context) {
 
     // -> Process document
     try {
-      const doc = editor.document
-      const workspacePath = vscode.workspace.getWorkspaceFolder(doc.uri).uri.fsPath
+      const workspacePath = vscode.workspace.getWorkspaceFolder(activeDoc.uri).uri.fsPath
 
       const codeRgx = /<sourcecode ?(?<attr>[a-z0-9=@\.\-_ "]+)?>\n?(?<code>[\s\S]+?)\n?<\/sourcecode>/gmi
-      const contents = doc.getText()
+      const contents = activeDoc.getText()
 
-      const output = vscode.window.createOutputChannel('DraftForge')
-      output.clear()
-      output.appendLine(`Code components extracted from ${doc.fileName}:\n`)
+      outputChannel.clear()
+      outputChannel.appendLine(`Code components extracted from ${activeDoc.fileName}:\n`)
       let idx = 1
       let noNameIdx = 1
 
@@ -59,7 +66,7 @@ export function registerExtractCodeComponentsCommand (context) {
           codeType = match.groups.attr.match(reType)?.groups?.type?.trim()
         }
         if (!codeFileName) {
-          codeFileName = `${posix.parse(doc.fileName).name}-${noNameIdx}`
+          codeFileName = `${posix.parse(activeDoc.fileName).name}-${noNameIdx}`
           noNameIdx++
         }
         if (!codeFileName.includes('.')) {
@@ -88,20 +95,20 @@ export function registerExtractCodeComponentsCommand (context) {
         // -> Export code to disk
         await vscode.workspace.fs.writeFile(vscode.Uri.parse(posix.join(workspacePath, EXTRACT_DIR, codeFileName)), new TextEncoder().encode(match.groups?.code || ''))
 
-        output.appendLine(`- ./${EXTRACT_DIR}/${codeFileName}`)
+        outputChannel.appendLine(`- ./${EXTRACT_DIR}/${codeFileName}`)
         idx++
       }
       idx--
 
       if (idx <= 0) {
-        output.appendLine('No code components found.')
+        outputChannel.appendLine('No code components found.')
         vscode.window.showInformationMessage('No code components found.')
       } else {
-        output.appendLine(`\n${idx - 1} code components extracted to ./${EXTRACT_DIR}`)
+        outputChannel.appendLine(`\n${idx - 1} code components extracted to ./${EXTRACT_DIR}`)
         vscode.window.showInformationMessage(`Found ${idx - 1} code component(s). See Output: DraftForge`)
       }
 
-      output.show(true)
+      outputChannel.show(true)
     } catch (err) {
       console.log(err)
       vscode.window.showErrorMessage(`Something went wrong: ${err.message}`)

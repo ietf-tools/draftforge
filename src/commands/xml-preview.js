@@ -9,6 +9,10 @@ import { debounce } from 'lodash-es'
 const execAsync = promisify(exec)
 let tmpPath = ''
 
+/**
+ * Get loading template
+ * @returns {String}
+ */
 function getLoadingContent() {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -20,9 +24,14 @@ function getLoadingContent() {
 <body>
   <div>Rendering preview...</div>
 </body>
-</html>`;
+</html>`
 }
 
+/**
+ * Get error template
+ * @param {String} errorMsg
+ * @returns {String}
+ */
 function getErrorContent(errorMsg) {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -35,7 +44,7 @@ function getErrorContent(errorMsg) {
   <div style="padding: 15px 0; font-size: 1.2rem;"><strong>Failed to render preview</strong></div>
   <div>${errorMsg.replaceAll("\n", '<br>')}</div>
 </body>
-</html>`;
+</html>`
 }
 
 class DocumentPreview {
@@ -138,18 +147,21 @@ class DocumentPreview {
 
 /**
  * @param {vscode.ExtensionContext} context
+ * @param {vscode.OutputChannel} outputChannel
  */
-export function registerXmlPreviewCommand (context) {
+export function registerXmlPreviewCommand (context, outputChannel) {
   let previews = {}
-
-  const outputChannel = vscode.window.createOutputChannel('xml2rfc')
-  context.subscriptions.push(outputChannel)
 
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.xmlPreview', async function () {
     try {
-      const activeDoc = vscode.window.activeTextEditor.document
-      if (!activeDoc || activeDoc.languageId !== 'xml') {
-        return vscode.window.showErrorMessage('Open or select an XML document first.')
+      const activeDoc = vscode.window.activeTextEditor?.document
+
+      if (!activeDoc) {
+        return vscode.window.showErrorMessage('Open a document first.')
+      } else if (activeDoc.uri.scheme === 'output') {
+        return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
+      } else if (activeDoc.languageId !== 'xml') {
+        return vscode.window.showErrorMessage('Unsupported Document Type.')
       }
 
       const activeUri = activeDoc.uri.toString()

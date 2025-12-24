@@ -36,6 +36,7 @@ class ToolsProvider {
       { id: 'extractCodeComponents', label: 'Extract Code Components', description: 'Extract all or some sourcecode blocks', icon: 'file-code' },
       { id: 'formatDocument', label: 'Format Document', description: 'Reformat document and fix indentation', icon: 'list-flat' },
       { id: 'idnits', label: 'IDNits', description: 'Run idnits on the current document', icon: 'tasklist' },
+      { id: 'abbreviations', label: 'List Abbreviations', description: 'List abbreviation expansion usage', icon: 'whole-word' },
       { id: 'inconsistentCapitalization', label: 'List Inconsistent Capitalization', description: 'List inconsistent use of capitalization', icon: 'case-sensitive' },
       { id: 'inconsistentFormatting', label: 'List Inconsistent Formatting', description: 'List inconsistent formatting like bold, italics, etc.', icon: 'paintcan' },
       { id: 'lookupSelectionAcrossDocs', label: 'Lookup Selection Across Docs', description: 'In opened documents', icon: 'search' },
@@ -85,6 +86,10 @@ export function activateToolsView (context) {
 
       const doc = vscode.window.activeTextEditor.document
       switch (tool.id) {
+        case 'abbreviations': {
+          await vscode.commands.executeCommand('draftforge.listAbbreviations')
+          break
+        }
         case 'addXmlModels': {
           await vscode.commands.executeCommand('draftforge.addXmlModels')
           break

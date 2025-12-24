@@ -37,13 +37,21 @@ export function registerIdnitsCommand (context) {
 
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.idnits', async function (mode = 'normal') {
     try {
-      const activeDoc = vscode.window.activeTextEditor.document
+      const activeDoc = vscode.window.activeTextEditor?.document
+
+      if (!activeDoc) {
+        return vscode.window.showErrorMessage('Open a document first.')
+      } else if (activeDoc.uri.scheme === 'output') {
+        return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
+      } else if (!['xml', 'plaintext'].includes(activeDoc.languageId)) {
+        return vscode.window.showErrorMessage('Unsupported Document Type.')
+      }
+
       const activeUri = activeDoc.uri.toString()
       const activeFilename = path.parse(activeDoc.fileName).base
       const enc = new TextEncoder()
       const results = []
       const resultGroups = []
-      let nitsTotal = 0
       const nitsByType = {
         error: 0,
         warning: 0,
@@ -141,7 +149,6 @@ export function registerIdnitsCommand (context) {
                 if (!valTask.isVoid && Array.isArray(taskResults)) {
                   resultGroups[grpIdx].nitsTotal += taskResults.length
 
-                  nitsTotal++
                   for (const nit of taskResults) {
                     let result = 'unknown'
                     if (nit instanceof ValidationComment) {

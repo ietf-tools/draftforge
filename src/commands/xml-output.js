@@ -7,6 +7,13 @@ import { tmpdir } from 'node:os'
 
 const execAsync = promisify(exec)
 
+/**
+ * Run XML2RFC
+ * @param {String} inputContent
+ * @param {String} outputFileType
+ * @param {String} outputPathUri
+ * @returns {Promise<void>}
+ */
 async function run (inputContent, outputFileType, outputPathUri) {
   try {
     // Get temp dir
@@ -38,11 +45,16 @@ async function run (inputContent, outputFileType, outputPathUri) {
  */
 export function registerXmlOutputCommand (context) {
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.xmlOutput', async function (fileType = 'html') {
-    if (!vscode.window.activeTextEditor || vscode.window.activeTextEditor.document.languageId !== 'xml') {
-      return vscode.window.showInformationMessage('Select an XML document first.')
+    const activeDoc = vscode.window.activeTextEditor?.document
+
+    if (!activeDoc) {
+      return vscode.window.showErrorMessage('Open a document first.')
+    } else if (activeDoc.uri.scheme === 'output') {
+      return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
+    } else if (activeDoc.languageId !== 'xml') {
+      return vscode.window.showErrorMessage('Unsupported Document Type.')
     }
 
-    const activeDoc = vscode.window.activeTextEditor.document
     const activeUriPath = path.posix.parse(activeDoc.uri.fsPath)
     const defaultUri = vscode.Uri.parse(path.posix.join(activeUriPath.dir, `${activeUriPath.name}.${fileType}`))
 

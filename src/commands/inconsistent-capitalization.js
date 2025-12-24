@@ -2,38 +2,46 @@ import * as vscode from 'vscode'
 
 /**
  * @param {vscode.ExtensionContext} context
+ * @param {vscode.OutputChannel} outputChannel
  */
-export function registerListInconsistentCapitalizationCommand (context) {
+export function registerListInconsistentCapitalizationCommand (context, outputChannel) {
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.listInconsistentCapitalization', async function () {
     try {
-      const activeDoc = vscode.window.activeTextEditor.document
+      const activeDoc = vscode.window.activeTextEditor?.document
+
+      if (!activeDoc) {
+        return vscode.window.showErrorMessage('Open a document first.')
+      } else if (activeDoc.uri.scheme === 'output') {
+        return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
+      } else if (!['xml', 'markdown', 'plaintext'].includes(activeDoc.languageId)) {
+        return vscode.window.showErrorMessage('Unsupported Document Type.')
+      }
 
       const results = findInconsistentCapitalization(activeDoc.getText())
 
-      const output = vscode.window.createOutputChannel('DraftForge')
-      output.clear()
-      output.appendLine(`List of inconsistent use of capitalization in ${activeDoc.fileName}:\n`)
+      outputChannel.clear()
+      outputChannel.appendLine(`List of inconsistent use of capitalization in ${activeDoc.fileName}:\n`)
       let idx = 0
 
       for (const key in results) {
         if (idx > 0) {
-          output.appendLine('--------')
+          outputChannel.appendLine('--------')
         }
         idx++
         const phrase = results[key]
         for (const variation of phrase) {
-          output.appendLine(`${variation.text} (${variation.count})`)
+          outputChannel.appendLine(`${variation.text} (${variation.count})`)
         }
       }
 
       if (idx === 0) {
-        output.appendLine('No inconsistent capitalization use found.')
+        outputChannel.appendLine('No inconsistent capitalization use found.')
         vscode.window.showInformationMessage('No inconsistent capitalization use found.')
       } else {
         vscode.window.showInformationMessage(`Found ${idx} inconsistent use of capitalization. See Output: DraftForge`)
       }
 
-      output.show(true)
+      outputChannel.show(true)
     } catch (err) {
       console.warn(err)
       vscode.window.showErrorMessage(err.message)

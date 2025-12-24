@@ -7,6 +7,11 @@ import { tmpdir } from 'node:os'
 
 const execAsync = promisify(exec)
 
+/**
+ * Run SVGCheck on text input
+ * @param {String} inputContent
+ * @returns {Promise<String>}
+ */
 async function run (inputContent) {
   try {
     // Get temp dir
@@ -38,11 +43,15 @@ async function run (inputContent) {
  */
 export function registerSvgcheckCommand (context, diagnosticCollection) {
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.svgcheck', async function () {
-    if (!vscode.window.activeTextEditor || vscode.window.activeTextEditor.document.languageId !== 'xml') {
-      return vscode.window.showInformationMessage('Select an XML / SVG document first.')
-    }
+    const activeDoc = vscode.window.activeTextEditor?.document
 
-    const activeDoc = vscode.window.activeTextEditor.document
+    if (!activeDoc) {
+      return vscode.window.showErrorMessage('Open a document first.')
+    } else if (activeDoc.uri.scheme === 'output') {
+      return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
+    } else if (activeDoc.languageId !== 'xml') {
+      return vscode.window.showErrorMessage('Unsupported Document Type.')
+    }
 
     diagnosticCollection.clear()
 

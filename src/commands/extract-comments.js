@@ -1,37 +1,43 @@
 import * as vscode from 'vscode'
 
-export function registerExtractCommentsCommand (context) {
+/**
+ * @param {vscode.ExtensionContext} context
+ * @param {vscode.OutputChannel} outputChannel
+ */
+export function registerExtractCommentsCommand (context, outputChannel) {
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.extractComments', async function () {
-    const editor = vscode.window.activeTextEditor
-    if (!editor) {
-      return vscode.window.showInformationMessage('Open an XML document first.')
+    const activeDoc = vscode.window.activeTextEditor?.document
+
+    if (!activeDoc) {
+      return vscode.window.showErrorMessage('Open a document first.')
+    } else if (activeDoc.uri.scheme === 'output') {
+      return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
+    } else if (!['xml', 'markdown'].includes(activeDoc.languageId)) {
+      return vscode.window.showErrorMessage('Unsupported Document Type.')
     }
 
-    const doc = editor.document
-
     const commentsRgx = /<!-- \[rfced\]([^]+?)-->/gmi
-    const contents = doc.getText()
+    const contents = activeDoc.getText()
 
-    const output = vscode.window.createOutputChannel('DraftForge')
-    output.clear()
-    output.appendLine(`List of comments for the RPC staff in ${doc.fileName}:\n`)
+    outputChannel.clear()
+    outputChannel.appendLine(`List of comments for the RPC staff in ${activeDoc.fileName}:\n`)
     let idx = 0
 
     for (const match of contents.matchAll(commentsRgx)) {
       if (idx > 0) {
-        output.appendLine('\n--------\n')
+        outputChannel.appendLine('\n--------\n')
       }
       idx++
-      output.appendLine(`${idx}. ${match[1].trim()}`)
+      outputChannel.appendLine(`${idx}. ${match[1].trim()}`)
     }
 
     if (idx === 0) {
-      output.appendLine('No [rfced] mentions found.')
+      outputChannel.appendLine('No [rfced] mentions found.')
       vscode.window.showInformationMessage('No [rfced] mentions found.')
     } else {
       vscode.window.showInformationMessage(`Found ${idx} [rfced] mention(s). See Output: DraftForge`)
     }
 
-    output.show(true)
+    outputChannel.show(true)
   }))
 }
