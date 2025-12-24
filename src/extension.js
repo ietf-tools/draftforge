@@ -12,6 +12,7 @@ import { registerExpandIncludesCommands } from './commands/expand-includes.js'
 import { registerExtractCodeComponentsCommand } from './commands/extract-code-components.js'
 import { registerExtractCommentsCommand } from './commands/extract-comments.js'
 import { registerListInconsistentCapitalizationCommand } from './commands/inconsistent-capitalization.js'
+import { registerListInconsistentFormattingCommand } from './commands/inconsistent-formatting.js'
 import { registerLookupSelectionAcrossDocsCommand } from './commands/lookup-selection-across-docs.js'
 import { registerStripMLineEndingsCommand } from './commands/strip-mline-endings.js'
 import { registerSurroundBcp14KeywordsCommand } from './commands/surround-bcp14-keywords.js'
@@ -41,6 +42,7 @@ export function activate(context) {
 	registerExtractCommentsCommand(context)
 	registerIdnitsCommand(context)
   registerListInconsistentCapitalizationCommand(context)
+  registerListInconsistentFormattingCommand(context)
   registerLookupSelectionAcrossDocsCommand(context)
 	registerStripMLineEndingsCommand(context)
   registerSurroundBcp14KeywordsCommand(context)

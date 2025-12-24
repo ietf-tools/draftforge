@@ -37,6 +37,7 @@ class ToolsProvider {
       { id: 'formatDocument', label: 'Format Document', description: 'Reformat document and fix indentation', icon: 'list-flat' },
       { id: 'idnits', label: 'IDNits', description: 'Run idnits on the current document', icon: 'tasklist' },
       { id: 'inconsistentCapitalization', label: 'List Inconsistent Capitalization', description: 'List inconsistent use of capitalization', icon: 'case-sensitive' },
+      { id: 'inconsistentFormatting', label: 'List Inconsistent Formatting', description: 'List inconsistent formatting like bold, italics, etc.', icon: 'paintcan' },
       { id: 'lookupSelectionAcrossDocs', label: 'Lookup Selection Across Docs', description: 'In opened documents', icon: 'search' },
       { id: 'openPreview', label: 'Open Preview', description: 'Open a preview of the current document', icon: 'open-preview' },
       { id: 'stripMLineEndings', label: 'Strip ^M Line Endings', description: 'Clean Document from ^M Line Endings', icon: 'no-newline' },
@@ -151,6 +152,10 @@ export function activateToolsView (context) {
         }
         case 'inconsistentCapitalization': {
           await vscode.commands.executeCommand('draftforge.listInconsistentCapitalization')
+          break
+        }
+        case 'inconsistentFormatting': {
+          await vscode.commands.executeCommand('draftforge.listInconsistentFormatting')
           break
         }
         case 'lookupSelectionAcrossDocs': {
