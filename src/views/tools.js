@@ -23,8 +23,8 @@ class ToolsProvider {
   populateTools() {
     const flags = {
       rpc: vscode.workspace.getConfiguration('draftforge').get('experience') === 'rpc',
-      xml: vscode.window.activeTextEditor.document.languageId === 'xml',
-      md: vscode.window.activeTextEditor.document.languageId === 'markdown'
+      xml: vscode.window.activeTextEditor?.document.languageId === 'xml',
+      md: vscode.window.activeTextEditor?.document.languageId === 'markdown'
     }
 
     this.tools = [

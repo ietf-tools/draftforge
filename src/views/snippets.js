@@ -17,7 +17,7 @@ class SnippetsProvider {
   }
 
   populateSnippets () {
-    const currentLanguage = vscode.window.activeTextEditor.document.languageId
+    const currentLanguage = vscode.window.activeTextEditor?.document.languageId
     this.snippets = [
       {
         id: 'xmlAuthorBlock',
