@@ -1,0 +1,32 @@
+site_name: IETF DraftForge
+site_url: https://draftforge.ietf.org
+plugins:
+  - search
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - search.suggest
+    - search.highlight
+  palette:
+    primary: red
+    accent: pink
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: install.md
+    - Usage: usage.md
+  - Validation Checks:
+    - Abbreviations: checks/abbreviations.md
+    - Articles: checks/articles.md
+    - Hyphenation: checks/hyphenation.md
+    - Inclusive Language: checks/inclusive-language.md
+  - Tools:
+    - Add XML Models: tools/add-xml-models.md
+  - Snippets:
+    - XMLRFC: snippets/xmlrfc.md
+  - Reference: reference.md
