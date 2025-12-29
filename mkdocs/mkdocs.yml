@@ -4,11 +4,18 @@ site_author: IETF Tools Team
 site_description: VS Code extension to write, review, refine and submit Internet-Drafts.
 repo_name: ietf-tools/draftforge
 repo_url: https://github.com/ietf-tools/draftforge
+copyright: "Made with ❤️ by the IETF Tools team"
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/ietf-tools/draftforge
+      name: GitHub
 plugins:
   - search
 markdown_extensions:
   - admonition
   - attr_list
+  - pymdownx.blocks.caption
   - pymdownx.details
   - pymdownx.superfences
   - pymdownx.tasklist:
