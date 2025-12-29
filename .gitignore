@@ -144,4 +144,5 @@ media/webviews/
 
 python-dbg
 
+mkdocs/site
 mkdocs/venv

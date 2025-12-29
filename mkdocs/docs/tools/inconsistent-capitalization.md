@@ -8,7 +8,7 @@ This tool lists instances of inconsistent capitalization for sequences of 2 to 5
     Using both `autonomous system` and `Autonomous System` will  be flagged as inconsistent.
 
 !!! note
-    - Capitalization at the start of a sentence is and will not result in a match.
+    - Capitalization at the start of a sentence is ignored and will not result in a match.
     - Words shorter than 3 characters (e.g. `at`, `the`, etc.) are ignored to avoid too many false positives.
     - Matches that are contained in longer matches are discarded. Only the longest match is kept.
 
