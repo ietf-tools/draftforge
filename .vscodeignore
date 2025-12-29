@@ -6,6 +6,7 @@ test/**
 .npmrc
 docs
 extension-packs
+mkdocs
 node_modules
 src
 webviews

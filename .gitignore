@@ -143,3 +143,5 @@ vite.config.ts.timestamp-*
 media/webviews/
 
 python-dbg
+
+mkdocs/venv

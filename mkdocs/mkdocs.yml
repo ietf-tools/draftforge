@@ -1,32 +1,67 @@
 site_name: IETF DraftForge
 site_url: https://draftforge.ietf.org
+site_author: IETF Tools Team
+site_description: VS Code extension to write, review, refine and submit Internet-Drafts.
+repo_name: ietf-tools/draftforge
+repo_url: https://github.com/ietf-tools/draftforge
 plugins:
   - search
 markdown_extensions:
   - admonition
+  - attr_list
   - pymdownx.details
   - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
 theme:
   name: material
   features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.footer
     - navigation.tabs
     - search.suggest
     - search.highlight
+    - toc.follow
   palette:
-    primary: red
-    accent: pink
+    scheme: slate
+    primary: black
+    accent: red
+  logo: assets/logo.png
+  favicon: assets/logo.png
 nav:
   - Home: index.md
   - Getting Started:
     - Installation: install.md
     - Usage: usage.md
   - Validation Checks:
-    - Abbreviations: checks/abbreviations.md
     - Articles: checks/articles.md
     - Hyphenation: checks/hyphenation.md
     - Inclusive Language: checks/inclusive-language.md
+    - Names: checks/names.md
+    - Non-ASCII: checks/non-ascii.md
+    - Placeholders: checks/placeholders.md
+    - RFC-specific Terms: checks/rfc-terms.md
+    - Typos: checks/typos.md
   - Tools:
     - Add XML Models: tools/add-xml-models.md
+    - Export As HTML/PDF/TXT: tools/export-as.md
+    - Extract [rfced] Comments: tools/extract-comments.md
+    - Extract Code Components: tools/extract-code-components.md
+    - Format Document: tools/format-document.md
+    - IDNits: tools/idnits.md
+    - List Abbreviations: tools/abbreviations.md
+    - List Inconsistent Capitalization: tools/inconsistent-capitalization.md
+    - List Inconsistent Formatting: tools/inconsistent-formatting.md
+    - Lookup Selection Across Docs: tools/lookup-selection-across-docs.md
+    - Open Preview: tools/preview.md
+    - Strip ^M Line Endings: tools/strip-mline-endings.md
+    - Surround BCP 14 Keywords: tools/surround-bcp14-keywords.md
   - Snippets:
-    - XMLRFC: snippets/xmlrfc.md
+    - RFCXML: snippets/rfcxml.md
   - Reference: reference.md
+exclude_docs: |
+  /requirements.txt
+  /venv
+watch:
+  - docs
