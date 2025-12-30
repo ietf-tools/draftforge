@@ -2,7 +2,7 @@
 
 ## Description
 
-This tool performs...
+This tool removes all instances of `^4` in the document.
 
 ## Supported Document Types
 

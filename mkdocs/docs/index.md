@@ -14,5 +14,5 @@ hide:
 
 *DraftForge is under active development. A beta release will be available in the coming months.*
 
-[Getting Started](/install)
+[Getting Started](install.md)
 { .md-button }

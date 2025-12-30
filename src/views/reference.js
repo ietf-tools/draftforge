@@ -11,7 +11,7 @@ class ReferenceProvider {
         label: 'User Guide',
         description: 'How to use DraftForge',
         kind: 'link',
-        href: 'https://github.com/ietf-tools/draftforge/blob/main/docs/README.md#usage'
+        href: 'https://draftforge.ietf.org/usage/'
       },
       {
         id: 'general',
