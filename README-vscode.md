@@ -8,7 +8,7 @@ IETF DraftForge provide tools, validation checks and snippets for both Internet-
 
 ## Install
 
-Follow the [User Guide](https://github.com/ietf-tools/draftforge/blob/main/docs/README.md) for installation instructions.
+Follow the [User Guide](https://draftforge.ietf.org/install/) for installation instructions.
 
 Some features of this extension relies on several dependencies that must also be installed, depending on your workflow.
 This extension should almost never be installed standalone. Install one of these extension packs instead:
