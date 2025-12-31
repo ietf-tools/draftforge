@@ -17,6 +17,8 @@ markdown_extensions:
   - attr_list
   - pymdownx.blocks.caption
   - pymdownx.details
+  - pymdownx.keys
+  - pymdownx.smartsymbols
   - pymdownx.superfences
   - pymdownx.tasklist:
       custom_checkbox: true

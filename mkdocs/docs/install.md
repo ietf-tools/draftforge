@@ -4,13 +4,19 @@
 
 1. Install [Visual Studio Code](https://code.visualstudio.com/)
 2. In the left activity bar, click the **Extensions** icon.
-3. Search for "`draftforge`" and install the extension:
-    - If you're part of the RFC Production Center, install the **DraftForge for the RFC Production Center** extension pack.
-    - Otherwise, install the **DraftForge for Internet-Draft Authors**.
+3. Search for "`draftforge`" and install one of the following extension packs:
+    - If you're part of the RFC Production Center staff, install the [**DraftForge for the RFC Production Center**](https://marketplace.visualstudio.com/items?itemName=ietf.draftforge-rpc) extension pack.
+    - Otherwise, install the [**DraftForge for Internet-Draft Authors**](https://marketplace.visualstudio.com/items?itemName=ietf.draftforge-authors).
+4. Read the [Usage](usage.md) guide to start using it.
 
-## Optional Dependencies
+!!! warning
+    Do not install the "DraftForge" extension by itself, as you're going to be missing important dependencies. Use one of the two extension packs listed above instead.
+    
+    They both bundle the core "DraftForge" extension and all the necessary 3rd-party extensions dependencies.
 
-GitHub repositories created under the `rfc-editor-drafts` organisation includes a devcontainer image, which contains all the necessary dependencies. **Therefore, you don't need to install anything listed below.**
+## Optional System Dependencies
+
+GitHub repositories created under the `rfc-editor-drafts` organisation includes a devcontainer image, which contains all the necessary system dependencies. **Therefore, you don't need to install anything listed below.**
 
 If you don't plan on working with these repositories or don't want to use the devcontainer image, you need to manually install these dependencies to be able to use all available features. Note that many of these packages are only used by the RPC and may not be relevant for authors.
 
