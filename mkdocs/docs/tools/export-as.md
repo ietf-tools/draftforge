@@ -2,7 +2,19 @@
 
 ## Description
 
-This tool performs...
+This tool exports the document to HTML / PDF / Plain Text.
+
+#### RFCXML
+
+This tool depends on the `xml2rfc` system dependency.
+
+#### Markdown
+
+*Coming soon*
+
+#### Plain Text
+
+*Coming soon*
 
 ## Supported Document Types
 

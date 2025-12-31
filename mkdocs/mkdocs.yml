@@ -68,6 +68,7 @@ nav:
     - Surround BCP 14 Keywords: tools/surround-bcp14-keywords.md
   - Snippets:
     - RFCXML: snippets/rfcxml.md
+    - Markdown: snippets/markdown.md
   - Reference: reference.md
 exclude_docs: |
   /requirements.txt
