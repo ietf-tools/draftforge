@@ -30,11 +30,19 @@ export function registerCheckNamesCommand (context, diagnosticCollection, ignore
       const eligibleIgnores = ignores[activeDoc.uri.toString()]?.names ?? []
 
       if (names.length < 1) {
-        const resp = await fetch(AUTHOR_NAMES_URL).then(r => r.json())
-        if (Array.isArray(resp) && resp?.length > 0) {
-          names = resp
-        } else {
-          throw new Error('Failed to fetch author names preferences from GitHub.')
+        try {
+          const resp = await fetch(AUTHOR_NAMES_URL).then(r => r.json())
+          if (Array.isArray(resp) && resp?.length > 0) {
+            names = resp
+          } else {
+            throw new Error('Failed to fetch author names preferences from GitHub.')
+          }
+        } catch (err) {
+          if (err.name === 'SyntaxError') {
+            throw new Error('Remote names.json file has invalid formatting.')
+          } else {
+            throw err
+          }
         }
       }
 
