@@ -2,7 +2,7 @@
   "name": "draftforge-rpc",
   "displayName": "DraftForge for the RFC Production Center",
   "description": "An extension pack for the RFC Production Center",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "ietf",
   "repository": {
     "type": "git",
