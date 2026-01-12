@@ -33,5 +33,5 @@ If you don't plan on working with these repositories or don't want to use the de
 - [Ruby](https://www.ruby-lang.org/) with the following gems:
     - [kramdown-rfc2629](https://github.com/cabo/kramdown-rfc)
 - [bap](https://github.com/ietf-tools/bap)
-- [htmlwdiff](https://github.com/ietf-tools/htmlwdiff)
-- [prep](https://github.com/ietf-tools/prep)
+- [htmlwdiff](https://github.com/ietf-tools/bap/blob/master/htmlwdiff)
+- [prep](https://github.com/ietf-tools/bap/blob/master/prep)
