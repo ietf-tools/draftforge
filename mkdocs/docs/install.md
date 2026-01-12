@@ -3,11 +3,12 @@
 ## Setup
 
 1. Install [Visual Studio Code](https://code.visualstudio.com/)
-2. In the left activity bar, click the **Extensions** icon.
-3. Search for "`draftforge`" and install one of the following extension packs:
+2. Install [Docker](https://www.docker.com/products/docker-desktop/) if working with the `rfc-editor-drafts` repositories, which rely on devcontainers. Optional otherwise.
+3. Launch **Visual Studio Code**. In the left activity bar, click the **Extensions** icon.
+4. Search for "`draftforge`" and install one of the following extension packs:
     - If you're part of the RFC Production Center staff, install the [**DraftForge for the RFC Production Center**](https://marketplace.visualstudio.com/items?itemName=ietf.draftforge-rpc) extension pack.
     - Otherwise, install the [**DraftForge for Internet-Draft Authors**](https://marketplace.visualstudio.com/items?itemName=ietf.draftforge-authors).
-4. Read the [Usage](usage.md) guide to start using it.
+5. Read the [Usage](usage.md) guide to start using it.
 
 !!! warning
     Do not install the "DraftForge" extension by itself, as you're going to be missing important dependencies. Use one of the two extension packs listed above instead.

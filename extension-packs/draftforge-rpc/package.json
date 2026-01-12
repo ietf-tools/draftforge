@@ -30,6 +30,7 @@
   },
   "extensionPack": [
     "ietf.draftforge",
+    "ms-vscode-remote.remote-containers",
     "ban.spellright",
     "redhat.vscode-xml"
   ],
