@@ -43,6 +43,7 @@ nav:
   - Getting Started:
     - Installation: install.md
     - Usage: usage.md
+    - RPC Workflow: workflow.md
   - Validation Checks:
     - Articles: checks/articles.md
     - Hyphenation: checks/hyphenation.md
