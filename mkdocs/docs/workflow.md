@@ -42,7 +42,7 @@ This page details the full workflow for working on a draft by the RPC.
 ## Switching to a different draft
 
 !!! info
-    A devcontainer is unique to each draft. Everything you see in the Visual Studio Code window is specific to the draft you opened the devcontainer with. It is an isolated environment with only the `/workspace` path being mapped to the cloned repository on your local machine. As such, you cannot access other drafts you cloned or other paths from within the devcontainer.
+    A devcontainer is unique to each draft. Everything you see in the Visual Studio Code window is specific to the draft you opened the devcontainer with. It is an isolated environment with only the `/workspace` path being mapped to the cloned repository on your local machine. As such, you cannot access other drafts you cloned or other paths of your machine from within the devcontainer.
 
     For example, the path `~/drafts/draft-ietf-foo-bar` on your machine will be mapped to `/workspace` in the devcontainer for that draft.
 
@@ -59,3 +59,15 @@ You can have multiple devcontainers opened at the same time. Each window being a
 You can copy content between windows using the clipboard. However, you cannot access the filesystem of another devcontainer from the integrated terminal. The integrated terminal is bound to the devcontainer context and can only see its isolated environment, with `/workspace` being the only path mapped to the outside.
 
 While you can create temporary files outside the `/workspace` path, you should always work under the `/workspace` path when possible. Because the `/workspace` path is directly mapped to your local machine, its contents will persist even if the devcontainer is destroyed.
+
+## Committing changes
+
+After making changes to a draft, you should create a commit to save these changes.
+
+1. Click on the Source Control tab in the left activity bar.
+2. Enter a message describing the change (e.g. `reformatted section ABCDEF`).
+3. Click the blue **Commit** button.
+4. Click the blue **Sync Changes** button to push the changes to GitHub.
+
+!!! tip
+    You can create as many commits as needed. They are a great way to save a specific point in time and revert back later if needed. You don't need to immediately **Sync Changes** after creating a commit if you want to refine the draft further before pushing all the changes to GitHub.
