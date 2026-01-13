@@ -38,3 +38,24 @@ This page details the full workflow for working on a draft by the RPC.
 4. Wait for the devcontainer to initialize. This can take a while the very first time. Click the "Connecting to Dev Container (show log)" link in the bottom-right corner of the window to follow the progress.
 5. Once you see the file listing in the left sidebar, the devcontainer is ready.
 6. Select a draft XML/Markdown/TXT file to start working on it.
+
+## Switching to a different draft
+
+!!! info
+    A devcontainer is unique to each draft. Everything you see in the Visual Studio Code window is specific to the draft you opened the devcontainer with. It is an isolated environment with only the `/workspace` path being mapped to the cloned repository on your local machine. As such, you cannot access other drafts you cloned or other paths from within the devcontainer.
+
+    For example, the path `~/drafts/draft-ietf-foo-bar` on your machine will be mapped to `/workspace` in the devcontainer for that draft.
+
+    You can however open multiple devcontainers of different drafts at once.
+
+1. Open Terminal and navigate to the folder containing all drafts. (e.g. `~/drafts`)
+2. Follow the instructions from the [Cloning a repository locally](#cloning-a-repository-locally) section.
+3. Follow the instructions from the [Open the repository in Visual Studio Code](#open-the-repository-in-visual-studio-code). This will launch a new devcontainer specifically for this draft.
+
+If you no longer need to work on a draft, simply close the Visual Studio Code window for this particular draft. The devcontainer will be stopped automatically. You can come back to it later and continue from the state it was when you left it.
+
+You can have multiple devcontainers opened at the same time. Each window being a specific draft.
+
+You can copy content between windows using the clipboard. However, you cannot access the filesystem of another devcontainer from the integrated terminal. The integrated terminal is bound to the devcontainer context and can only see its isolated environment, with `/workspace` being the only path mapped to the outside.
+
+While you can create temporary files outside the `/workspace` path, you should always work under the `/workspace` path when possible. Because the `/workspace` path is directly mapped to your local machine, its contents will persist even if the devcontainer is destroyed.
