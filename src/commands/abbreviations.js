@@ -83,7 +83,7 @@ export function registerListAbbreviationsCommand (context, outputChannel) {
 
             // Look for full expansion
             if (abbr.full) {
-              const fullRgx = new RegExp(`(?:^|[\\s>([])(?<full>${escapeRegExp(abbr.full)})(?:$|[\\s.,<>)\\]:])`, 'g')
+              const fullRgx = new RegExp(`(?:^|[\\s>([])(?<full>${escapeRegExp(abbr.full)})(?:$|[\\s.,<>)\\]:])`, 'gi')
 
               while ((rgxArray = fullRgx.exec(contents)) !== null) {
                 if (rgxArray.groups?.full) {
@@ -164,11 +164,42 @@ export function registerListAbbreviationsCommand (context, outputChannel) {
       let totalWarnings = 0
       const lf = new Intl.ListFormat('en')
 
+      // Output results
       for (const result of results) {
-        idx++
         let resultStr = result.term
         let resultArr = []
         let isWarning = false
+        let isIndented = false
+
+        // -> Check for abbreviations with multiple expansions
+        const multiExpansions = results.filter(fl => fl.term === result.term)
+        if (multiExpansions.length > 1) {
+          if (!multiExpansions.some(me => me.expanded)) {
+            if (!multiExpansions.some(me => me.chosen)) {
+              // No term is expanded, just show the first one
+              result.chosen = true
+            } else {
+              // No term is expanded and the first one is already displayed, skip the rest
+              continue
+            }
+          } else if (!result.expanded) {
+            // Another term is expanded, skip this one as it's not expanded
+            continue
+          } else {
+            if (multiExpansions.filter(fl => fl.expanded).length > 1) {
+              isIndented = true
+
+              if (!multiExpansions.some(me => me.chosen)) {
+                // Warn that multiple expansions will be listed
+                result.chosen = true
+                outputChannel.appendLine(`🔶 Multiple expansions for ${result.term}:`)
+              }
+            }
+          }
+        }
+
+        idx++
+
         // -> Well Known
         if (result.wellknown) {
           resultArr.push('is well known')
@@ -195,7 +226,7 @@ export function registerListAbbreviationsCommand (context, outputChannel) {
           if (result.notAbbreviated) {
             resultArr.push(`"${result.full}" used ${result.overusedExpansion + 1} times but never abbreviated as "${result.term}"`)
           } else {
-            resultArr.push(`expansion used ${result.overusedExpansion} extra time(s) after expansion of "${result.term}"`)
+            resultArr.push(`expansion used ${result.overusedExpansion} extra time(s) after initial expansion of "${result.term}"`)
           }
         }
         // -> Pointless abbreviation
@@ -215,6 +246,9 @@ export function registerListAbbreviationsCommand (context, outputChannel) {
           resultStr = `⚠️ ${resultStr}`
         } else {
           resultStr = `🟢 ${resultStr}`
+        }
+        if (isIndented) {
+          resultStr = `└─ ${resultStr}`
         }
         outputChannel.appendLine(resultStr)
       }
