@@ -1,5 +1,6 @@
 import * as vscode from 'vscode'
-import { escapeRegExp } from 'lodash-es'
+import { escapeRegExp, uniq } from 'lodash-es'
+import { setTimeout } from 'node:timers/promises'
 
 const ABBR_URL = "https://github.com/rfc-editor-drafts/common/raw/refs/heads/main/abbreviations.json"
 
@@ -28,7 +29,7 @@ export function registerListAbbreviationsCommand (context, outputChannel) {
       // Show progress notification
       await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: 'Analyzing abbreviations usage...',
+        title: 'Analyzing abbreviations usage',
         cancellable: false
       }, async (progress) => {
         try {
@@ -56,7 +57,7 @@ export function registerListAbbreviationsCommand (context, outputChannel) {
 
           // Check each abbreviation
           for (const abbr of abbreviations) {
-            progress.report({ increment: progressIncrement })
+            progress.report({ increment: progressIncrement, message: abbr.term })
 
             let rgxArray
             const foundLocations = []
@@ -97,14 +98,33 @@ export function registerListAbbreviationsCommand (context, outputChannel) {
                   })
                 }
               }
+
+              // Look for redundant word after abbreviation
+              const lastExpansionWord = abbr.full.split(' ').pop()
+              const redundantRgx = new RegExp(`(?:^|[\\s>([])(?<term>${escapeRegExp(abbr.term)}[\\s\\-]${escapeRegExp(lastExpansionWord)})(?:$|[\\s.,<>)\\]:])`, 'gi')
+              while ((rgxArray = redundantRgx.exec(contents)) !== null) {
+                if (rgxArray.groups?.term) {
+                  const startIdx = rgxArray[0].indexOf(abbr.term) === 0 ? rgxArray.index : rgxArray.index + 1
+                  if (startIdx < firstTermIdx || firstTermIdx < 0) {
+                    firstTermIdx = startIdx
+                  }
+                  foundLocations.push({
+                    type: 'redundant',
+                    indexStart: startIdx,
+                    indexEnd: startIdx + abbr.term.length + 1 + lastExpansionWord.length,
+                    match: rgxArray.groups.term
+                  })
+                }
+              }
             }
 
-            // Check positions
+            // Check positions / instances
             if (foundLocations.length > 0) {
               const result = { ...abbr }
 
               const termInstances = foundLocations.filter(fl => fl.type === 'term')
               const fullInstances = foundLocations.filter(fl => fl.type === 'full')
+              const redundantInstances = foundLocations.filter(fl => fl.type === 'redundant')
 
               if (firstTermIdx >= 0 && firstFullIdx >= 0) {
                 result.expanded = true
@@ -125,8 +145,14 @@ export function registerListAbbreviationsCommand (context, outputChannel) {
                   result.overusedExpansion = fullInstances.length - 1
                 }
               }
+              if (redundantInstances.length > 0) {
+                result.redundantTerms = uniq(redundantInstances.map(fl => fl.match))
+              }
               results.push(result)
             }
+
+            // Wait for next tick to avoid freezing the progress UI
+            await setTimeout()
           }
         } catch (err) {
           vscode.window.showErrorMessage(err.message)
@@ -173,9 +199,14 @@ export function registerListAbbreviationsCommand (context, outputChannel) {
           }
         }
         // -> Pointless abbreviation
-        if (result.pointlessAbbreviation) {
+        if (result.pointlessAbbreviation && !result.overusedExpansion) {
           isWarning = true
           resultArr.push('only used once')
+        }
+        // -> Redundant wording
+        if (result.redundantTerms) {
+          isWarning = true
+          resultArr.push('has redundant word after abbreviation: ' + lf.format(result.redundantTerms.map(t => `"${t}"`)))
         }
         // -> Format List + Warnings
         resultStr += ` - ${lf.format(resultArr)}`
