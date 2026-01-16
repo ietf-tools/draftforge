@@ -65,7 +65,7 @@ export function registerListAbbreviationsCommand (context, outputChannel) {
             let firstFullIdx = -1
 
             // Look for term
-            const termRgx = new RegExp(`(?:^|[\\s>([])(?<term>${escapeRegExp(abbr.term)})(?:$|[\\s.,<>)\\]:])`, 'g')
+            const termRgx = new RegExp(`(?:^|[\\s>([*_])(?<term>${escapeRegExp(abbr.term)})(?:$|[\\s.,<>)*_\\]:])`, 'g')
 
             while ((rgxArray = termRgx.exec(contents)) !== null) {
               if (rgxArray.groups?.term) {
@@ -83,7 +83,7 @@ export function registerListAbbreviationsCommand (context, outputChannel) {
 
             // Look for full expansion
             if (abbr.full) {
-              const fullRgx = new RegExp(`(?:^|[\\s>([])(?<full>${escapeRegExp(abbr.full)})(?:$|[\\s.,<>)\\]:])`, 'gi')
+              const fullRgx = new RegExp(`(?:^|[\\s>([*_])(?<full>${escapeRegExp(abbr.full)})(?:$|[\\s.,<>)*_\\]:])`, 'gi')
 
               while ((rgxArray = fullRgx.exec(contents)) !== null) {
                 if (rgxArray.groups?.full) {
@@ -101,7 +101,7 @@ export function registerListAbbreviationsCommand (context, outputChannel) {
 
               // Look for redundant word after abbreviation
               const lastExpansionWord = abbr.full.split(' ').pop()
-              const redundantRgx = new RegExp(`(?:^|[\\s>([])(?<term>${escapeRegExp(abbr.term)}[\\s\\-]${escapeRegExp(lastExpansionWord)})(?:$|[\\s.,<>)\\]:])`, 'gi')
+              const redundantRgx = new RegExp(`(?:^|[\\s>([*_])(?<term>${escapeRegExp(abbr.term)}[\\s\\-]${escapeRegExp(lastExpansionWord)})(?:$|[\\s.,<>)*_\\]:])`, 'gi')
               while ((rgxArray = redundantRgx.exec(contents)) !== null) {
                 if (rgxArray.groups?.term) {
                   const startIdx = rgxArray[0].indexOf(abbr.term) === 0 ? rgxArray.index : rgxArray.index + 1
