@@ -18,8 +18,15 @@ export function registerListInconsistentCapitalizationCommand (context, outputCh
         return vscode.window.showErrorMessage('Unsupported Document Type.')
       }
 
-      const ignoreTextRgx = /<name>(?<term>.+)<\/name>/gi
-      const results = findInconsistentCapitalization(activeDoc.getText().replaceAll(ignoreTextRgx, (_, p1) => `<name>${repeat('_', p1.length)}</name>`))
+      const ignoreXmlTagsRgx = /<([ \t\S]+?)>/gi
+      const ignoreNameTagTextRgx = /<name>(?<term>.+?)<\/name>/gi
+      const ignoreAnchorPropTextRgx = /anchor="(?<term>.+?)"/gi
+      const results = findInconsistentCapitalization(
+        activeDoc.getText()
+          .replaceAll(ignoreXmlTagsRgx, (_, p1) => `<${repeat('_', p1.length)}>`)
+          .replaceAll(ignoreNameTagTextRgx, (_, p1) => `<name>${repeat('_', p1.length)}</name>`)
+          .replaceAll(ignoreAnchorPropTextRgx, (_, p1) => `anchor="${repeat('_', p1.length)}"`)
+      )
 
       outputChannel.clear()
       outputChannel.appendLine(`List of inconsistent use of capitalization in ${activeDoc.fileName}:\n`)
