@@ -23,9 +23,9 @@ export function registerListInconsistentCapitalizationCommand (context, outputCh
       const ignoreAnchorPropTextRgx = /anchor="(?<term>.+?)"/gi
       const results = findInconsistentCapitalization(
         activeDoc.getText()
-          .replaceAll(ignoreXmlTagsRgx, (_, p1) => `<${repeat('_', p1.length)}>`)
           .replaceAll(ignoreNameTagTextRgx, (_, p1) => `<name>${repeat('_', p1.length)}</name>`)
           .replaceAll(ignoreAnchorPropTextRgx, (_, p1) => `anchor="${repeat('_', p1.length)}"`)
+          .replaceAll(ignoreXmlTagsRgx, (_, p1) => `<${repeat('_', p1.length)}>`)
       )
 
       outputChannel.clear()
@@ -107,10 +107,10 @@ function findInconsistentCapitalization(text) {
   let nextIsStart = true
 
   rawLines.forEach((lineText, lineIndex) => {
-    const lineTokens = lineText.match(/[a-zA-Z0-9']+|[.!?>]+/g) || []
+    const lineTokens = lineText.match(/[a-zA-Z0-9'-]+|[.:;=!?>]+/g) || []
 
     for (const t of lineTokens) {
-      if (/^[.!?>]+$/.test(t)) {
+      if (/^[.:;=!?>]+$/.test(t)) {
         nextIsStart = true
       } else {
         tokens.push({
@@ -139,6 +139,13 @@ function findInconsistentCapitalization(text) {
     for (let j = 0; j < MAX_N && (i + j) < tokens.length; j++) {
       const tokenObj = tokens[i + j]
       const word = tokenObj.word
+
+      // Do not allow phrases to span sentence boundaries: if this token is
+      // marked as the start of a sentence and it's not the first word in the
+      // phrase, stop expanding the current phrase.
+      if (j > 0 && tokenObj.isStart) {
+        break
+      }
 
       // Flag single letters only if they are NOT in our ignored list
       if (word.length === 1 && !IGNORED_TERMS.has(word.toLowerCase())) {
