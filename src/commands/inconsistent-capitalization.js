@@ -18,7 +18,7 @@ export function registerListInconsistentCapitalizationCommand (context, outputCh
         return vscode.window.showErrorMessage('Unsupported Document Type.')
       }
 
-      const ignoreXmlTagsRgx = /<([ \t\S]+?)>/gi
+      const ignoreXmlTagsRgx = /<([ \t\S]{2,}?)>/gi
       const ignoreNameTagTextRgx = /<name>(?<term>.+?)<\/name>/gi
       const ignoreAnchorPropTextRgx = /anchor="(?<term>.+?)"/gi
       const results = findInconsistentCapitalization(
