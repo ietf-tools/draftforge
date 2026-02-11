@@ -10,7 +10,7 @@
     "url": "git+https://github.com/ietf-tools/draftforge.git"
   },
   "engines": {
-    "vscode": "^1.106.1"
+    "vscode": "^1.109.2"
   },
   "categories": [
     "Linters",
