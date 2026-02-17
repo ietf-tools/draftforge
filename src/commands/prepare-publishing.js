@@ -54,20 +54,26 @@ export function registerPrepareForPublishingCommand (context, outputChannel) {
     for await (const fl of klaw(workspaceUri.fsPath, { depthLimit: 1 })) {
       if (fl.stats.isFile()) {
         const filePath = path.posix.parse(fl.path)
+        const filePathRelative = path.relative(workspaceUri.fsPath, fl.path)
         const fileType = filePath.ext.slice(1)
-        if (filePath.name === `rfc${rfcNumber}` && ['html', 'json', 'pdf', 'txt', 'xml'].includes(fileType)) {
-          const filePathRelative = path.relative(workspaceUri.fsPath, fl.path)
+        if (filePath.name === `rfc${rfcNumber}` && ['html', 'pdf', 'txt', 'xml'].includes(fileType)) {
           includedFiles.push({
             path: filePathRelative,
             type: fileType
           })
-          outputChannel.appendLine(`Found candidate: ${filePathRelative}`)
+          outputChannel.appendLine(`Adding ${filePathRelative}`)
+        } else if (filePath.name === `rfc${rfcNumber}.notprepped` && fileType === 'xml') {
+          includedFiles.push({
+            path: filePathRelative,
+            type: 'notprepped'
+          })
+          outputChannel.appendLine(`Adding ${filePathRelative}`)
         }
       }
     }
 
     if (includedFiles.length < 1) {
-      return outputChannel.appendLine(`⚠️ No suitable file candidates found. Looked for **/rfc${rfcNumber}.{html,json,pdf,txt,xml}`)
+      return outputChannel.appendLine(`⚠️ No suitable file candidates found. Looked for **/rfc${rfcNumber}.{html,pdf,txt,xml} and **/rfc${rfcNumber}.notprepped.xml`)
     }
 
     // Add to manifest
