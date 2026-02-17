@@ -15,12 +15,12 @@ import { registerListAbbreviationsCommand } from './commands/abbreviations.js'
 import { registerListInconsistentCapitalizationCommand } from './commands/inconsistent-capitalization.js'
 import { registerListInconsistentFormattingCommand } from './commands/inconsistent-formatting.js'
 import { registerLookupSelectionAcrossDocsCommand } from './commands/lookup-selection-across-docs.js'
+import { registerPrepareForPublishingCommand } from './commands/prepare-publishing.js'
 import { registerStripMLineEndingsCommand } from './commands/strip-mline-endings.js'
 import { registerSurroundBcp14KeywordsCommand } from './commands/surround-bcp14-keywords.js'
 import { registerSvgcheckCommand } from './commands/svgcheck.js'
 import { registerXmlOutputCommand } from './commands/xml-output.js'
 import { registerXmlPreviewCommand, unregisterXmlPreviewCommand } from './commands/xml-preview.js'
-import { registerPrepareForPublishingCommand } from './commands/prepare-publishing.js'
 
 /**
  * @param {vscode.ExtensionContext} context
