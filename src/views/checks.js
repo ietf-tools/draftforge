@@ -1,7 +1,8 @@
 import * as vscode from 'vscode'
-import { posix } from 'node:path'
 import { get, merge, set, uniq } from 'lodash-es'
 import crypto from 'node:crypto'
+
+import manifestManager from '../helpers/manifest.js'
 
 import { registerCheckArticlesCommand } from '../commands/articles.js'
 import { registerCheckHyphenationCommand } from '../commands/hyphenation.js'
@@ -226,7 +227,7 @@ export async function activateChecksView (context, diagnosticCollection) {
         set(ignores[documentUri.toString()], diag.code, uniq(currentIgnoreValues))
 
         // Add to ignore list in manifest
-        const manifest = await getWorkspaceManifest(workspacePath)
+        const manifest = await manifestManager.getManifest(workspacePath)
 
         const documentPath = documentUri.fsPath.replace(`${workspacePath}/`, '')
         const documentPathHash = crypto.createHash('md5').update(documentPath).digest('hex')
@@ -234,10 +235,7 @@ export async function activateChecksView (context, diagnosticCollection) {
 
         const manifestIgnores = get(manifest, ignorePath, [])
         manifestIgnores.push(diag.match)
-        set(manifest, ignorePath, uniq(manifestIgnores))
-
-        const manifestPath = posix.join(workspacePath, 'manifest.json')
-        await vscode.workspace.fs.writeFile(vscode.Uri.parse(manifestPath), new TextEncoder().encode(JSON.stringify(manifest, null, 2)))
+        manifestManager.updateManifest(workspacePath, ignorePath, uniq(manifestIgnores), true)
 
         // Remove from active diagnotics collection
         const diags = diagnosticCollection.get(documentUri)
@@ -272,31 +270,7 @@ async function loadIgnoresForDocument (docUri) {
   const documentPath = docUri.fsPath.replace(`${workspacePath}/`, '')
   const documentPathHash = crypto.createHash('md5').update(documentPath).digest('hex')
 
-  const manifest = await getWorkspaceManifest(workspacePath)
+  const manifest = await manifestManager.getManifest(workspacePath)
   ignores[docUri.toString()] = get(manifest, 'draftforge.ignores.global', {})
   ignores[docUri.toString()] = merge(ignores[docUri.toString()], get(manifest, `draftforge.ignores.${documentPathHash}`, {}))
-}
-
-/**
- * Get workspace manifest from disk
- * @param {String} workspacePath Path to workspace
- * @returns {Promise<Object>} Manifest Object
- */
-async function getWorkspaceManifest (workspacePath) {
-  const manifestPath = posix.join(workspacePath, 'manifest.json')
-
-  let manifest = null
-  try {
-    const manifestRaw = await vscode.workspace.fs.readFile(vscode.Uri.parse(manifestPath))
-    manifest = JSON.parse(new TextDecoder().decode(manifestRaw))
-  } catch (err) {
-    if (err.code === 'FileNotFound') {
-      manifest = {}
-    } else {
-      console.log(err)
-      throw new Error('Cannot read repository manifest.json file!')
-    }
-  }
-
-  return manifest
 }

@@ -41,6 +41,7 @@ class ToolsProvider {
       { id: 'inconsistentFormatting', label: 'List Inconsistent Formatting', description: 'List inconsistent formatting like bold, italics, etc.', icon: 'paintcan' },
       { id: 'lookupSelectionAcrossDocs', label: 'Lookup Selection Across Docs', description: 'In opened documents', icon: 'search' },
       { id: 'openPreview', label: 'Open Preview', description: 'Open a preview of the current document', icon: 'open-preview' },
+      flags.rpc && { id: 'prepareForPublishing', label: 'Prepare for Publishing', description: 'Ensure repository is ready for publishing', icon: 'mortar-board' },
       { id: 'stripMLineEndings', label: 'Strip ^M Line Endings', description: 'Clean Document from ^M Line Endings', icon: 'no-newline' },
       { id: 'surroundBcp14Keywords', label: 'Surround BCP 14 Keywords', description: 'Ensure all BCP 14 keywords are enclosed with <bcp14> tags', icon: 'bold' },
       flags.xml && { id: 'svgcheck', label: 'SVG Check', description: 'Validate SVGs in the current document', icon: 'circuit-board' }
@@ -175,6 +176,10 @@ export function activateToolsView (context) {
           } else {
             vscode.window.showInformationMessage('Preview not available for this document type.')
           }
+          break
+        }
+        case 'prepareForPublishing': {
+          await vscode.commands.executeCommand('draftforge.prepareForPublishing')
           break
         }
         case 'stripMLineEndings': {

@@ -45,8 +45,8 @@
         "id": "ietf"
       }
     ],
-    "codeActionProvider" : "true",
-    "codeLensProvider" : {
+    "codeActionProvider": "true",
+    "codeLensProvider": {
       "resolveProvider": "true"
     },
     "commands": [
@@ -343,6 +343,7 @@
   },
   "dependencies": {
     "@ietf-tools/idnits": "3.0.0-alpha.70",
+    "klaw": "4.1.0",
     "lodash-es": "4.17.21",
     "uuid": "13.0.0"
   }
