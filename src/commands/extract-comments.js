@@ -16,7 +16,7 @@ export function registerExtractCommentsCommand (context, outputChannel) {
       return vscode.window.showErrorMessage('Unsupported Document Type.')
     }
 
-    const commentsRgx = /<!-- \[rfced\]([^]+?)-->/gmi
+    const commentsRgx = /<!--\s?\[rfced\]([^]+?)-->/gmi
     const contents = activeDoc.getText()
 
     outputChannel.clear()
