@@ -8,6 +8,7 @@ import { debounce } from 'lodash-es'
 
 const execAsync = promisify(exec)
 let tmpPath = ''
+let previews = {}
 
 /**
  * Get loading template
@@ -59,14 +60,14 @@ class DocumentPreview {
     this.documentFilename = path.parse(fileName).base
     this.outputChannel = outputChannel
 
-    this.setupPanel()
+    this.setupPanel(documentUri)
     this.generateDebounced = debounce(this.generate, 500)
   }
 
   /**
    * Initialize Webview Panel
    */
-  setupPanel () {
+  setupPanel (documentUri) {
     this.panel = vscode.window.createWebviewPanel(
       'xml2rfcPreview',
       `Preview - ${this.documentFilename}`,
@@ -79,6 +80,7 @@ class DocumentPreview {
 
     this.panel.onDidDispose(() => {
       this.panel = null
+      delete previews[documentUri.toString()]
     })
 
     this.panel.webview.html = getLoadingContent()
@@ -150,8 +152,6 @@ class DocumentPreview {
  * @param {vscode.OutputChannel} outputChannel
  */
 export function registerXmlPreviewCommand (context, outputChannel) {
-  let previews = {}
-
   context.subscriptions.push(vscode.commands.registerCommand('draftforge.xmlPreview', async function () {
     try {
       const activeDoc = vscode.window.activeTextEditor?.document
