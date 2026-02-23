@@ -78,7 +78,7 @@ export function registerPrepareForPublishingCommand (context, outputChannel) {
 
     // Add to manifest
     await manifestManager.updateManifest(workspaceUri.fsPath, 'publications', [{
-      rfcNumber,
+      rfcNumber: parseInt(rfcNumber),
       files: includedFiles
     }], true)
 
