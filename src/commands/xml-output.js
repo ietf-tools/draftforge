@@ -15,29 +15,35 @@ const execAsync = promisify(exec)
  * @returns {Promise<void>}
  */
 async function run (inputContent, outputFileType, outputPathUri) {
-  try {
-    // Get temp dir
-    const tmpPath = await fs.mkdtemp(path.join(tmpdir(), 'draftforge-'))
-    const now = Date.now().toString()
+  await vscode.window.withProgress({
+    location: vscode.ProgressLocation.Notification,
+    title: `Generating ${outputFileType.toUpperCase()} output`,
+    cancellable: false
+  }, async () => {
+    try {
+      // Get temp dir
+      const tmpPath = await fs.mkdtemp(path.join(tmpdir(), 'draftforge-'))
+      const now = Date.now().toString()
 
-    // Write input
-    const inputPath = path.join(tmpPath, `${now}.xml`)
-    await fs.writeFile(inputPath, inputContent, 'utf8')
+      // Write input
+      const inputPath = path.join(tmpPath, `${now}.xml`)
+      await fs.writeFile(inputPath, inputContent, 'utf8')
 
-    // Run xml2rfc
-    const execPath = vscode.workspace.getConfiguration('draftforge.xml2rfc').get('executablePath')
-    const flags = vscode.workspace.getConfiguration('draftforge.xml2rfc').get(`${outputFileType}OutputFlags`)
-    const outputFileTypeFlag = (outputFileType === 'txt') ? 'text' : outputFileType
-    const cmd = `${execPath} ${flags} --${outputFileTypeFlag} -o "${outputPathUri}" "${inputPath}"`
-    await execAsync(cmd, {
-      timeout: 30000, // 30s
-      windowsHide: true
-    })
-    vscode.window.showInformationMessage('Document exported successfully.')
-    await fs.rm(tmpPath, { recursive: true, force: true })
-  } catch (err) {
-    vscode.window.showErrorMessage(err.message)
-  }
+      // Run xml2rfc
+      const execPath = vscode.workspace.getConfiguration('draftforge.xml2rfc').get('executablePath')
+      const flags = vscode.workspace.getConfiguration('draftforge.xml2rfc').get(`${outputFileType}OutputFlags`)
+      const outputFileTypeFlag = (outputFileType === 'txt') ? 'text' : outputFileType
+      const cmd = `${execPath} ${flags} --${outputFileTypeFlag} -o "${outputPathUri}" "${inputPath}"`
+      await execAsync(cmd, {
+        timeout: 30000, // 30s
+        windowsHide: true
+      })
+      vscode.window.showInformationMessage('Document exported successfully.')
+      await fs.rm(tmpPath, { recursive: true, force: true })
+    } catch (err) {
+      vscode.window.showErrorMessage(err.message)
+    }
+  })
 }
 
 /**
