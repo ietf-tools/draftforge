@@ -65,6 +65,7 @@ nav:
     - List Inconsistent Formatting: tools/inconsistent-formatting.md
     - Lookup Selection Across Docs: tools/lookup-selection-across-docs.md
     - Open Preview: tools/preview.md
+    - Prepare for Publishing: tools/prepare-publishing.md
     - Strip ^M Line Endings: tools/strip-mline-endings.md
     - Surround BCP 14 Keywords: tools/surround-bcp14-keywords.md
   - Snippets:
