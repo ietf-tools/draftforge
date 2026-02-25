@@ -30,7 +30,7 @@ If you don't plan on working with these repositories or don't want to use the de
     - [rfcdiff](https://github.com/ietf-tools/rfcdiff)
     - [rfcstrip](https://github.com/mbj4668/rfcstrip)
     - [svgcheck](https://github.com/ietf-tools/svgcheck)
-    - [xml2rfc](https://github.com/ietf-tools/xml2rfc)
+    - [xml2rfc](https://github.com/ietf-tools/xml2rfc) with `[pdf]` flag
 - [Ruby](https://www.ruby-lang.org/) with the following gems:
     - [kramdown-rfc2629](https://github.com/cabo/kramdown-rfc)
 - [bap](https://github.com/ietf-tools/bap)
