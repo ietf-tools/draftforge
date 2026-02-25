@@ -1,5 +1,6 @@
 import * as vscode from 'vscode'
 import path from 'node:path'
+import fs from 'node:fs/promises'
 import klaw from 'klaw'
 
 import manifestManager from '../helpers/manifest.js'
@@ -57,6 +58,22 @@ export function registerPrepareForPublishingCommand (context, outputChannel) {
         const filePathRelative = path.relative(workspaceUri.fsPath, fl.path)
         const fileType = filePath.ext.slice(1)
         if (filePath.name === `rfc${rfcNumber}` && ['html', 'pdf', 'txt', 'xml'].includes(fileType)) {
+          // Ensure RFC number consistency
+          if (fileType === 'xml') {
+            try {
+              const xmlContents = await fs.readFile(fl.path, 'utf8')
+              const rfcNumberMatch = xmlContents.match(/<rfc[^>]+?number="(?<rfcNumber>[0-9]+)"/)
+              if (!rfcNumberMatch?.groups?.rfcNumber || rfcNumberMatch.groups?.rfcNumber !== rfcNumber) {
+                outputChannel.appendLine(`Operation canceled.`)
+                return vscode.window.showErrorMessage(`RFC number mismatch in ${filePathRelative}`, { modal: true })
+              }
+            } catch (err) {
+              outputChannel.appendLine(`Operation canceled.`)
+              return vscode.window.showErrorMessage(`Failed to read ${filePathRelative}: ${err.message}`, { modal: true })
+            }
+          }
+
+          // Add to list
           includedFiles.push({
             path: filePathRelative,
             type: fileType
