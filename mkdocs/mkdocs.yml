@@ -55,6 +55,7 @@ nav:
     - Typos: checks/typos.md
   - Tools:
     - Add XML Models: tools/add-xml-models.md
+    - Expand/Fold/Peek References: tools/expand-includes.md
     - Export As HTML/PDF/TXT: tools/export-as.md
     - Extract [rfced] Comments: tools/extract-comments.md
     - Extract Code Components: tools/extract-code-components.md

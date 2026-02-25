@@ -9,8 +9,9 @@ This tool performs the following actions, in order:
 - For XML files, validate that the `<rfc number="XXXX"` value matches the expected RFC number
 - Add the RFC number and the matching files to `manifest.json` in the `publications` field
 
+!!! note
+    This tool is only available in the RFC Production Center mode.
+
 ## Supported Document Types
 
-- [x] RFCXML
-- [ ] Markdown
-- [ ] Plain Text
+*Not applicable*
