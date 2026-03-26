@@ -92,3 +92,16 @@ After making changes to a draft, you should create a commit to save these change
 
 !!! tip
     You can create as many commits as needed. They are a great way to save a specific point in time and revert back later if needed. You don't need to immediately **Sync Changes** after creating a commit if you want to refine the draft further before pushing all the changes to GitHub.
+
+## Refreshing the Dev Container Image
+
+Tools and dependencies inside the dev container sometimes need to be updated.
+The [base image](https://github.com/rfc-editor-drafts/base-devcontainer) should first be updated and rebuilt by the Tools Team.
+
+You can then refresh your local dev containers by running the [`.devcontainer/pull-latest-image.sh`](https://github.com/rfc-editor-drafts/base-template/blob/main/.devcontainer/pull-latest-image.sh) script, found in any repository made from the `rfc-editor-drafts/base-template` template. This script should be run from your local host terminal, **NOT** inside VS Code or dev container.
+
+This will download the latest version of the dev container base image.
+
+Once downloaded, you must recreate your existing dev containers to use this new image. This is done by opening the desired repository in VS Code, launching the Command Palette (<kbd>F1</kbd>) and choosing "**Rebuild Container Without Cache**". Wait for the rebuild process to complete.
+
+Note that if you're working on multiple repositories at once, you need to repeat the previous step for each repository. You **DO NOT** need to run the `pull-latest-image.sh` script multiple times as it only needs to be downloaded once for your whole system.
