@@ -29,6 +29,7 @@ class ToolsProvider {
 
     this.tools = [
       flags.xml && { id: 'addXmlModels', label: 'Add XML Models', description: 'Download and add RelaxNG schema files to the document directory', icon: 'cloud-download' },
+      { id: 'exportAs', label: 'Export as...', description: 'Generate multiple outputs of the current document', icon: 'files' },
       { id: 'exportHtml', label: 'Export as HTML', description: 'Generate HTML output of the current document', icon: 'file-symlink-file' },
       { id: 'exportPdf', label: 'Export as PDF', description: 'Generate PDF output of the current document', icon: 'file-pdf' },
       { id: 'exportTxt', label: 'Export as TXT', description: 'Generate TXT output of the current document', icon: 'file-text' },
@@ -93,6 +94,35 @@ export function activateToolsView (context) {
         }
         case 'addXmlModels': {
           await vscode.commands.executeCommand('draftforge.addXmlModels')
+          break
+        }
+        case 'exportAs': {
+          if (doc.languageId === 'xml') {
+            const selectedOutputsRaw = await vscode.window.showQuickPick([
+              { label: 'HTML', picked: true, value: 'html' },
+              { label: 'PDF', picked: true, value: 'pdf' },
+              { label: 'Plain Text', picked: true, value: 'txt' }
+            ], {
+              canPickMany: true,
+              ignoreFocusOut: true,
+              title: 'Select Output Formats'
+            })
+            let desiredPath = ''
+            for (const format of selectedOutputsRaw) {
+              if (desiredPath.length > 2 && desiredPath.includes('.')) {
+                desiredPath = desiredPath.split('.').toSpliced(-1, 1).join('.') + `.${format.value}`
+                console.log(desiredPath)
+              }
+              const chosenPath = await vscode.commands.executeCommand('draftforge.xmlOutput', format.value, desiredPath)
+              if (chosenPath && typeof chosenPath === 'string') {
+                desiredPath = chosenPath
+              }
+            }
+          } else if (doc.languageId === 'markdown') {
+            await vscode.window.showInformationMessage('Export from Markdown not implemented yet.')
+          } else {
+            await vscode.window.showInformationMessage('Export not available for this document type.')
+          }
           break
         }
         case 'exportHtml': {

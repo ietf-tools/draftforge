@@ -50,7 +50,7 @@ async function run (inputContent, outputFileType, outputPathUri) {
  * @param {vscode.ExtensionContext} context
  */
 export function registerXmlOutputCommand (context) {
-  context.subscriptions.push(vscode.commands.registerCommand('draftforge.xmlOutput', async function (fileType = 'html') {
+  context.subscriptions.push(vscode.commands.registerCommand('draftforge.xmlOutput', async function (fileType = 'html', desiredPath) {
     const activeDoc = vscode.window.activeTextEditor?.document
 
     if (!activeDoc) {
@@ -65,16 +65,24 @@ export function registerXmlOutputCommand (context) {
     const defaultUri = vscode.Uri.parse(path.posix.join(activeUriPath.dir, `${activeUriPath.name}.${fileType}`))
 
     try {
-      const selectedOutputUri = await vscode.window.showSaveDialog({
-        title: 'Export As',
-        filters: {
-          'Document': [fileType]
-        },
-        defaultUri
-      })
-      if (selectedOutputUri) {
-        await run(activeDoc.getText(), fileType, selectedOutputUri.fsPath)
+      let chosenPath = ''
+      if (desiredPath) {
+        chosenPath = desiredPath
+      } else {
+        const selectedOutputUri = await vscode.window.showSaveDialog({
+          title: 'Export As',
+          filters: {
+            'Document': [fileType]
+          },
+          defaultUri
+        })
+        chosenPath = selectedOutputUri.fsPath
       }
+
+      if (chosenPath) {
+        await run(activeDoc.getText(), fileType, chosenPath)
+      }
+      return chosenPath
     } catch (err) {
       vscode.window.showErrorMessage(err.message)
     }
