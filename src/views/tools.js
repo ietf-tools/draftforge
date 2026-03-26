@@ -111,7 +111,6 @@ export function activateToolsView (context) {
             for (const format of selectedOutputsRaw) {
               if (desiredPath.length > 2 && desiredPath.includes('.')) {
                 desiredPath = desiredPath.split('.').toSpliced(-1, 1).join('.') + `.${format.value}`
-                console.log(desiredPath)
               }
               const chosenPath = await vscode.commands.executeCommand('draftforge.xmlOutput', format.value, desiredPath)
               if (chosenPath && typeof chosenPath === 'string') {
