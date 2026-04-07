@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-zinc-900 flex flex-col gap-2 flex-1 overflow-y-auto p-2">
+  <div class="bg-white dark:bg-zinc-900 flex flex-col gap-2 flex-1 overflow-y-auto p-2">
     <div v-if="state.results.length < 1" class="text-zinc-500 dark:text-zinc-200">Analyzing...</div>
     <div v-for="grp of state.results" :key="grp.key" class="pb-2 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-700 rounded-md shadow-sm dark:shadow-white/5">
       <div class="p-3 flex items-center justify-between sm:flex-nowrap">
@@ -34,9 +34,9 @@
                 <div class="flex items-center pr-2">
                   <UBadge :label="getNitType(nit).name" :class="'mr-2 font-bold ' + getNitType(nit).css" bold />
                   <UBadge :label="nit.name" class="mr-2 bg-red-500/10 text-red-800 dark:text-red-200" />
-                  <span>{{ nit.message }}</span>
+                  <span class="text-gray-800 dark:text-white">{{ nit.message }}</span>
                 </div>
-                <button v-if="nit.refUrl" @click="viewRef(nit.refUrl)" class="cursor-pointer rounded-md font-medium inline-flex items-center text-sm bg-neutral-800 hover:bg-neutral-800/75 gap-1.5 px-2.5 py-1.5 ring ring-inset ring-neutral-800">
+                <button v-if="nit.refUrl" @click="viewRef(nit.refUrl)" class="cursor-pointer rounded-md font-medium inline-flex items-center text-sm bg-neutral-800 hover:bg-neutral-800/75 gap-1.5 px-2.5 py-1.5 ring ring-inset ring-neutral-800 text-white">
                   <IconLucideBookText />
                   Ref
                   <IconLucideArrowUpRight />
