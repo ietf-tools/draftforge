@@ -71,14 +71,14 @@ class ReferenceProvider {
               {
                 id: 'area',
                 label: 'area',
-                tooltip: 'Provides information about the IETF area to which this document relates (currently not used when generating documents).',
+                tooltip:
+                  'Provides information about the IETF area to which this document relates (currently not used when generating documents).',
                 href: 'https://authors.ietf.org/en/rfcxml-vocabulary#area'
               }
             ]
           }
         ]
-
-      },
+      }
     ]
   }
 
@@ -128,9 +128,11 @@ class ReferenceProvider {
 /**
  * @param {vscode.ExtensionContext} context
  */
-export function activateReferenceView (context) {
+export function activateReferenceView(context) {
   const referenceProvider = new ReferenceProvider()
-  const referenceView = vscode.window.createTreeView('draftforge-reference', { treeDataProvider: referenceProvider })
+  const referenceView = vscode.window.createTreeView('draftforge-reference', {
+    treeDataProvider: referenceProvider
+  })
   context.subscriptions.push(referenceView)
 
   // context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => referenceProvider.refresh()))

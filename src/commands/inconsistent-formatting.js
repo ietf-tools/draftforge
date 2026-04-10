@@ -4,49 +4,55 @@ import * as vscode from 'vscode'
  * @param {vscode.ExtensionContext} context
  * @param {vscode.OutputChannel} outputChannel
  */
-export function registerListInconsistentFormattingCommand (context, outputChannel) {
-  context.subscriptions.push(vscode.commands.registerCommand('draftforge.listInconsistentFormatting', async function () {
-    try {
-      const activeDoc = vscode.window.activeTextEditor?.document
+export function registerListInconsistentFormattingCommand(context, outputChannel) {
+  context.subscriptions.push(
+    vscode.commands.registerCommand('draftforge.listInconsistentFormatting', async function () {
+      try {
+        const activeDoc = vscode.window.activeTextEditor?.document
 
-      if (!activeDoc) {
-        return vscode.window.showErrorMessage('Open a document first.')
-      } else if (activeDoc.uri.scheme === 'output') {
-        return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
-      } else if (!['xml', 'markdown'].includes(activeDoc.languageId)) {
-        return vscode.window.showErrorMessage('Unsupported Document Type.')
-      }
-
-      const results = findInconsistentFormatting(activeDoc.getText(), activeDoc.languageId)
-
-      outputChannel.clear()
-      outputChannel.appendLine(`List of inconsistent formatting in ${activeDoc.fileName}:\n`)
-      let idx = 0
-
-      for (const key in results) {
-        if (idx > 0) {
-          outputChannel.appendLine('--------')
+        if (!activeDoc) {
+          return vscode.window.showErrorMessage('Open a document first.')
+        } else if (activeDoc.uri.scheme === 'output') {
+          return vscode.window.showErrorMessage(
+            'Focus your desired document first. Focus is currently in the Output window.'
+          )
+        } else if (!['xml', 'markdown'].includes(activeDoc.languageId)) {
+          return vscode.window.showErrorMessage('Unsupported Document Type.')
         }
-        idx++
-        const phrase = results[key]
-        for (const variation of phrase) {
-          outputChannel.appendLine(`${variation.text} (${variation.count})`)
+
+        const results = findInconsistentFormatting(activeDoc.getText(), activeDoc.languageId)
+
+        outputChannel.clear()
+        outputChannel.appendLine(`List of inconsistent formatting in ${activeDoc.fileName}:\n`)
+        let idx = 0
+
+        for (const key in results) {
+          if (idx > 0) {
+            outputChannel.appendLine('--------')
+          }
+          idx++
+          const phrase = results[key]
+          for (const variation of phrase) {
+            outputChannel.appendLine(`${variation.text} (${variation.count})`)
+          }
         }
-      }
 
-      if (idx === 0) {
-        outputChannel.appendLine('No inconsistent formatting found.')
-        vscode.window.showInformationMessage('No inconsistent formatting found.')
-      } else {
-        vscode.window.showInformationMessage(`Found ${idx} instance(s) of inconsistent formatting. See Output: DraftForge`)
-      }
+        if (idx === 0) {
+          outputChannel.appendLine('No inconsistent formatting found.')
+          vscode.window.showInformationMessage('No inconsistent formatting found.')
+        } else {
+          vscode.window.showInformationMessage(
+            `Found ${idx} instance(s) of inconsistent formatting. See Output: DraftForge`
+          )
+        }
 
-      outputChannel.show(true)
-    } catch (err) {
-      console.warn(err)
-      vscode.window.showErrorMessage(err.message)
-    }
-  }))
+        outputChannel.show(true)
+      } catch (err) {
+        console.warn(err)
+        vscode.window.showErrorMessage(err.message)
+      }
+    })
+  )
 }
 
 /**
@@ -57,7 +63,7 @@ export function registerListInconsistentFormattingCommand (context, outputChanne
  * @param {String} languageId
  * @returns {Object}
  */
-function findInconsistentFormatting (text, languageId) {
+function findInconsistentFormatting(text, languageId) {
   const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   const normalizedKeyOf = (s) => s.replace(/\s+/g, ' ').trim().toLowerCase()
 
@@ -105,7 +111,7 @@ function findInconsistentFormatting (text, languageId) {
   const keys = Object.keys(variationsByKey)
   for (const key of keys) {
     // pick a representative inner text for searching (use first formatted match inner)
-    const rep = formattedMatches.find(f => f.key === key)
+    const rep = formattedMatches.find((f) => f.key === key)
     if (!rep) {
       continue
     }
@@ -118,7 +124,7 @@ function findInconsistentFormatting (text, languageId) {
     while ((m = re.exec(text)) !== null) {
       const start = m.index
       // if this occurrence falls inside any formatted match range, skip (it's formatted)
-      const insideFormatted = formattedMatches.some(f => start >= f.start && start < f.end)
+      const insideFormatted = formattedMatches.some((f) => start >= f.start && start < f.end)
       if (insideFormatted) {
         continue
       }
@@ -132,7 +138,10 @@ function findInconsistentFormatting (text, languageId) {
   const results = {}
   for (const key in variationsByKey) {
     const vmap = variationsByKey[key]
-    const variations = Object.keys(vmap).map(textVar => ({ text: textVar.trim(), count: vmap[textVar] }))
+    const variations = Object.keys(vmap).map((textVar) => ({
+      text: textVar.trim(),
+      count: vmap[textVar]
+    }))
     if (variations.length > 1) {
       results[key] = variations
     }

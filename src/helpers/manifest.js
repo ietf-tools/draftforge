@@ -1,6 +1,5 @@
 import * as vscode from 'vscode'
 import { posix } from 'node:path'
-import { set } from 'lodash-es'
 
 const manifests = new Map()
 
@@ -27,7 +26,7 @@ const manifestManager = {
    */
   updateManifest: async (workspacePath, propPath, propValue, persistToDisk = false) => {
     const manifest = manifests.get(workspacePath) || {}
-    set(manifest, propPath, propValue)
+    manifest[propPath] = propValue
     return manifestManager.setManifest(workspacePath, manifest, persistToDisk)
   },
   /**
@@ -72,7 +71,10 @@ const manifestManager = {
    */
   saveToDisk: async (workspacePath) => {
     const manifestPath = posix.join(workspacePath, 'manifest.json')
-    await vscode.workspace.fs.writeFile(vscode.Uri.parse(manifestPath), new TextEncoder().encode(JSON.stringify(manifests.get(workspacePath) || {}, null, 2)))
+    await vscode.workspace.fs.writeFile(
+      vscode.Uri.parse(manifestPath),
+      new TextEncoder().encode(JSON.stringify(manifests.get(workspacePath) || {}, null, 2))
+    )
   },
   /**
    *

@@ -4,7 +4,7 @@ import { exec } from 'node:child_process'
 import { promisify } from 'node:util'
 import fs from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { debounce } from 'lodash-es'
+import { debounce } from 'es-toolkit/function'
 
 const execAsync = promisify(exec)
 let tmpPath = ''
@@ -43,7 +43,7 @@ function getErrorContent(errorMsg) {
 </head>
 <body>
   <div style="padding: 15px 0; font-size: 1.2rem;"><strong>Failed to render preview</strong></div>
-  <div>${errorMsg.replaceAll("\n", '<br>')}</div>
+  <div>${errorMsg.replaceAll('\n', '<br>')}</div>
 </body>
 </html>`
 }
@@ -61,13 +61,14 @@ class DocumentPreview {
     this.outputChannel = outputChannel
 
     this.setupPanel(documentUri)
+    // oxlint-disable-next-line typescript/unbound-method
     this.generateDebounced = debounce(this.generate, 500)
   }
 
   /**
    * Initialize Webview Panel
    */
-  setupPanel (documentUri) {
+  setupPanel(documentUri) {
     this.panel = vscode.window.createWebviewPanel(
       'xml2rfcPreview',
       `Preview - ${this.documentFilename}`,
@@ -92,7 +93,7 @@ class DocumentPreview {
    *
    * @param {string} inputContent Content to transform
    */
-  async generate (inputContent) {
+  async generate(inputContent) {
     const now = Date.now().toString()
     const inputPath = path.join(tmpPath, `${now}.xml`)
     try {
@@ -129,10 +130,10 @@ class DocumentPreview {
    *
    * @param {string} stderr xml2rfc stderr output
    */
-  parseOutput (stderr) {
+  parseOutput(stderr) {
     const diagRgx = /(.xml\((?<line>[0-9]+)\): )?(?<kind>Warning|Error): (?<msg>.*)/i
     this.outputChannel.clear()
-    for(const line of stderr.split('\n')) {
+    for (const line of stderr.split('\n')) {
       const match = line.match(diagRgx)
       if (match) {
         const lineParts = [match.groups.kind]
@@ -151,46 +152,56 @@ class DocumentPreview {
  * @param {vscode.ExtensionContext} context
  * @param {vscode.OutputChannel} outputChannel
  */
-export function registerXmlPreviewCommand (context, outputChannel) {
-  context.subscriptions.push(vscode.commands.registerCommand('draftforge.xmlPreview', async function () {
-    try {
-      const activeDoc = vscode.window.activeTextEditor?.document
+export function registerXmlPreviewCommand(context, outputChannel) {
+  context.subscriptions.push(
+    vscode.commands.registerCommand('draftforge.xmlPreview', async function () {
+      try {
+        const activeDoc = vscode.window.activeTextEditor?.document
 
-      if (!activeDoc) {
-        return vscode.window.showErrorMessage('Open a document first.')
-      } else if (activeDoc.uri.scheme === 'output') {
-        return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
-      } else if (activeDoc.languageId !== 'xml') {
-        return vscode.window.showErrorMessage('Unsupported Document Type.')
+        if (!activeDoc) {
+          return vscode.window.showErrorMessage('Open a document first.')
+        } else if (activeDoc.uri.scheme === 'output') {
+          return vscode.window.showErrorMessage(
+            'Focus your desired document first. Focus is currently in the Output window.'
+          )
+        } else if (activeDoc.languageId !== 'xml') {
+          return vscode.window.showErrorMessage('Unsupported Document Type.')
+        }
+
+        const activeUri = activeDoc.uri.toString()
+        if (!previews[activeUri]) {
+          previews[activeUri] = new DocumentPreview(
+            activeDoc.uri,
+            activeDoc.fileName,
+            outputChannel
+          )
+        }
+
+        // Get temp dir
+        if (!tmpPath) {
+          tmpPath = await fs.mkdtemp(path.join(tmpdir(), 'draftforge-'))
+        }
+
+        // Show preview
+        await previews[activeUri].generate(activeDoc.getText())
+      } catch (err) {
+        console.warn(err)
+        vscode.window.showErrorMessage(err.message)
       }
+    })
+  )
 
-      const activeUri = activeDoc.uri.toString()
-      if (!previews[activeUri]) {
-        previews[activeUri] = new DocumentPreview(activeDoc.uri, activeDoc.fileName, outputChannel)
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeTextDocument(async (ev) => {
+      const activeUri = ev.document.uri.toString()
+      if (previews[activeUri]) {
+        await previews[activeUri].generateDebounced(ev.document.getText())
       }
-
-      // Get temp dir
-      if (!tmpPath) {
-        tmpPath = await fs.mkdtemp(path.join(tmpdir(), 'draftforge-'))
-      }
-
-      // Show preview
-      await previews[activeUri].generate(activeDoc.getText())
-    } catch (err) {
-      console.warn(err)
-      vscode.window.showErrorMessage(err.message)
-    }
-  }))
-
-  context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(async (ev) => {
-    const activeUri = ev.document.uri.toString()
-    if (previews[activeUri]) {
-      await previews[activeUri].generateDebounced(ev.document.getText())
-    }
-  }))
+    })
+  )
 }
 
-export function unregisterXmlPreviewCommand () {
+export function unregisterXmlPreviewCommand() {
   if (tmpPath) {
     console.log(`Cleaning up ${tmpPath}...`)
     fs.rm(tmpPath, { recursive: true, force: true })

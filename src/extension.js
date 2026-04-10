@@ -15,6 +15,7 @@ import { registerListAbbreviationsCommand } from './commands/abbreviations.js'
 import { registerListInconsistentCapitalizationCommand } from './commands/inconsistent-capitalization.js'
 import { registerListInconsistentFormattingCommand } from './commands/inconsistent-formatting.js'
 import { registerLookupSelectionAcrossDocsCommand } from './commands/lookup-selection-across-docs.js'
+import { registerMakeDiffCommand } from './commands/make-diff.js'
 import { registerPrepareForPublishingCommand } from './commands/prepare-publishing.js'
 import { registerStripMLineEndingsCommand } from './commands/strip-mline-endings.js'
 import { registerSurroundBcp14KeywordsCommand } from './commands/surround-bcp14-keywords.js'
@@ -26,50 +27,50 @@ import { registerXmlPreviewCommand, unregisterXmlPreviewCommand } from './comman
  * @param {vscode.ExtensionContext} context
  */
 export function activate(context) {
-	console.log('Initializing DraftForge...')
+  console.log('Initializing DraftForge...')
 
   // Create DraftForge Output channel
   let outputChannel = vscode.window.createOutputChannel('DraftForge')
   context.subscriptions.push(outputChannel)
 
-	// Register Diagnostic Collection
-	let diagnosticCollection = vscode.languages.createDiagnosticCollection('draftforgeChecks')
-	context.subscriptions.push(diagnosticCollection)
+  // Register Diagnostic Collection
+  let diagnosticCollection = vscode.languages.createDiagnosticCollection('draftforgeChecks')
+  context.subscriptions.push(diagnosticCollection)
 
   // Register auth provider
   context.subscriptions.push(new IetfAuthenticationProvider(context))
 
   // Register commands
   // -> Note: Validation checks commands are registered in the Checks view
-	registerAddXmlModelsCommand(context)
+  registerAddXmlModelsCommand(context)
   registerAuthCommands(context)
   registerExpandIncludesCommands(context)
   registerExtractCodeComponentsCommand(context, outputChannel)
-	registerExtractCommentsCommand(context, outputChannel)
-	registerIdnitsCommand(context)
+  registerExtractCommentsCommand(context, outputChannel)
+  registerIdnitsCommand(context)
   registerListAbbreviationsCommand(context, outputChannel)
   registerListInconsistentCapitalizationCommand(context, outputChannel)
   registerListInconsistentFormattingCommand(context, outputChannel)
   registerLookupSelectionAcrossDocsCommand(context, outputChannel)
+  registerMakeDiffCommand(context, outputChannel)
   registerPrepareForPublishingCommand(context, outputChannel)
-	registerStripMLineEndingsCommand(context)
+  registerStripMLineEndingsCommand(context)
   registerSurroundBcp14KeywordsCommand(context)
   registerSvgcheckCommand(context, diagnosticCollection)
   registerXmlOutputCommand(context)
   registerXmlPreviewCommand(context, outputChannel)
 
   // Activate views
-	activateChecksView(context, diagnosticCollection)
-	activateToolsView(context)
-	activateSnippetsView(context)
-	activateReferenceView(context)
+  void activateChecksView(context, diagnosticCollection)
+  activateToolsView(context)
+  activateSnippetsView(context)
+  activateReferenceView(context)
 
   // Extension is ready
-	vscode.commands.executeCommand('setContext', 'draftforge.isReady', true)
-	console.log('DraftForge initialized.')
+  vscode.commands.executeCommand('setContext', 'draftforge.isReady', true)
+  console.log('DraftForge initialized.')
 }
 
 export function deactivate() {
   unregisterXmlPreviewCommand()
 }
-

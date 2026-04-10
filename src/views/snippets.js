@@ -10,13 +10,15 @@ class SnippetsProvider {
 
     this.populateSnippets()
 
-    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(_ev => {
-      this.populateSnippets()
-      this.refresh()
-    }))
+    context.subscriptions.push(
+      vscode.window.onDidChangeActiveTextEditor((_ev) => {
+        this.populateSnippets()
+        this.refresh()
+      })
+    )
   }
 
-  populateSnippets () {
+  populateSnippets() {
     const currentLanguage = vscode.window.activeTextEditor?.document.languageId
     this.snippets = [
       {
@@ -37,7 +39,9 @@ class SnippetsProvider {
         id: 'xmlTable',
         label: 'Table',
         description: 'Insert a custom table',
-        body: () => { return generateXmlTable() },
+        body: () => {
+          return generateXmlTable()
+        },
         targetLanguage: 'xml'
       },
       {
@@ -55,7 +59,7 @@ class SnippetsProvider {
         body: '| Col1 | Col2 |\n| --- | --- |\n| ${1:cell1} | ${2:cell2} |\n',
         targetLanguage: 'markdown'
       }
-    ].filter(s => s.targetLanguage === currentLanguage)
+    ].filter((s) => s.targetLanguage === currentLanguage)
   }
 
   refresh() {
@@ -85,27 +89,36 @@ class SnippetsProvider {
  * Generate a table by prompting the user for header, columns and rows count
  * @returns {Promise<String>} Snippet Body
  */
-async function generateXmlTable () {
-  const includeHeaders = await vscode.window.showQuickPick([
-    { label: 'Yes, include a header row', picked: true, value: 'yes' },
-    { label: 'No, don\'t include a header row', value: 'no' }
-  ], {
-    ignoreFocusOut: true,
-    title: 'Include a table header row?',
-    placeHolder: 'Choose...'
-  })
-  if (!includeHeaders) { return }
+async function generateXmlTable() {
+  const includeHeaders = await vscode.window.showQuickPick(
+    [
+      { label: 'Yes, include a header row', picked: true, value: 'yes' },
+      { label: "No, don't include a header row", value: 'no' }
+    ],
+    {
+      ignoreFocusOut: true,
+      title: 'Include a table header row?',
+      placeHolder: 'Choose...'
+    }
+  )
+  if (!includeHeaders) {
+    return
+  }
   const columnsStr = await vscode.window.showInputBox({
     title: 'How many columns to generate?',
     value: '4'
   })
-  if (!columnsStr) { return }
+  if (!columnsStr) {
+    return
+  }
   const cols = parseInt(columnsStr)
   const rowsStr = await vscode.window.showInputBox({
     title: 'How many rows to generate?',
     value: '3'
   })
-  if (!rowsStr) { return }
+  if (!rowsStr) {
+    return
+  }
   const rows = parseInt(rowsStr)
 
   let output = `<table>\n`
@@ -129,7 +142,7 @@ async function generateXmlTable () {
  * @param {Number} startIdx Starting index number
  * @returns {String} Output
  */
-function repeatWithIndex (input, times, startIdx = 1) {
+function repeatWithIndex(input, times, startIdx = 1) {
   let output = ''
   for (let idx = startIdx; idx < startIdx + times; idx++) {
     output += input.replaceAll('IDX', idx.toString())
@@ -140,26 +153,34 @@ function repeatWithIndex (input, times, startIdx = 1) {
 /**
  * @param {vscode.ExtensionContext} context
  */
-export function activateSnippetsView (context) {
+export function activateSnippetsView(context) {
   const snippetsProvider = new SnippetsProvider(context)
-  const snippetsView = vscode.window.createTreeView('draftforge-snippets', { treeDataProvider: snippetsProvider })
+  const snippetsView = vscode.window.createTreeView('draftforge-snippets', {
+    treeDataProvider: snippetsProvider
+  })
   context.subscriptions.push(snippetsView)
 
-  context.subscriptions.push(vscode.commands.registerCommand('draftforge.insertSnippet', async (snippet) => {
-    try {
-      const editor = vscode.window.activeTextEditor
-      if (!editor) {
-        return vscode.window.showInformationMessage('No active editor to insert snippet into.')
+  context.subscriptions.push(
+    vscode.commands.registerCommand('draftforge.insertSnippet', async (snippet) => {
+      try {
+        const editor = vscode.window.activeTextEditor
+        if (!editor) {
+          return vscode.window.showInformationMessage('No active editor to insert snippet into.')
+        }
+        const body = typeof snippet.body === 'function' ? await snippet.body() : snippet.body
+        if (!body) {
+          return
+        }
+        const snippetString = new vscode.SnippetString(body || '')
+        await editor.insertSnippet(snippetString, editor.selection.start)
+      } catch (err) {
+        console.warn(err)
+        vscode.window.showErrorMessage(err.message)
       }
-      const body = (typeof snippet.body === 'function') ? await snippet.body() : snippet.body
-      if (!body) { return }
-      const snippetString = new vscode.SnippetString(body || '')
-      await editor.insertSnippet(snippetString, editor.selection.start)
-    } catch (err) {
-      console.warn(err)
-      vscode.window.showErrorMessage(err.message)
-    }
-  }))
+    })
+  )
 
-  context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => snippetsProvider.refresh()))
+  context.subscriptions.push(
+    vscode.window.onDidChangeActiveTextEditor(() => snippetsProvider.refresh())
+  )
 }

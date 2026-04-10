@@ -12,7 +12,7 @@ const execAsync = promisify(exec)
  * @param {String} inputContent
  * @returns {Promise<String>}
  */
-async function run (inputContent) {
+async function run(inputContent) {
   try {
     // Get temp dir
     const tmpPath = await fs.mkdtemp(path.join(tmpdir(), 'draftforge-'))
@@ -41,43 +41,49 @@ async function run (inputContent) {
  * @param {vscode.ExtensionContext} context
  * @param {vscode.DiagnosticCollection} diagnosticCollection
  */
-export function registerSvgcheckCommand (context, diagnosticCollection) {
-  context.subscriptions.push(vscode.commands.registerCommand('draftforge.svgcheck', async function () {
-    const activeDoc = vscode.window.activeTextEditor?.document
+export function registerSvgcheckCommand(context, diagnosticCollection) {
+  context.subscriptions.push(
+    vscode.commands.registerCommand('draftforge.svgcheck', async function () {
+      const activeDoc = vscode.window.activeTextEditor?.document
 
-    if (!activeDoc) {
-      return vscode.window.showErrorMessage('Open a document first.')
-    } else if (activeDoc.uri.scheme === 'output') {
-      return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
-    } else if (activeDoc.languageId !== 'xml') {
-      return vscode.window.showErrorMessage('Unsupported Document Type.')
-    }
-
-    diagnosticCollection.clear()
-
-    try {
-      const output = await run(activeDoc.getText())
-      if (output.includes('ERROR: ')) {
-        const diags = []
-        const diagRgx = /[0-9]+\.xml:(?<line>[0-9]+): (?<msg>.*)/i
-        for(const line of output.split('\n')) {
-          const match = line.match(diagRgx)
-          if (match) {
-            const lineIdx = parseInt(match.groups.line) - 1
-            diags.push(new vscode.Diagnostic(
-              new vscode.Range(lineIdx, 0, lineIdx, line.length),
-              match.groups.msg,
-              vscode.DiagnosticSeverity.Warning
-            ))
-          }
-        }
-        diagnosticCollection.set(activeDoc.uri, diags)
-        await vscode.commands.executeCommand('workbench.action.problems.focus')
-      } else {
-        vscode.window.showInformationMessage('Document conforms to SVG requirements.')
+      if (!activeDoc) {
+        return vscode.window.showErrorMessage('Open a document first.')
+      } else if (activeDoc.uri.scheme === 'output') {
+        return vscode.window.showErrorMessage(
+          'Focus your desired document first. Focus is currently in the Output window.'
+        )
+      } else if (activeDoc.languageId !== 'xml') {
+        return vscode.window.showErrorMessage('Unsupported Document Type.')
       }
-    } catch (err) {
-      vscode.window.showErrorMessage(err.message)
-    }
-  }))
+
+      diagnosticCollection.clear()
+
+      try {
+        const output = await run(activeDoc.getText())
+        if (output.includes('ERROR: ')) {
+          const diags = []
+          const diagRgx = /[0-9]+\.xml:(?<line>[0-9]+): (?<msg>.*)/i
+          for (const line of output.split('\n')) {
+            const match = line.match(diagRgx)
+            if (match) {
+              const lineIdx = parseInt(match.groups.line) - 1
+              diags.push(
+                new vscode.Diagnostic(
+                  new vscode.Range(lineIdx, 0, lineIdx, line.length),
+                  match.groups.msg,
+                  vscode.DiagnosticSeverity.Warning
+                )
+              )
+            }
+          }
+          diagnosticCollection.set(activeDoc.uri, diags)
+          await vscode.commands.executeCommand('workbench.action.problems.focus')
+        } else {
+          vscode.window.showInformationMessage('Document conforms to SVG requirements.')
+        }
+      } catch (err) {
+        vscode.window.showErrorMessage(err.message)
+      }
+    })
+  )
 }

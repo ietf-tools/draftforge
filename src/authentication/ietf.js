@@ -17,7 +17,7 @@ export class IetfAuthenticationProvider {
    * Constructor
    * @param {vscode.ExtensionContext} context
    */
-  constructor (context) {
+  constructor(context) {
     /** @type {vscode.EventEmitter<vscode.AuthenticationProviderAuthenticationSessionsChangeEvent>} */
     this._onDidChangeSessions = new vscode.EventEmitter()
     this._initializedDisposable = undefined
@@ -33,22 +33,21 @@ export class IetfAuthenticationProvider {
 
     // Register Auth Provider
     this._disposable = vscode.Disposable.from(
-      vscode.authentication.registerAuthenticationProvider(
-        'ietf',
-        'IETF Account',
-        this,
-        { supportsMultipleAccounts: false }
-      ),
+      vscode.authentication.registerAuthenticationProvider('ietf', 'IETF Account', this, {
+        supportsMultipleAccounts: false
+      }),
       vscode.window.registerUriHandler({
-        handleUri: (uri) =>{ this.handleLoginCallback(uri) }
+        handleUri: (uri) => {
+          void this.handleLoginCallback(uri)
+        }
       })
     )
 
     // Check for past session to recover
-    this.recoverPastSession()
+    void this.recoverPastSession()
 
     // Build redirect URI
-    const publisher = context.extension.packageJSON.publisher;
+    const publisher = context.extension.packageJSON.publisher
     const name = context.extension.packageJSON.name
     this.redirectUri = `${vscode.env.uriScheme}://${publisher}.${name}`
   }
@@ -57,7 +56,7 @@ export class IetfAuthenticationProvider {
    * Event fired when authentication sessions change.
    * @type {vscode.Event<vscode.AuthenticationProviderAuthenticationSessionsChangeEvent>}
    */
-  get onDidChangeSessions () {
+  get onDidChangeSessions() {
     return this._onDidChangeSessions.event
   }
 
@@ -65,7 +64,7 @@ export class IetfAuthenticationProvider {
    * Checks if the user is logged in
    * @type {Boolean}
    */
-  get isLoggedIn () {
+  get isLoggedIn() {
     return Boolean(this.accessToken && this.refreshToken)
   }
 
@@ -73,14 +72,14 @@ export class IetfAuthenticationProvider {
    * Checks if the access token has expired
    * @type {Boolean}
    */
-  get isExpired () {
+  get isExpired() {
     return this.expiresAt <= Math.floor(Date.now() / 1000)
   }
 
   /**
    * Recover past session tokens
    */
-  async recoverPastSession () {
+  async recoverPastSession() {
     const previousSessionTokens = await this.secretStorage.get('draftforge.ietf.tokens')
     if (previousSessionTokens) {
       console.log('Past session tokens found. Restoring...')
@@ -96,7 +95,7 @@ export class IetfAuthenticationProvider {
    * Login Callback
    * @param {vscode.Uri} uri
    */
-  async handleLoginCallback (uri) {
+  async handleLoginCallback(uri) {
     console.log('Login callback received.')
     const clbQuery = new URLSearchParams(uri.query)
 
@@ -104,7 +103,9 @@ export class IetfAuthenticationProvider {
       return vscode.window.showErrorMessage('Login cancelled by the user.', { modal: true })
     }
     if (clbQuery.get('state') !== this.stateId) {
-      return vscode.window.showErrorMessage('Invalid / Expired Auth State. Try to login again.', { modal: true })
+      return vscode.window.showErrorMessage('Invalid / Expired Auth State. Try to login again.', {
+        modal: true
+      })
     }
 
     try {
@@ -121,7 +122,7 @@ export class IetfAuthenticationProvider {
           code: clbQuery.get('code'),
           redirect_uri: this.redirectUri
         })
-      }).then(res => res.json())
+      }).then((res) => res.json())
 
       // @ts-ignore
       this.accessToken = res.access_token
@@ -132,11 +133,14 @@ export class IetfAuthenticationProvider {
       // @ts-ignore
       this.idToken = res.id_token
 
-      await this.secretStorage.store('draftforge.ietf.tokens', JSON.stringify({
-        accessToken: this.accessToken,
-        refreshToken: this.refreshToken,
-        expiresAt: this.expiresAt
-      }))
+      await this.secretStorage.store(
+        'draftforge.ietf.tokens',
+        JSON.stringify({
+          accessToken: this.accessToken,
+          refreshToken: this.refreshToken,
+          expiresAt: this.expiresAt
+        })
+      )
 
       console.log('Access token refreshed successfully.')
 
@@ -156,7 +160,7 @@ export class IetfAuthenticationProvider {
    * Fetch user info
    * @returns {Promise<Object>}
    */
-  async fetchUserInfo () {
+  async fetchUserInfo() {
     console.log('Fetching user info...')
 
     if (!this.isLoggedIn) {
@@ -169,7 +173,9 @@ export class IetfAuthenticationProvider {
       headers: {
         'Cache-Control': 'no-cache'
       }
-    }).then(res => { return res.json() })
+    }).then((res) => {
+      return res.json()
+    })
     if (res) {
       console.log('User info fetched successfully.')
       this.profile = res
@@ -181,7 +187,7 @@ export class IetfAuthenticationProvider {
   /**
    * Refresh access token using refresh token
    */
-  async refreshAccessToken () {
+  async refreshAccessToken() {
     try {
       console.log('Renewing access token...')
       const res = await fetch(TOKEN_URL, {
@@ -196,7 +202,7 @@ export class IetfAuthenticationProvider {
           refresh_token: this.refreshToken,
           redirect_uri: this.redirectUri
         })
-      }).then(res => res.json())
+      }).then((res) => res.json())
 
       if (res.error) {
         throw new Error(`${res.error}: ${res.error_description}`)
@@ -211,11 +217,14 @@ export class IetfAuthenticationProvider {
       // @ts-ignore
       this.idToken = res.id_token
 
-      await this.secretStorage.store('draftforge.ietf.tokens', JSON.stringify({
-        accessToken: this.accessToken,
-        refreshToken: this.refreshToken,
-        expiresAt: this.expiresAt
-      }))
+      await this.secretStorage.store(
+        'draftforge.ietf.tokens',
+        JSON.stringify({
+          accessToken: this.accessToken,
+          refreshToken: this.refreshToken,
+          expiresAt: this.expiresAt
+        })
+      )
 
       console.log('Access token refreshed successfully.')
     } catch (err) {
@@ -228,53 +237,56 @@ export class IetfAuthenticationProvider {
    * Login
    * @param {string[]} scopes
    */
-  async login (scopes = []) {
+  async login(scopes = []) {
     console.log('Login requested...')
-    return await vscode.window.withProgress({
-      location: vscode.ProgressLocation.Notification,
-      title: "Signing in to IETF...",
-      cancellable: true
-    }, async (_, cancelToken) => {
-      const externalCancelPromise = Promise.withResolvers()
-      cancelToken.onCancellationRequested(ev => {
-        externalCancelPromise.reject('User Cancelled')
-      })
+    return await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: 'Signing in to IETF...',
+        cancellable: true
+      },
+      async (_, cancelToken) => {
+        const externalCancelPromise = Promise.withResolvers()
+        cancelToken.onCancellationRequested((_ev) => {
+          externalCancelPromise.reject('User Cancelled')
+        })
 
-      this.stateId = uuid()
+        this.stateId = uuid()
 
-      if (!scopes.includes('openid')) {
-        scopes.push('openid')
-      }
-      if (!scopes.includes('profile')) {
-        scopes.push('profile')
-      }
-      if (!scopes.includes('email')) {
-        scopes.push('email')
-      }
+        if (!scopes.includes('openid')) {
+          scopes.push('openid')
+        }
+        if (!scopes.includes('profile')) {
+          scopes.push('profile')
+        }
+        if (!scopes.includes('email')) {
+          scopes.push('email')
+        }
 
-      const searchParams = new URLSearchParams([
-        ['response_type', 'code'],
-        ['client_id', CLIENT_ID],
-        ['redirect_uri', this.redirectUri],
-        ['scope', scopes.join(' ')],
-        ['state', this.stateId]
-      ])
-
-      const uri = vscode.Uri.parse(`${AUTHORIZE_URL}?${searchParams.toString()}`)
-      await vscode.env.openExternal(uri)
-
-      this.loginPromise = Promise.withResolvers()
-
-      try {
-        return await Promise.race([
-          this.loginPromise.promise,
-          new Promise((_, reject) => setTimeout(() => reject('Cancelled'), 60000)),
-          externalCancelPromise.promise
+        const searchParams = new URLSearchParams([
+          ['response_type', 'code'],
+          ['client_id', CLIENT_ID],
+          ['redirect_uri', this.redirectUri],
+          ['scope', scopes.join(' ')],
+          ['state', this.stateId]
         ])
-      } finally {
-        this.loginPromise.resolve()
+
+        const uri = vscode.Uri.parse(`${AUTHORIZE_URL}?${searchParams.toString()}`)
+        await vscode.env.openExternal(uri)
+
+        this.loginPromise = Promise.withResolvers()
+
+        try {
+          return await Promise.race([
+            this.loginPromise.promise,
+            new Promise((_, reject) => setTimeout(() => reject('Cancelled'), 60000)),
+            externalCancelPromise.promise
+          ])
+        } finally {
+          this.loginPromise.resolve()
+        }
       }
-    })
+    )
   }
 
   /**
@@ -289,7 +301,7 @@ export class IetfAuthenticationProvider {
    * @param {string[]} scopes
    * @returns {Promise<vscode.AuthenticationSession>}
    */
-  async createSession (scopes) {
+  async createSession(scopes) {
     await this.login(scopes)
 
     const sessionId = uuid()
@@ -319,7 +331,7 @@ export class IetfAuthenticationProvider {
    * @param {vscode.AuthenticationGetSessionOptions} [options] - Optional parameters to control retrieval.
    * @returns {Promise<Array<vscode.AuthenticationSession>>}
    */
-  async getSessions (scopes, options) {
+  async getSessions(_scopes, _options) {
     try {
       const allSessions = await this.secretStorage.get(SESSIONS_SECRET_KEY)
 
@@ -355,12 +367,12 @@ export class IetfAuthenticationProvider {
    * Removes the session corresponding to session id.
    * @param {String} sessionId
    */
-  async removeSession (sessionId) {
+  async removeSession(sessionId) {
     console.log(`Removing session for ${sessionId}...`)
     const allSessions = await this.secretStorage.get(SESSIONS_SECRET_KEY)
     if (allSessions) {
       let sessions = JSON.parse(allSessions)
-      const sessionIdx = sessions.findIndex(s => s.id === sessionId)
+      const sessionIdx = sessions.findIndex((s) => s.id === sessionId)
       const session = sessions[sessionIdx]
       sessions.splice(sessionIdx, 1)
 

@@ -327,24 +327,23 @@
     ]
   },
   "scripts": {
-    "compile": "rollup -c rollup.config.mjs",
-    "test": "vscode-test"
+    "compile": "rollup -c rollup.config.mjs"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "29.0.0",
     "@rollup/plugin-node-resolve": "16.0.3",
-    "@types/mocha": "10.0.10",
+    "@tsconfig/node22": "22.0.5",
     "@types/node": "22.x",
     "@types/vscode": "1.106.1",
-    "@vscode/test-cli": "0.0.12",
-    "@vscode/test-electron": "2.5.2",
-    "eslint": "9.39.1",
+    "oxfmt": "0.44.0",
+    "oxlint": "1.59.0",
+    "oxlint-tsgolint": "0.20.0",
     "rollup": "4.53.3"
   },
   "dependencies": {
     "@ietf-tools/idnits": "3.0.0-alpha.70",
+    "es-toolkit": "1.45.1",
     "klaw": "4.1.0",
-    "lodash-es": "4.17.21",
     "uuid": "13.0.0"
   }
 }

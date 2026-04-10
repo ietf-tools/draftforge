@@ -1,61 +1,71 @@
 import * as vscode from 'vscode'
-import { repeat } from 'lodash-es'
 
 /**
  * @param {vscode.ExtensionContext} context
  * @param {vscode.OutputChannel} outputChannel
  */
-export function registerListInconsistentCapitalizationCommand (context, outputChannel) {
-  context.subscriptions.push(vscode.commands.registerCommand('draftforge.listInconsistentCapitalization', async function () {
-    try {
-      const activeDoc = vscode.window.activeTextEditor?.document
+export function registerListInconsistentCapitalizationCommand(context, outputChannel) {
+  context.subscriptions.push(
+    vscode.commands.registerCommand('draftforge.listInconsistentCapitalization', async function () {
+      try {
+        const activeDoc = vscode.window.activeTextEditor?.document
 
-      if (!activeDoc) {
-        return vscode.window.showErrorMessage('Open a document first.')
-      } else if (activeDoc.uri.scheme === 'output') {
-        return vscode.window.showErrorMessage('Focus your desired document first. Focus is currently in the Output window.')
-      } else if (!['xml', 'markdown', 'plaintext'].includes(activeDoc.languageId)) {
-        return vscode.window.showErrorMessage('Unsupported Document Type.')
-      }
-
-      const ignoreXmlTagsRgx = /<([ \t\S]{2,}?)>/gi
-      const ignoreNameTagTextRgx = /<name>(?<term>.+?)<\/name>/gi
-      const ignoreAnchorPropTextRgx = /anchor="(?<term>.+?)"/gi
-      const results = findInconsistentCapitalization(
-        activeDoc.getText()
-          .replaceAll(ignoreNameTagTextRgx, (_, p1) => `<name>${repeat('_', p1.length)}</name>`)
-          .replaceAll(ignoreAnchorPropTextRgx, (_, p1) => `anchor="${repeat('_', p1.length)}"`)
-          .replaceAll(ignoreXmlTagsRgx, (_, p1) => `<${repeat('_', p1.length)}>`)
-      )
-
-      outputChannel.clear()
-      outputChannel.appendLine(`List of inconsistent use of capitalization in ${activeDoc.fileName}:\n`)
-      let idx = 0
-
-      for (const key in results) {
-        if (idx > 0) {
-          outputChannel.appendLine('--------')
+        if (!activeDoc) {
+          return vscode.window.showErrorMessage('Open a document first.')
+        } else if (activeDoc.uri.scheme === 'output') {
+          return vscode.window.showErrorMessage(
+            'Focus your desired document first. Focus is currently in the Output window.'
+          )
+        } else if (!['xml', 'markdown', 'plaintext'].includes(activeDoc.languageId)) {
+          return vscode.window.showErrorMessage('Unsupported Document Type.')
         }
-        idx++
-        const phrase = results[key]
-        for (const variation of phrase) {
-          outputChannel.appendLine(`${variation.text} (${variation.count}) (Ln ${variation.lines.join(', ')})`)
+
+        const ignoreXmlTagsRgx = /<([ \t\S]{2,}?)>/gi
+        const ignoreNameTagTextRgx = /<name>(?<term>.+?)<\/name>/gi
+        const ignoreAnchorPropTextRgx = /anchor="(?<term>.+?)"/gi
+        const results = findInconsistentCapitalization(
+          activeDoc
+            .getText()
+            .replaceAll(ignoreNameTagTextRgx, (_, p1) => `<name>${'_'.repeat(p1.length)}</name>`)
+            .replaceAll(ignoreAnchorPropTextRgx, (_, p1) => `anchor="${'_'.repeat(p1.length)}"`)
+            .replaceAll(ignoreXmlTagsRgx, (_, p1) => `<${'_'.repeat(p1.length)}>`)
+        )
+
+        outputChannel.clear()
+        outputChannel.appendLine(
+          `List of inconsistent use of capitalization in ${activeDoc.fileName}:\n`
+        )
+        let idx = 0
+
+        for (const key in results) {
+          if (idx > 0) {
+            outputChannel.appendLine('--------')
+          }
+          idx++
+          const phrase = results[key]
+          for (const variation of phrase) {
+            outputChannel.appendLine(
+              `${variation.text} (${variation.count}) (Ln ${variation.lines.join(', ')})`
+            )
+          }
         }
-      }
 
-      if (idx === 0) {
-        outputChannel.appendLine('No inconsistent capitalization use found.')
-        vscode.window.showInformationMessage('No inconsistent capitalization use found.')
-      } else {
-        vscode.window.showInformationMessage(`Found ${idx} inconsistent use of capitalization. See Output: DraftForge`)
-      }
+        if (idx === 0) {
+          outputChannel.appendLine('No inconsistent capitalization use found.')
+          vscode.window.showInformationMessage('No inconsistent capitalization use found.')
+        } else {
+          vscode.window.showInformationMessage(
+            `Found ${idx} inconsistent use of capitalization. See Output: DraftForge`
+          )
+        }
 
-      outputChannel.show(true)
-    } catch (err) {
-      console.warn(err)
-      vscode.window.showErrorMessage(err.message)
-    }
-  }))
+        outputChannel.show(true)
+      } catch (err) {
+        console.warn(err)
+        vscode.window.showErrorMessage(err.message)
+      }
+    })
+  )
 }
 
 /**
@@ -69,14 +79,35 @@ export function registerListInconsistentCapitalizationCommand (context, outputCh
 function findInconsistentCapitalization(text) {
   // CONFIG: Words to ignore capitalization for (must be lowercase here)
   const IGNORED_TERMS = new Set([
-    "the", "a", "an", "and", "but", "or", "nor", "for", "yet", "so", // Articles
-    "in", "on", "at", "to", "of", "by", "with", "from", "up", "about", "into", "over", "after" // Prepositions
+    'the',
+    'a',
+    'an',
+    'and',
+    'but',
+    'or',
+    'nor',
+    'for',
+    'yet',
+    'so', // Articles
+    'in',
+    'on',
+    'at',
+    'to',
+    'of',
+    'by',
+    'with',
+    'from',
+    'up',
+    'about',
+    'into',
+    'over',
+    'after' // Prepositions
   ])
 
   // HELPER: check if two phrases are effectively the same ignoring preposition caps
   function isEffectivelySame(phrase1, phrase2) {
-    const words1 = phrase1.split(" ")
-    const words2 = phrase2.split(" ")
+    const words1 = phrase1.split(' ')
+    const words2 = phrase2.split(' ')
 
     if (words1.length !== words2.length) {
       return false
@@ -130,13 +161,13 @@ function findInconsistentCapitalization(text) {
 
   // 2. Sliding Window
   for (let i = 0; i < tokens.length; i++) {
-    let currentPhrase = ""
-    let lowerPhrase = ""
+    let currentPhrase = ''
+    let lowerPhrase = ''
     const isPhraseStart = tokens[i].isStart
     const startLine = tokens[i].lineNumber
     let hasSingleLetterTerm = false
 
-    for (let j = 0; j < MAX_N && (i + j) < tokens.length; j++) {
+    for (let j = 0; j < MAX_N && i + j < tokens.length; j++) {
       const tokenObj = tokens[i + j]
       const word = tokenObj.word
 
@@ -153,8 +184,8 @@ function findInconsistentCapitalization(text) {
       }
 
       if (j > 0) {
-        currentPhrase += " " + word
-        lowerPhrase += " " + word.toLowerCase()
+        currentPhrase += ' ' + word
+        lowerPhrase += ' ' + word.toLowerCase()
       } else {
         currentPhrase = word
         lowerPhrase = word.toLowerCase()
@@ -185,9 +216,9 @@ function findInconsistentCapitalization(text) {
     // Group effectively identical variations (ignoring prepositions)
     const uniqueVariations = []
 
-    rawOccurrences.forEach(occ => {
+    rawOccurrences.forEach((occ) => {
       // Find if this specific text variation (handling ignored terms) already exists
-      let match = uniqueVariations.find(v => isEffectivelySame(v.text, occ.text))
+      let match = uniqueVariations.find((v) => isEffectivelySame(v.text, occ.text))
 
       if (!match) {
         match = {
@@ -257,7 +288,7 @@ function findInconsistentCapitalization(text) {
     }
   }
 
-  keysToDelete.forEach(k => delete results[k])
+  keysToDelete.forEach((k) => delete results[k])
 
   return results
 }
