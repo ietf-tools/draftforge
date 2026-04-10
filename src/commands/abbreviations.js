@@ -105,7 +105,7 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
 
                 // Look for term
                 const termRgx = new RegExp(
-                  `(?:^|[\\s>([*_])(?<term>${escapeRegExp(abbr.term)})(?:$|[\\s.,<>)*_\\]:])`,
+                  `(?:^|[\\s>([*_])(?<term>${escapeRegExp(abbr.term)}(s?))(?:$|[\\s.,<>)*_\\]:])`,
                   'g'
                 )
 
@@ -127,7 +127,7 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
                 // Look for full expansion
                 if (abbr.full) {
                   const fullRgx = new RegExp(
-                    `(?:^|[\\s>([*_])(?<full>${escapeRegExp(abbr.full)})(?:$|[\\s.,<>)*_\\]:])`,
+                    `(?:^|[\\s>([*_])(?<full>${escapeRegExp(abbr.full)}(s?))(?:$|[\\s.,<>)*_\\]:])`,
                     'gi'
                   )
 
