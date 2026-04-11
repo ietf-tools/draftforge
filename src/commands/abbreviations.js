@@ -169,41 +169,70 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
                   }
                 }
 
-                // Check positions / instances
+                // Store locations for post-processing
                 if (foundLocations.length > 0) {
-                  const result = { ...abbr }
-
-                  const termInstances = foundLocations.filter((fl) => fl.type === 'term')
-                  const fullInstances = foundLocations.filter((fl) => fl.type === 'full')
-                  const redundantInstances = foundLocations.filter((fl) => fl.type === 'redundant')
-
-                  if (firstTermIdx >= 0 && firstFullIdx >= 0) {
-                    result.expanded = true
-
-                    if (firstTermIdx < firstFullIdx) {
-                      result.usedBeforeExpansion = true
-                    }
-
-                    if (fullInstances.length > 1) {
-                      result.overusedExpansion = fullInstances.length - 1
-                    }
-                    if (termInstances.length === 1) {
-                      result.pointlessAbbreviation = true
-                    }
-                  } else if (firstFullIdx >= 0) {
-                    if (fullInstances.length > 1) {
-                      result.notAbbreviated = true
-                      result.overusedExpansion = fullInstances.length - 1
-                    }
-                  }
-                  if (redundantInstances.length > 0) {
-                    result.redundantTerms = uniq(redundantInstances.map((fl) => fl.match))
-                  }
-                  results.push(result)
+                  results.push({ ...abbr, _locations: foundLocations })
                 }
 
                 // Wait for next tick to avoid freezing the progress UI
                 await setTimeout()
+              }
+
+              // Exclude full expansion matches that are contained within a longer full expansion match
+              const allFullLocations = results.flatMap((r) =>
+                r._locations.filter((l) => l.type === 'full')
+              )
+              for (const result of results) {
+                result._locations = result._locations.filter((loc) => {
+                  if (loc.type !== 'full') return true
+                  return !allFullLocations.some(
+                    (other) =>
+                      other !== loc &&
+                      other.indexStart <= loc.indexStart &&
+                      other.indexEnd > loc.indexEnd
+                  )
+                })
+              }
+
+              // Remove results with no remaining locations after filtering
+              results.splice(0, results.length, ...results.filter((r) => r._locations.length > 0))
+
+              // Compute result flags from filtered locations
+              for (const result of results) {
+                const locations = result._locations
+                const termInstances = locations.filter((fl) => fl.type === 'term')
+                const fullInstances = locations.filter((fl) => fl.type === 'full')
+                const redundantInstances = locations.filter((fl) => fl.type === 'redundant')
+
+                const firstTermIdx =
+                  termInstances.length > 0
+                    ? Math.min(...termInstances.map((l) => l.indexStart))
+                    : -1
+                const firstFullIdx =
+                  fullInstances.length > 0
+                    ? Math.min(...fullInstances.map((l) => l.indexStart))
+                    : -1
+
+                if (firstTermIdx >= 0 && firstFullIdx >= 0) {
+                  result.expanded = true
+                  if (firstTermIdx < firstFullIdx) {
+                    result.usedBeforeExpansion = true
+                  }
+                  if (fullInstances.length > 1) {
+                    result.overusedExpansion = fullInstances.length - 1
+                  }
+                  if (termInstances.length === 1) {
+                    result.pointlessAbbreviation = true
+                  }
+                } else if (firstFullIdx >= 0) {
+                  if (fullInstances.length > 1) {
+                    result.notAbbreviated = true
+                    result.overusedExpansion = fullInstances.length - 1
+                  }
+                }
+                if (redundantInstances.length > 0) {
+                  result.redundantTerms = uniq(redundantInstances.map((fl) => fl.match))
+                }
               }
             } catch (err) {
               vscode.window.showErrorMessage(err.message)
