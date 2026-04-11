@@ -245,6 +245,8 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
         let totalWarnings = 0
         const lf = new Intl.ListFormat('en')
 
+        const secondBatch = []
+
         // Output results
         for (const result of results) {
           let resultStr = result.term
@@ -347,7 +349,20 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
           if (isIndented) {
             resultStr = `└─ ${resultStr}`
           }
-          outputChannel.appendLine(resultStr)
+
+          // -> Print now or add to second batch
+          if (isWarning || isIndented) {
+            outputChannel.appendLine(resultStr)
+          } else {
+            secondBatch.push(resultStr)
+          }
+        }
+
+        // -> Print second batch
+        if (secondBatch.length > 0) {
+          for (const resultStr of secondBatch) {
+            outputChannel.appendLine(resultStr)
+          }
         }
 
         if (idx === 0) {
