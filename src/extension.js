@@ -15,7 +15,7 @@ import { registerListAbbreviationsCommand } from './commands/abbreviations.js'
 import { registerListInconsistentCapitalizationCommand } from './commands/inconsistent-capitalization.js'
 import { registerListInconsistentFormattingCommand } from './commands/inconsistent-formatting.js'
 import { registerLookupSelectionAcrossDocsCommand } from './commands/lookup-selection-across-docs.js'
-import { registerMakeDiffCommand } from './commands/make-diff.js'
+// import { registerMakeDiffCommand } from './commands/make-diff.js'
 import { registerPrepareForPublishingCommand } from './commands/prepare-publishing.js'
 import { registerStripMLineEndingsCommand } from './commands/strip-mline-endings.js'
 import { registerSurroundBcp14KeywordsCommand } from './commands/surround-bcp14-keywords.js'
@@ -52,7 +52,7 @@ export function activate(context) {
   registerListInconsistentCapitalizationCommand(context, outputChannel)
   registerListInconsistentFormattingCommand(context, outputChannel)
   registerLookupSelectionAcrossDocsCommand(context, outputChannel)
-  registerMakeDiffCommand(context, outputChannel)
+  // registerMakeDiffCommand(context, outputChannel)
   registerPrepareForPublishingCommand(context, outputChannel)
   registerStripMLineEndingsCommand(context)
   registerSurroundBcp14KeywordsCommand(context)

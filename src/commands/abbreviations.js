@@ -28,16 +28,16 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
           return vscode.window.showErrorMessage('Unsupported Document Type.')
         }
 
-        const selectedMode = await vscode.window.showQuickPick(
-          [
-            { label: 'Match from the predefined RPC list only', picked: true, value: 'predefined' },
-            { label: 'Match anything resembling an abbreviation', value: 'anything' }
-          ],
-          {
-            ignoreFocusOut: true,
-            title: 'Select Matching Mode'
-          }
-        )
+        // const selectedMode = await vscode.window.showQuickPick(
+        //   [
+        //     { label: 'Match from the predefined RPC list only', picked: true, value: 'predefined' },
+        //     { label: 'Match anything resembling an abbreviation', value: 'anything' }
+        //   ],
+        //   {
+        //     ignoreFocusOut: true,
+        //     title: 'Select Matching Mode'
+        //   }
+        // )
 
         const results = []
         outputChannel.clear()
@@ -51,11 +51,17 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
           },
           async (progress) => {
             try {
-              const progressIncrement = 100 / abbreviations.length
               const contents = activeDoc.getText()
 
               // Fetch list from GitHub
               if (abbreviations.length < 1) {
+                // Update progress + wait for next tick to avoid freezing its UI
+                progress.report({
+                  increment: 0,
+                  message: 'Fetching list'
+                })
+                await setTimeout()
+
                 try {
                   const resp = await fetch(ABBR_URL).then((r) => r.json())
                   if (Array.isArray(resp) && resp?.length > 0) {
@@ -72,31 +78,48 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
                 }
               }
 
+              const progressIncrement = 100 / abbreviations.length
+
               // Detect anything resembling an abbreviation
-              if (selectedMode?.value === 'anything') {
-                const anythingRgx = /(?:^|[\s>([*_])(?<term>[A-Z0-9]{2,})(?:$|[\s.,<>)*_\]:])/g
+              // if (selectedMode?.value === 'anything') {
+              //   progress.report({ increment: 0, message: 'Looking for new terms' })
+              //   const anythingRgx = /(?:^|[\s>([*_])(?<term>[A-Z0-9]{2,}(s?))(?:$|[\s.,<>)*_\]:])/g
 
-                let rgxArray
+              //   let rgxArray
 
-                while ((rgxArray = anythingRgx.exec(contents)) !== null) {
-                  if (rgxArray.groups?.term) {
-                    const term = rgxArray.groups?.term
-                    const startIdx =
-                      rgxArray[0].indexOf(term) === 0 ? rgxArray.index : rgxArray.index + 1
+              //   while ((rgxArray = anythingRgx.exec(contents)) !== null) {
+              //     console.log(rgxArray.groups?.term)
+              //     if (rgxArray.groups?.term) {
+              //       let term = rgxArray.groups?.term
 
-                    const line = activeDoc.lineAt(activeDoc.positionAt(rgxArray.index))
+              //       // Strip plural end
+              //       if (term.endsWith('s')) {
+              //         term = term.slice(0, -1)
+              //       }
 
-                    if (abbreviations.some((abbr) => abbr.term === term)) {
-                      // Skip matches that are in the predefined list
-                      continue
-                    }
-                  }
-                }
-              }
+              //       // Skip matches that are in the predefined list
+              //       if (abbreviations.some((abbr) => abbr.term === term)) {
+              //         continue
+              //       }
+
+              //       const startIdx =
+              //         rgxArray[0].indexOf(term) === 0 ? rgxArray.index : rgxArray.index + 1
+              //       const line = activeDoc.lineAt(activeDoc.positionAt(rgxArray.index))
+
+              //       abbreviations.push({
+              //         term,
+              //         full: '',
+              //         new: true
+              //       })
+              //     }
+              //   }
+              // }
 
               // Check each abbreviation
               for (const abbr of abbreviations) {
+                // Update progress + wait for next tick to avoid freezing its UI
                 progress.report({ increment: progressIncrement, message: abbr.term })
+                await setTimeout()
 
                 let rgxArray
                 const foundLocations = []
@@ -173,9 +196,6 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
                 if (foundLocations.length > 0) {
                   results.push({ ...abbr, _locations: foundLocations })
                 }
-
-                // Wait for next tick to avoid freezing the progress UI
-                await setTimeout()
               }
 
               // Exclude full expansion matches that are contained within a longer full expansion match
@@ -340,7 +360,9 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
           }
           // -> Format List + Warnings
           resultStr += ` - ${lf.format(resultArr)}`
-          if (isWarning) {
+          if (result.new) {
+            resultStr = `🔷 ${resultStr}`
+          } else if (isWarning) {
             totalWarnings++
             resultStr = `⚠️ ${resultStr}`
           } else {

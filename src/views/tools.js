@@ -110,12 +110,12 @@ class ToolsProvider {
         description: 'In opened documents',
         icon: 'search'
       },
-      flags.rpc && {
-        id: 'makeDiff',
-        label: 'Make Diff',
-        description: 'Add diff to repo session',
-        icon: 'diff'
-      },
+      // flags.rpc && {
+      //   id: 'makeDiff',
+      //   label: 'Make Diff',
+      //   description: 'Add diff to repo session',
+      //   icon: 'diff'
+      // },
       {
         id: 'openPreview',
         label: 'Open Preview',
