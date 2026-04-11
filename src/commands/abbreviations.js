@@ -277,6 +277,15 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
                 }
               }
             }
+          } else if (
+            // -> Skip terms that are simply expanded but no other attributes
+            !result.notAbbreviated &&
+            !result.expanded &&
+            !result.overusedExpansion &&
+            !result.pointlessAbbreviation &&
+            !result.redundantTerms
+          ) {
+            continue
           }
 
           idx++
