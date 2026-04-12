@@ -57,3 +57,35 @@ This snippet is generated dynamically based on the answers to the following prom
       </tbody>
     </table>
     ```
+
+## Reference - Generic
+
+```xml
+<reference anchor="${1:Citation Tag}" target="${2:URL}">
+  <front>
+    <title>${3:Title}</title>
+    <author initials="" surname="" fullname="">
+      <organization />
+    </author>
+    <date month="${4:$CURRENT_MONTH_NAME}" year="${5:$CURRENT_YEAR}"/>
+  </front>
+  <seriesInfo name="${6:Name}" value="${7:Value}"/>
+  <seriesInfo name="DOI" value="${8:Value}"/>
+</reference>
+```
+
+## Reference - RFC
+
+```xml
+<reference anchor="RFC${1:YYYY}" target="https://www.rfc-editor.org/info/rfc${1:YYYY}">
+  <front>
+    <title>${2:Title}</title>
+    <author initials="" surname="" fullname="">
+      <organization />
+    </author>
+    <date month="${3:$CURRENT_MONTH_NAME}" year="${4:$CURRENT_YEAR}"/>
+  </front>
+  <seriesInfo name="RFC" value="${1:YYYY}"/>
+  <seriesInfo name="DOI" value="10.17487/RFC${1:YYYY}"/>
+</reference>
+```
