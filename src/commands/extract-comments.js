@@ -1,4 +1,5 @@
 import * as vscode from 'vscode'
+import { dedent } from '../helpers/text.js'
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -31,7 +32,7 @@ export function registerExtractCommentsCommand(context, outputChannel) {
           outputChannel.appendLine('\n--------\n')
         }
         idx++
-        outputChannel.appendLine(`${idx}. ${match[1].trim()}`)
+        outputChannel.appendLine(`${idx}. ${dedent(match[1]).trim()}`)
       }
 
       if (idx === 0) {
