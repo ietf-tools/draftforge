@@ -45,6 +45,20 @@ class SnippetsProvider {
         targetLanguage: 'xml'
       },
       {
+        id: 'xmlGenericRefBlock',
+        label: 'Reference - Generic',
+        description: 'Insert a generic reference block',
+        body: '<reference anchor="${1:Citation Tag}" target="${2:URL}">\n\t<front>\n\t\t<title>${3:Title}</title>\n\t\t<author initials="" surname="" fullname="">\n\t\t\t<organization />\n\t\t</author>\n\t\t<date month="${4:$CURRENT_MONTH_NAME}" year="${5:$CURRENT_YEAR}"/>\n\t</front>\n\t<seriesInfo name="${6:Name}" value="${7:Value}"/>\n\t<seriesInfo name="DOI" value="${8:Value}"/>\n</reference>',
+        targetLanguage: 'xml'
+      },
+      {
+        id: 'xmlRfcRefBlock',
+        label: 'Reference - RFC',
+        description: 'Insert an RFC reference block',
+        body: '<reference anchor="RFC${1:YYYY}" target="https://www.rfc-editor.org/info/rfc${1:YYYY}">\n\t<front>\n\t\t<title>${2:Title}</title>\n\t\t<author initials="" surname="" fullname="">\n\t\t\t<organization />\n\t\t</author>\n\t\t<date month="${3:$CURRENT_MONTH_NAME}" year="${4:$CURRENT_YEAR}"/>\n\t</front>\n\t<seriesInfo name="RFC" value="${1:YYYY}"/>\n\t<seriesInfo name="DOI" value="10.17487/RFC${1:YYYY}"/>\n</reference>',
+        targetLanguage: 'xml'
+      },
+      {
         id: 'fencedCode',
         label: 'Fenced Code Block',
         description: 'Insert a fenced code block',
