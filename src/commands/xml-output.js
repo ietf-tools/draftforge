@@ -25,10 +25,10 @@ async function run(inputContent, outputFileType, outputPathUri) {
       try {
         // Get temp dir
         const tmpPath = await fs.mkdtemp(path.join(tmpdir(), 'draftforge-'))
-        const now = Date.now().toString()
 
         // Write input
-        const inputPath = path.join(tmpPath, `${now}.xml`)
+        const outputPathUriParts = path.parse(outputPathUri)
+        const inputPath = path.join(tmpPath, `${outputPathUriParts.name}.xml`)
         await fs.writeFile(inputPath, inputContent, 'utf8')
 
         // Run xml2rfc
