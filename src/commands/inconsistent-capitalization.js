@@ -20,17 +20,28 @@ export function registerListInconsistentCapitalizationCommand(context, outputCha
           return vscode.window.showErrorMessage('Unsupported Document Type.')
         }
 
-        const ignoreNameTagTextRgx = /<name>(?<term>.+?)<\/name>/gi
-        const ignoreAnchorPropTextRgx = /anchor="(?<term>.+?)"/gi
-        const ignoreXmlTagsRgx = /<([ \t\S]{2,}?)>/gi
-        const ignoreXmlCommentsRgx = /<!--([\s\S]*?)-->/gi
         const results = findInconsistentCapitalization(
           activeDoc
             .getText()
-            .replaceAll(ignoreNameTagTextRgx, (_, p1) => `<name>${'_'.repeat(p1.length)}</name>`)
-            .replaceAll(ignoreAnchorPropTextRgx, (_, p1) => `anchor="${'_'.repeat(p1.length)}"`)
-            .replaceAll(ignoreXmlTagsRgx, (_, p1) => `<${'_'.repeat(p1.length)}>`)
-            .replaceAll(ignoreXmlCommentsRgx, (_, p1) => p1.replaceAll(/[^\n]/g, '_'))
+            .replaceAll(
+              /<email>(?<term>.+?)<\/email>/gi,
+              (_, p1) => `<email>${'_'.repeat(p1.length)}</email>`
+            )
+            .replaceAll(
+              /<name>(?<term>.+?)<\/name>/gi,
+              (_, p1) => `<name>${'_'.repeat(p1.length)}</name>`
+            )
+            .replaceAll(
+              /<target>(?<term>.+?)<\/target>/gi,
+              (_, p1) => `<target>${'_'.repeat(p1.length)}</target>`
+            )
+            .replaceAll(
+              /<title>(?<term>.+?)<\/title>/gi,
+              (_, p1) => `<title>${'_'.repeat(p1.length)}</title>`
+            )
+            .replaceAll(/anchor="(?<term>.+?)"/gi, (_, p1) => `anchor="${'_'.repeat(p1.length)}"`)
+            .replaceAll(/<([ \t\S]{2,}?)>/gi, (_, p1) => `<${'_'.repeat(p1.length)}>`)
+            .replaceAll(/<!--([\s\S]*?)-->/gi, (_, p1) => p1.replaceAll(/[^\n]/g, '_'))
         )
 
         outputChannel.clear()
