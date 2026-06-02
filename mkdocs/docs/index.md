@@ -12,7 +12,9 @@ hide:
 
 ### Write, Review, Refine and Submit Internet-Drafts
 
-*DraftForge is under active development. A beta release will be available in the coming months.*
+DraftForge is a VS Code extension from the IETF Tools team, designed to take authors and RFC Production Center staff smoothly from first draft to final publishing of Internet Drafts.
+
+It supports RFCXML, Plain Text and Markdown formats, with real-time validation checks, useful tools, ready-to-use snippets and quick access reference.
 
 [Getting Started](install.md)
 { .md-button }
