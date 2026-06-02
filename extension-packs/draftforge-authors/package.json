@@ -2,7 +2,7 @@
   "name": "draftforge-authors",
   "displayName": "DraftForge for Internet-Draft Authors",
   "description": "An extension pack for Internet-Draft Authors",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "publisher": "ietf",
   "repository": {
     "type": "git",
