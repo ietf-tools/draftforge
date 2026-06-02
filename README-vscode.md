@@ -2,8 +2,6 @@
 
 # IETF DraftForge
 
-> Warning ⚠️ - This is alpha release that should only be used for testing and development purposes by IETF / RFC-Editor staff.
-
 IETF DraftForge provide tools, validation checks and snippets for both Internet-Drafts authors and the RFC Production Center.
 
 ## Install

@@ -21,7 +21,7 @@
     "rfc-editor",
     "rfc"
   ],
-  "preview": true,
+  "preview": false,
   "pricing": "Free",
   "icon": "media/logo-rpc.png",
   "galleryBanner": {

@@ -25,7 +25,7 @@
     "rfc",
     "xml2rfc"
   ],
-  "preview": true,
+  "preview": false,
   "pricing": "Free",
   "icon": "media/logo.png",
   "galleryBanner": {
