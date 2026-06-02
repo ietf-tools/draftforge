@@ -54,7 +54,7 @@ jobs:
         run: vsce publish --pat $VSCE_PAT
 
       - name: Create Draft Release
-        uses: ncipollo/release-action@v1.20.0
+        uses: ncipollo/release-action@v1.21.0
         with:
           prerelease: true
           draft: false
@@ -76,7 +76,7 @@ jobs:
           writeToFile: false
 
       - name: Finalize Release
-        uses: ncipollo/release-action@v1.20.0
+        uses: ncipollo/release-action@v1.21.0
         with:
           allowUpdates: true
           makeLatest: true
