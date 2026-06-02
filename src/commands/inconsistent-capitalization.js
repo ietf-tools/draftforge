@@ -20,15 +20,17 @@ export function registerListInconsistentCapitalizationCommand(context, outputCha
           return vscode.window.showErrorMessage('Unsupported Document Type.')
         }
 
-        const ignoreXmlTagsRgx = /<([ \t\S]{2,}?)>/gi
         const ignoreNameTagTextRgx = /<name>(?<term>.+?)<\/name>/gi
         const ignoreAnchorPropTextRgx = /anchor="(?<term>.+?)"/gi
+        const ignoreXmlTagsRgx = /<([ \t\S]{2,}?)>/gi
+        const ignoreXmlCommentsRgx = /<!--([\s\S]*?)-->/gi
         const results = findInconsistentCapitalization(
           activeDoc
             .getText()
             .replaceAll(ignoreNameTagTextRgx, (_, p1) => `<name>${'_'.repeat(p1.length)}</name>`)
             .replaceAll(ignoreAnchorPropTextRgx, (_, p1) => `anchor="${'_'.repeat(p1.length)}"`)
             .replaceAll(ignoreXmlTagsRgx, (_, p1) => `<${'_'.repeat(p1.length)}>`)
+            .replaceAll(ignoreXmlCommentsRgx, (_, p1) => p1.replaceAll(/[^\n]/g, '_'))
         )
 
         outputChannel.clear()
