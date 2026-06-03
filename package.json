@@ -217,6 +217,16 @@
           "default": false,
           "description": "Whether to run IDNits in offline mode. Any check that requires an internet connection will be skipped."
         },
+        "draftforge.kramdownRfc.executablePath": {
+          "type": "string",
+          "default": "kramdown-rfc",
+          "description": "kramdown-rfc executable name or path"
+        },
+        "draftforge.kramdownRfc.outputFlags": {
+          "type": "string",
+          "default": "-3",
+          "description": "The flags to provide to kramdown-rfc when generating XMLRFC outputs of markdown documents. Do not include the output format / paths flags."
+        },
         "draftforge.svgcheck.executablePath": {
           "type": "string",
           "default": "svgcheck",
@@ -330,20 +340,20 @@
     "compile": "rollup -c rollup.config.mjs"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "29.0.0",
+    "@rollup/plugin-commonjs": "29.0.3",
     "@rollup/plugin-node-resolve": "16.0.3",
     "@tsconfig/node22": "22.0.5",
     "@types/node": "22.x",
-    "@types/vscode": "1.106.1",
-    "oxfmt": "0.44.0",
-    "oxlint": "1.59.0",
-    "oxlint-tsgolint": "0.20.0",
+    "@types/vscode": "1.120.0",
+    "oxfmt": "0.53.0",
+    "oxlint": "1.68.0",
+    "oxlint-tsgolint": "0.23.0",
     "rollup": "4.53.3"
   },
   "dependencies": {
-    "@ietf-tools/idnits": "3.0.0-alpha.70",
-    "es-toolkit": "1.45.1",
+    "@ietf-tools/idnits": "3.0.0-alpha.74",
+    "es-toolkit": "1.47.0",
     "klaw": "4.1.0",
-    "uuid": "13.0.0"
+    "uuid": "14.0.0"
   }
 }

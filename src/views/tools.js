@@ -200,47 +200,47 @@ export function activateToolsView(context) {
             break
           }
           case 'exportAs': {
-            if (doc.languageId === 'xml') {
-              const selectedOutputsRaw = await vscode.window.showQuickPick(
-                [
-                  { label: 'HTML', picked: true, value: 'html' },
-                  { label: 'PDF', picked: true, value: 'pdf' },
-                  { label: 'Plain Text', picked: true, value: 'txt' }
-                ],
-                {
-                  canPickMany: true,
-                  ignoreFocusOut: true,
-                  title: 'Select Output Formats'
-                }
-              )
-              if (!selectedOutputsRaw || selectedOutputsRaw.length < 1) {
-                return vscode.window.showErrorMessage('You must select at least 1 format.', {
-                  modal: true
-                })
+            if (!['markdown', 'xml'].some(doc.languageId)) {
+              await vscode.window.showErrorMessage('Export not available for this document type.', {
+                modal: true
+              })
+            }
+
+            const exportCommand = {
+              markdown: 'draftforge.mdOutput',
+              xml: 'draftforge.xmlOutput'
+            }
+
+            const selectedOutputsRaw = await vscode.window.showQuickPick(
+              [
+                { label: 'HTML', picked: true, value: 'html' },
+                { label: 'PDF', picked: true, value: 'pdf' },
+                { label: 'Plain Text', picked: true, value: 'txt' }
+              ],
+              {
+                canPickMany: true,
+                ignoreFocusOut: true,
+                title: 'Select Output Formats'
               }
-              let desiredPath = ''
-              for (const format of selectedOutputsRaw) {
-                if (desiredPath.length > 2 && desiredPath.includes('.')) {
-                  desiredPath =
-                    desiredPath.split('.').toSpliced(-1, 1).join('.') + `.${format.value}`
-                }
-                const chosenPath = await vscode.commands.executeCommand(
-                  'draftforge.xmlOutput',
-                  format.value,
-                  desiredPath
-                )
-                if (chosenPath && typeof chosenPath === 'string') {
-                  desiredPath = chosenPath
-                }
+            )
+            if (!selectedOutputsRaw || selectedOutputsRaw.length < 1) {
+              return vscode.window.showErrorMessage('You must select at least 1 format.', {
+                modal: true
+              })
+            }
+            let desiredPath = ''
+            for (const format of selectedOutputsRaw) {
+              if (desiredPath.length > 2 && desiredPath.includes('.')) {
+                desiredPath = desiredPath.split('.').toSpliced(-1, 1).join('.') + `.${format.value}`
               }
-            } else if (doc.languageId === 'markdown') {
-              await vscode.window.showInformationMessage(
-                'Export from Markdown not implemented yet.'
+              const chosenPath = await vscode.commands.executeCommand(
+                exportCommand[doc.languageId],
+                format.value,
+                desiredPath
               )
-            } else {
-              await vscode.window.showInformationMessage(
-                'Export not available for this document type.'
-              )
+              if (chosenPath && typeof chosenPath === 'string') {
+                desiredPath = chosenPath
+              }
             }
             break
           }
@@ -248,9 +248,7 @@ export function activateToolsView(context) {
             if (doc.languageId === 'xml') {
               await vscode.commands.executeCommand('draftforge.xmlOutput', 'html')
             } else if (doc.languageId === 'markdown') {
-              await vscode.window.showInformationMessage(
-                'Export to HTML from Markdown not implemented yet.'
-              )
+              await vscode.commands.executeCommand('draftforge.mdOutput', 'html')
             } else {
               await vscode.window.showInformationMessage(
                 'Export to HTML not available for this document type.'
@@ -262,9 +260,7 @@ export function activateToolsView(context) {
             if (doc.languageId === 'xml') {
               await vscode.commands.executeCommand('draftforge.xmlOutput', 'pdf')
             } else if (doc.languageId === 'markdown') {
-              await vscode.window.showInformationMessage(
-                'Export to PDF from Markdown not implemented yet.'
-              )
+              await vscode.commands.executeCommand('draftforge.mdOutput', 'pdf')
             } else {
               await vscode.window.showInformationMessage(
                 'Export to PDF not available for this document type.'
@@ -276,9 +272,7 @@ export function activateToolsView(context) {
             if (doc.languageId === 'xml') {
               await vscode.commands.executeCommand('draftforge.xmlOutput', 'txt')
             } else if (doc.languageId === 'markdown') {
-              await vscode.window.showInformationMessage(
-                'Export to TXT from Markdown not implemented yet.'
-              )
+              await vscode.commands.executeCommand('draftforge.mdOutput', 'txt')
             } else {
               await vscode.window.showInformationMessage(
                 'Export to TXT not available for this document type.'

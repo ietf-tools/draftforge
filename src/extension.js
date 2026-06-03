@@ -22,6 +22,7 @@ import { registerSurroundBcp14KeywordsCommand } from './commands/surround-bcp14-
 import { registerSvgcheckCommand } from './commands/svgcheck.js'
 import { registerXmlOutputCommand } from './commands/xml-output.js'
 import { registerXmlPreviewCommand, unregisterXmlPreviewCommand } from './commands/xml-preview.js'
+import { registerMdOutputCommand } from './commands/md-output.js'
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -53,6 +54,7 @@ export function activate(context) {
   registerListInconsistentFormattingCommand(context, outputChannel)
   registerLookupSelectionAcrossDocsCommand(context, outputChannel)
   // registerMakeDiffCommand(context, outputChannel)
+  registerMdOutputCommand(context, outputChannel)
   registerPrepareForPublishingCommand(context, outputChannel)
   registerStripMLineEndingsCommand(context)
   registerSurroundBcp14KeywordsCommand(context)
