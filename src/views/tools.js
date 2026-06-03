@@ -213,6 +213,11 @@ export function activateToolsView(context) {
                   title: 'Select Output Formats'
                 }
               )
+              if (!selectedOutputsRaw || selectedOutputsRaw.length < 1) {
+                return vscode.window.showErrorMessage('You must select at least 1 format.', {
+                  modal: true
+                })
+              }
               let desiredPath = ''
               for (const format of selectedOutputsRaw) {
                 if (desiredPath.length > 2 && desiredPath.includes('.')) {
