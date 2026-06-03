@@ -200,7 +200,7 @@ export function activateToolsView(context) {
             break
           }
           case 'exportAs': {
-            if (!['markdown', 'xml'].some(doc.languageId)) {
+            if (!['markdown', 'xml'].includes(doc.languageId)) {
               await vscode.window.showErrorMessage('Export not available for this document type.', {
                 modal: true
               })
