@@ -41,6 +41,7 @@ async function run(inputContent, outputFileType, outputPathUri) {
           .get(`outputFlags`)
         const mdCmd = `${mdExecPath} ${mdFlags} "${inputPath}" > "${intermediatePath}"`
         await execAsync(mdCmd, {
+          cwd: tmpPath,
           timeout: 30000, // 30s
           windowsHide: true
         })
