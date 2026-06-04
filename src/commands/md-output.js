@@ -34,10 +34,10 @@ async function run(inputContent, outputFileType, outputPathUri) {
 
         // Run kramdown-rfc
         const mdExecPath = vscode.workspace
-          .getConfiguration('draftforge.kramdown-rfc')
+          .getConfiguration('draftforge.kramdownRfc')
           .get('executablePath')
         const mdFlags = vscode.workspace
-          .getConfiguration('draftforge.kramdown-rfc')
+          .getConfiguration('draftforge.kramdownRfc')
           .get(`outputFlags`)
         const mdCmd = `${mdExecPath} ${mdFlags} "${inputPath}" > "${intermediatePath}"`
         await execAsync(mdCmd, {
@@ -83,7 +83,7 @@ export function registerMdOutputCommand(context) {
           return vscode.window.showErrorMessage(
             'Focus your desired document first. Focus is currently in the Output window.'
           )
-        } else if (activeDoc.languageId !== 'md') {
+        } else if (activeDoc.languageId !== 'markdown') {
           return vscode.window.showErrorMessage('Unsupported Document Type.')
         }
 
