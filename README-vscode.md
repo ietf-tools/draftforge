@@ -59,6 +59,8 @@ This extension contributes the following settings:
 - `draftforge.experience`: Set to `author` *(default)* for an author-centric experience or `rpc` for a RPC staff-centric experience.
 - `draftforge.idnits.mode`: The default validation mode to use when running IDNits. Set to `prompt` *(default)* to be prompted every time or to `normal`, `forgive`, `submission`.
 - `draftforge.idnits.offline`: Whether to run IDNits in offline mode. Any check that requires an internet connection will be skipped. (Defaults to `false`)
+- `draftforge.kramdownRfc.executablePath`: kramdown-rfc executable name or path. (Defaults to `kramdown-rfc`)
+- `draftforge.kramdownRfc.flags`: The flags to provide to kramdown-rfc. Do not include the output format / paths flags. (Defaults to `-3`)
 - `draftforge.svgcheck.executablePath`: svgcheck executable name or path. (Defaults to `svgcheck`)
 - `draftforge.svgcheck.flags`: The flags to provide to svgcheck. Do not include the output format / paths flags. (Defaults to *empty*)
 - `draftforge.xml2rfc.executablePath`: XML2RFC executable name or path. (Defaults to `xml2rfc`)
