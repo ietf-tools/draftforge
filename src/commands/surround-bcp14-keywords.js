@@ -1,6 +1,7 @@
 import * as vscode from 'vscode'
+import { parse } from 'node:path'
 
-export function registerSurroundBcp14KeywordsCommand(context, outputChannel) {
+export function registerSurroundBcp14KeywordsCommand(context, outputView) {
   context.subscriptions.push(
     vscode.commands.registerCommand('draftforge.surroundBcp14Keywords', async function () {
       const editor = vscode.window.activeTextEditor
@@ -66,8 +67,13 @@ export function registerSurroundBcp14KeywordsCommand(context, outputChannel) {
         }
       }
 
+      const fileName = parse(activeDoc.fileName).base
+      outputView.clear()
+      outputView.setFileUri(activeDoc.uri)
+
       if (keywordsReplaces.length === 0) {
         vscode.window.showInformationMessage('No BCP 14 keywords to enclose found.')
+        outputView.appendLine(`No BCP 14 keywords to enclose found in ${fileName}.`)
       } else {
         await editor.edit((editBuilder) => {
           // replace from bottom to top to avoid shifting positions
@@ -78,15 +84,26 @@ export function registerSurroundBcp14KeywordsCommand(context, outputChannel) {
         vscode.window.showInformationMessage(
           `Surrounded ${keywordsReplaces.length} BCP 14 keywords.`
         )
-        outputChannel.clear()
-        outputChannel.appendLine(`BCP 14 keywords surrounded in ${activeDoc.fileName}:\n`)
+
+        outputView.appendLine(`BCP 14 keywords surrounded in ${fileName}:`)
+        outputView.appendLine('')
         for (const replace of keywordsReplaces) {
-          outputChannel.appendLine(
-            `- ${replace.term} on line ${replace.range.start.line} (${activeDoc.fileName}:${replace.range.start.line + 1}:${replace.range.start.character + 1})`
-          )
+          outputView.appendLineWithRanges({
+            text: `- ${replace.term}`,
+            ranges: [
+              {
+                startLine: replace.range.start.line,
+                startCharacter: replace.range.start.character,
+                endLine: replace.range.end.line,
+                endCharacter: replace.range.end.character + 15,
+                label: `${replace.range.start.line}:${replace.range.start.character}`
+              }
+            ]
+          })
         }
-        outputChannel.show(true)
       }
+
+      outputView.reveal()
     })
   )
 }

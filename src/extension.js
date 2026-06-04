@@ -23,6 +23,7 @@ import { registerSvgcheckCommand } from './commands/svgcheck.js'
 import { registerXmlOutputCommand } from './commands/xml-output.js'
 import { registerXmlPreviewCommand, unregisterXmlPreviewCommand } from './commands/xml-preview.js'
 import { registerMdOutputCommand } from './commands/md-output.js'
+import { OutputWebviewView } from './views/neue-output.js'
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -33,6 +34,11 @@ export function activate(context) {
   // Create DraftForge Output channel
   let outputChannel = vscode.window.createOutputChannel('DraftForge')
   context.subscriptions.push(outputChannel)
+
+  let outputView = new OutputWebviewView()
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider('draftforge.outputView', outputView)
+  )
 
   // Register Diagnostic Collection
   let diagnosticCollection = vscode.languages.createDiagnosticCollection('draftforgeChecks')
@@ -57,7 +63,7 @@ export function activate(context) {
   registerMdOutputCommand(context, outputChannel)
   registerPrepareForPublishingCommand(context, outputChannel)
   registerStripMLineEndingsCommand(context)
-  registerSurroundBcp14KeywordsCommand(context, outputChannel)
+  registerSurroundBcp14KeywordsCommand(context, outputView)
   registerSvgcheckCommand(context, diagnosticCollection)
   registerXmlOutputCommand(context)
   registerXmlPreviewCommand(context, outputChannel)

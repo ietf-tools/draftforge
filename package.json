@@ -271,6 +271,13 @@
           "title": "IETF DraftForge",
           "icon": "media/icon.svg"
         }
+      ],
+      "panel": [
+        {
+          "id": "draftforgeOutputView",
+          "title": "DraftForge",
+          "icon": "media/icon.svg"
+        }
       ]
     },
     "viewsWelcome": [
@@ -305,6 +312,15 @@
           "id": "draftforge-reference",
           "name": "Reference",
           "when": "draftforge.isReady"
+        }
+      ],
+      "draftforgeOutputView": [
+        {
+          "type": "webview",
+          "id": "draftforge.outputView",
+          "name": "DraftForge",
+          "when": "draftforge.isReady",
+          "retainContextWhenHidden": true
         }
       ]
     },
