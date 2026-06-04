@@ -57,7 +57,7 @@ export function activate(context) {
   registerMdOutputCommand(context, outputChannel)
   registerPrepareForPublishingCommand(context, outputChannel)
   registerStripMLineEndingsCommand(context)
-  registerSurroundBcp14KeywordsCommand(context)
+  registerSurroundBcp14KeywordsCommand(context, outputChannel)
   registerSvgcheckCommand(context, diagnosticCollection)
   registerXmlOutputCommand(context)
   registerXmlPreviewCommand(context, outputChannel)

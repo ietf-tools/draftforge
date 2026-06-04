@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 
-export function registerSurroundBcp14KeywordsCommand(context) {
+export function registerSurroundBcp14KeywordsCommand(context, outputChannel) {
   context.subscriptions.push(
     vscode.commands.registerCommand('draftforge.surroundBcp14Keywords', async function () {
       const editor = vscode.window.activeTextEditor
@@ -78,6 +78,14 @@ export function registerSurroundBcp14KeywordsCommand(context) {
         vscode.window.showInformationMessage(
           `Surrounded ${keywordsReplaces.length} BCP 14 keywords.`
         )
+        outputChannel.clear()
+        outputChannel.appendLine(`BCP 14 keywords surrounded in ${activeDoc.fileName}:\n`)
+        for (const replace of keywordsReplaces) {
+          outputChannel.appendLine(
+            `- ${replace.term} on line ${replace.range.start.line} (${activeDoc.fileName}:${replace.range.start.line + 1}:${replace.range.start.character + 1})`
+          )
+        }
+        outputChannel.show(true)
       }
     })
   )
