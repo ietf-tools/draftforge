@@ -20,14 +20,25 @@ export function registerSurroundBcp14KeywordsCommand(context) {
 
       const matchRgx =
         /<bcp14>[\s\S]*?<\/bcp14>|(?<term>MUST\sNOT|MUST|SHOULD\sNOT|SHOULD|SHALL\sNOT|SHALL|RECOMMENDED|NOT\sRECOMMENDED|MAY|OPTIONAL|REQUIRED)/g
+      const artworkRgx = /<artwork[^>]*>[\s\S]*?<\/artwork>/g
       const sourcecodeRgx = /<sourcecode[^>]*>[\s\S]*?<\/sourcecode>/g
-      const sourcecodeRanges = []
+      const excludedRanges = []
       const keywordsReplaces = []
       let match
 
+      // List all artwork blocks first to exclude them
+      while ((match = artworkRgx.exec(text)) !== null) {
+        excludedRanges.push(
+          new vscode.Range(
+            activeDoc.positionAt(match.index),
+            activeDoc.positionAt(match.index + match[0].length)
+          )
+        )
+      }
+
       // List all sourcecode blocks first to exclude them
       while ((match = sourcecodeRgx.exec(text)) !== null) {
-        sourcecodeRanges.push(
+        excludedRanges.push(
           new vscode.Range(
             activeDoc.positionAt(match.index),
             activeDoc.positionAt(match.index + match[0].length)
@@ -43,7 +54,7 @@ export function registerSurroundBcp14KeywordsCommand(context) {
           const endPos = activeDoc.positionAt(match.index + match[0].length)
 
           // -> Ensure it's not within a sourcecode block range
-          if (sourcecodeRanges.some((rg) => rg.contains(startPos))) {
+          if (excludedRanges.some((rg) => rg.contains(startPos))) {
             continue
           }
 
