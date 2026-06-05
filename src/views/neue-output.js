@@ -17,6 +17,7 @@ import * as vscode from 'vscode'
  * @property {string}      text     - The text content of the line
  * @property {LineRange[]} [ranges] - Optional ranges shown as clickable links at the end of the line
  * @property {string|null}      [color]  - Optional CSS color, e.g. "var(--vscode-errorForeground)"
+ * @property {string|null}      [kind]  - Optional special element kind (separator, header, etc.)
  */
 
 // ─── View ─────────────────────────────────────────────────────────────────────
@@ -122,6 +123,23 @@ export class OutputWebviewView {
     this.#render()
   }
 
+  /**
+   * Append header
+   * @param {string} text
+   */
+  appendHeader(text) {
+    this.#lines.push({ kind: 'header', text })
+    this.#pushLine({ kind: 'header', text })
+  }
+
+  /**
+   * Append a separator line
+   */
+  appendSeparator() {
+    this.#lines.push({ kind: 'separator', text: '' })
+    this.#pushLine({ kind: 'separator', text: '' })
+  }
+
   /** Clear all lines. */
   clear() {
     this.#lines = []
@@ -161,7 +179,7 @@ export class OutputWebviewView {
    * @param {OutputLine} line
    * @returns {object}
    */
-  #serializeLine({ text, color = null, ranges = [] }) {
+  #serializeLine({ text, color = null, ranges = [], kind = 'text' }) {
     return {
       text,
       color,
@@ -171,7 +189,8 @@ export class OutputWebviewView {
         startCharacter: r.startCharacter,
         endLine: r.endLine,
         endCharacter: r.endCharacter
-      }))
+      })),
+      kind
     }
   }
 
@@ -257,6 +276,19 @@ export class OutputWebviewView {
     text-decoration: underline;
   }
 
+  .header {
+    font-weight: 600;
+    padding: 6px 12px 6px 12px;
+    margin-bottom: 8px;
+    border-left: 4px solid rgb(0, 122, 204);
+  }
+
+  .separator {
+    height: 1px;
+    background: linear-gradient(to right, rgba(51,51,51,1), rgba(51,51,51,0));
+    margin: 15px 0;
+  }
+
   ::-webkit-scrollbar { width: 10px; height: 10px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb {
@@ -274,32 +306,49 @@ export class OutputWebviewView {
   const vscode = acquireVsCodeApi()
   const outputEl = document.getElementById('output')
 
-  const buildLineEl = ({ text, color, ranges }) => {
+  const buildLineEl = ({ text, color, ranges, kind }) => {
     const row = document.createElement('div')
-    row.className = 'line'
 
-    const textEl = Object.assign(document.createElement('span'), { className: 'line-text', textContent: text })
-    if (color) textEl.style.color = color
-    row.appendChild(textEl)
-
-    if (ranges?.length > 0) {
-      const rangesEl = document.createElement('span')
-      rangesEl.className = 'ranges'
-      rangesEl.appendChild(document.createTextNode('(Line '))
-
-      for (const r of ranges) {
-        const a = Object.assign(document.createElement('a'), {
-          className: 'range-link',
-          textContent: r.label,
-          title: \`Go to line \${r.startLine + 1}, col \${r.startCharacter}\`,
-        })
-        a.addEventListener('click', () => vscode.postMessage({ type: 'navigate', range: r }))
-        rangesEl.appendChild(a)
+    switch (kind) {
+      // ====== HEADER ======
+      case 'header': {
+        row.className = 'header'
+        row.appendChild(document.createTextNode(text))
+        break
       }
+      // ====== SEPARATOR ======
+      case 'separator': {
+        row.className = 'separator'
+        break
+      }
+      // ====== TEXT LINE ======
+      default: {
+        row.className = 'line'
 
-      rangesEl.appendChild(document.createTextNode(')'))
+        const textEl = Object.assign(document.createElement('span'), { className: 'line-text', textContent: text })
+        if (color) textEl.style.color = color
+        row.appendChild(textEl)
 
-      row.appendChild(rangesEl)
+        if (ranges?.length > 0) {
+          const rangesEl = document.createElement('span')
+          rangesEl.className = 'ranges'
+          rangesEl.appendChild(document.createTextNode('(Line '))
+
+          for (const r of ranges) {
+            const a = Object.assign(document.createElement('a'), {
+              className: 'range-link',
+              textContent: r.label,
+              title: \`Go to line \${r.startLine + 1}, col \${r.startCharacter}\`,
+            })
+            a.addEventListener('click', () => vscode.postMessage({ type: 'navigate', range: r }))
+            rangesEl.appendChild(a)
+          }
+
+          rangesEl.appendChild(document.createTextNode(')'))
+
+          row.appendChild(rangesEl)
+        }
+      }
     }
 
     return row

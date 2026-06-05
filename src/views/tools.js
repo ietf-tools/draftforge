@@ -175,7 +175,7 @@ class ToolsProvider {
 /**
  * @param {vscode.ExtensionContext} context
  */
-export function activateToolsView(context) {
+export function activateToolsView(context, outputView) {
   const toolsProvider = new ToolsProvider(context)
   const toolsView = vscode.window.createTreeView('draftforge-tools', {
     treeDataProvider: toolsProvider
@@ -229,7 +229,9 @@ export function activateToolsView(context) {
               })
             }
             let desiredPath = ''
+            let curFormatIdx = 0
             for (const format of selectedOutputsRaw) {
+              curFormatIdx++
               if (desiredPath.length > 2 && desiredPath.includes('.')) {
                 desiredPath = desiredPath.split('.').toSpliced(-1, 1).join('.') + `.${format.value}`
               }
@@ -240,6 +242,9 @@ export function activateToolsView(context) {
               )
               if (chosenPath && typeof chosenPath === 'string') {
                 desiredPath = chosenPath
+              }
+              if (curFormatIdx < selectedOutputsRaw.length) {
+                outputView.appendSeparator()
               }
             }
             break

@@ -73,7 +73,7 @@ export function registerSurroundBcp14KeywordsCommand(context, outputView) {
 
       if (keywordsReplaces.length === 0) {
         vscode.window.showInformationMessage('No BCP 14 keywords to enclose found.')
-        outputView.appendLine(`No BCP 14 keywords to enclose found in ${fileName}.`)
+        outputView.appendHeader(`No BCP 14 keywords to enclose found in ${fileName}.`)
       } else {
         await editor.edit((editBuilder) => {
           // replace from bottom to top to avoid shifting positions
@@ -85,8 +85,7 @@ export function registerSurroundBcp14KeywordsCommand(context, outputView) {
           `Surrounded ${keywordsReplaces.length} BCP 14 keywords.`
         )
 
-        outputView.appendLine(`BCP 14 keywords surrounded in ${fileName}:`)
-        outputView.appendLine('')
+        outputView.appendHeader(`BCP 14 keywords surrounded in ${fileName}:`)
         for (const replace of keywordsReplaces) {
           outputView.appendLineWithRanges({
             text: `- ${replace.term}`,

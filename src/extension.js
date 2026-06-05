@@ -65,12 +65,12 @@ export function activate(context) {
   registerStripMLineEndingsCommand(context)
   registerSurroundBcp14KeywordsCommand(context, outputView)
   registerSvgcheckCommand(context, diagnosticCollection)
-  registerXmlOutputCommand(context)
+  registerXmlOutputCommand(context, outputView)
   registerXmlPreviewCommand(context, outputChannel)
 
   // Activate views
   void activateChecksView(context, diagnosticCollection)
-  activateToolsView(context)
+  activateToolsView(context, outputView)
   activateSnippetsView(context)
   activateReferenceView(context)
 

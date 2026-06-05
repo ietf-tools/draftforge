@@ -7,6 +7,8 @@ import { tmpdir } from 'node:os'
 
 const execAsync = promisify(exec)
 
+const warnErrRgx = /(.xml\((?<line>[0-9]+)\): )?(?<kind>Warning|Error): (?<msg>.*)/i
+
 /**
  * Run XML2RFC
  * @param {String} inputContent
@@ -14,7 +16,7 @@ const execAsync = promisify(exec)
  * @param {String} outputPathUri
  * @returns {Promise<void>}
  */
-async function run(inputContent, outputFileType, outputPathUri) {
+async function run(inputContent, outputFileType, outputPathUri, outputView) {
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
@@ -40,23 +42,61 @@ async function run(inputContent, outputFileType, outputPathUri) {
           .get(`${outputFileType}OutputFlags`)
         const outputFileTypeFlag = outputFileType === 'txt' ? 'text' : outputFileType
         const cmd = `${execPath} ${flags} --${outputFileTypeFlag} -o "${outputPathUri}" "${inputPath}"`
-        await execAsync(cmd, {
+        const { stderr } = await execAsync(cmd, {
           timeout: 30000, // 30s
           windowsHide: true
         })
+
+        // Parse stderr output
+        let errLines = 0
+        for (const line of stderr.split('\n')) {
+          const match = line.match(warnErrRgx)
+          if (match) {
+            errLines++
+            if (errLines === 1) {
+              outputView.appendHeader(
+                `Warnings/Errors from xml2rfc output (${outputFileType.toUpperCase()}):`
+              )
+            }
+            if (match.groups.line) {
+              const lineInt = Math.abs(parseInt(match.groups.line) - 1)
+              outputView.appendLineWithRanges({
+                text: `- ${match.groups.kind}: ${match.groups.msg}`,
+                ranges: [
+                  {
+                    startLine: lineInt,
+                    startCharacter: 0,
+                    endLine: lineInt,
+                    endCharacter: 0,
+                    label: `${match.groups.line}`
+                  }
+                ]
+              })
+            } else {
+              outputView.appendLine(`- ${match.groups.kind}: ${match.groups.msg}`)
+            }
+          }
+        }
+        if (errLines === 0) {
+          outputView.appendLine('xml2rfc exported the document without any warning/error.')
+        }
+
         vscode.window.showInformationMessage('Document exported successfully.')
         await fs.rm(tmpPath, { recursive: true, force: true })
       } catch (err) {
+        outputView.appendHeader(`Failed to output to ${outputFileType.toUpperCase()}:`)
+        outputView.appendLine(err.message)
         vscode.window.showErrorMessage(err.message)
       }
     }
   )
+  outputView.reveal()
 }
 
 /**
  * @param {vscode.ExtensionContext} context
  */
-export function registerXmlOutputCommand(context) {
+export function registerXmlOutputCommand(context, outputView) {
   context.subscriptions.push(
     vscode.commands.registerCommand(
       'draftforge.xmlOutput',
@@ -78,11 +118,14 @@ export function registerXmlOutputCommand(context) {
           path.posix.join(activeUriPath.dir, `${activeUriPath.name}.${fileType}`)
         )
 
+        outputView.setFileUri(activeDoc.uri)
+
         try {
           let chosenPath = ''
           if (desiredPath) {
             chosenPath = desiredPath
           } else {
+            outputView.clear()
             const selectedOutputUri = await vscode.window.showSaveDialog({
               title: 'Export As',
               filters: {
@@ -90,11 +133,14 @@ export function registerXmlOutputCommand(context) {
               },
               defaultUri
             })
+            if (!selectedOutputUri) {
+              throw new Error('Cancelled')
+            }
             chosenPath = selectedOutputUri.fsPath
           }
 
           if (chosenPath) {
-            await run(activeDoc.getText(), fileType, chosenPath)
+            await run(activeDoc.getText(), fileType, chosenPath, outputView)
           }
           return chosenPath
         } catch (err) {
