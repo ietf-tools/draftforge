@@ -221,8 +221,9 @@ export function activateToolsView(context, outputView) {
               [
                 { label: 'HTML', picked: true, value: 'html' },
                 { label: 'PDF', picked: true, value: 'pdf' },
-                { label: 'Plain Text', picked: true, value: 'txt' }
-              ],
+                { label: 'Plain Text', picked: true, value: 'txt' },
+                doc.languageId === 'markdown' && { label: 'RFCXML', picked: false, value: 'xml' }
+              ].filter((t) => t),
               {
                 canPickMany: true,
                 ignoreFocusOut: true,
