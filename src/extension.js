@@ -56,7 +56,7 @@ export function activate(context) {
   registerExtractCommentsCommand(context, outputChannel)
   registerIdnitsCommand(context)
   registerListAbbreviationsCommand(context, outputChannel)
-  registerListInconsistentCapitalizationCommand(context, outputChannel)
+  registerListInconsistentCapitalizationCommand(context, outputView)
   registerListInconsistentFormattingCommand(context, outputChannel)
   registerLookupSelectionAcrossDocsCommand(context, outputChannel)
   // registerMakeDiffCommand(context, outputChannel)

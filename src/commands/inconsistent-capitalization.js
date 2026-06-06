@@ -1,10 +1,11 @@
 import * as vscode from 'vscode'
+import { parse } from 'node:path'
 
 /**
  * @param {vscode.ExtensionContext} context
- * @param {vscode.OutputChannel} outputChannel
+ * @param outputView
  */
-export function registerListInconsistentCapitalizationCommand(context, outputChannel) {
+export function registerListInconsistentCapitalizationCommand(context, outputView) {
   context.subscriptions.push(
     vscode.commands.registerCommand('draftforge.listInconsistentCapitalization', async function () {
       try {
@@ -44,27 +45,35 @@ export function registerListInconsistentCapitalizationCommand(context, outputCha
             .replaceAll(/<!--([\s\S]*?)-->/gi, (_, p1) => p1.replaceAll(/[^\n]/g, '_'))
         )
 
-        outputChannel.clear()
-        outputChannel.appendLine(
-          `List of inconsistent use of capitalization in ${activeDoc.fileName}:\n`
-        )
+        const fileName = parse(activeDoc.fileName).base
+        outputView.clear()
+        outputView.setFileUri(activeDoc.uri)
+        outputView.appendHeader(`List of inconsistent use of capitalization in ${fileName}:`)
         let idx = 0
 
         for (const key in results) {
           if (idx > 0) {
-            outputChannel.appendLine('--------')
+            outputView.appendSeparator()
           }
           idx++
           const phrase = results[key]
           for (const variation of phrase) {
-            outputChannel.appendLine(
-              `${variation.text} (${variation.count}) (Ln ${variation.lines.join(', ')})`
-            )
+            outputView.appendLineWithRanges({
+              text: variation.text,
+              badge: variation.count,
+              ranges: variation.lines.map((ln) => ({
+                startLine: ln - 1,
+                startCharacter: 0,
+                endLine: ln - 1,
+                endCharacter: 10000, // try to capture end of line
+                label: ln
+              }))
+            })
           }
         }
 
         if (idx === 0) {
-          outputChannel.appendLine('No inconsistent capitalization use found.')
+          outputView.appendLine('No inconsistent capitalization use found.')
           vscode.window.showInformationMessage('No inconsistent capitalization use found.')
         } else {
           vscode.window.showInformationMessage(
@@ -72,7 +81,7 @@ export function registerListInconsistentCapitalizationCommand(context, outputCha
           )
         }
 
-        outputChannel.show(true)
+        outputView.reveal()
       } catch (err) {
         console.warn(err)
         vscode.window.showErrorMessage(err.message)

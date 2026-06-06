@@ -17,6 +17,7 @@ import * as vscode from 'vscode'
  * @property {string}      text     - The text content of the line
  * @property {LineRange[]} [ranges] - Optional ranges shown as clickable links at the end of the line
  * @property {string|null}      [color]  - Optional CSS color, e.g. "var(--vscode-errorForeground)"
+ * @property {string|null}      [badge]  - Optional badge content
  * @property {string|null}      [kind]  - Optional special element kind (separator, header, etc.)
  */
 
@@ -97,10 +98,10 @@ export class OutputWebviewView {
   /**
    * Append a plain text line (no links).
    * @param {string} text
-   * @param {string} [color] - Optional CSS color
+   * @param {object} [opts] - Additional properties
    */
-  appendLine(text, color) {
-    const line = { text, color }
+  appendLine(text, opts = {}) {
+    const line = { text, ...opts }
     this.#lines.push(line)
     this.#pushLine(line)
   }
@@ -179,10 +180,11 @@ export class OutputWebviewView {
    * @param {OutputLine} line
    * @returns {object}
    */
-  #serializeLine({ text, color = null, ranges = [], kind = 'text' }) {
+  #serializeLine({ text, color = null, badge = null, ranges = [], kind = 'text' }) {
     return {
       text,
       color,
+      badge,
       ranges: ranges.map((r) => ({
         label: r.label ?? this.#defaultLabel(r),
         startLine: r.startLine,
@@ -268,10 +270,6 @@ export class OutputWebviewView {
     user-select: none;
   }
 
-  .range-link + .range-link {
-    margin-left: 5px;
-  }
-
   .range-link:hover {
     text-decoration: underline;
   }
@@ -281,6 +279,18 @@ export class OutputWebviewView {
     padding: 6px 12px 6px 12px;
     margin-bottom: 8px;
     border-left: 4px solid rgb(0, 122, 204);
+    background: linear-gradient(45deg, rgba(0, 122, 204, .1), rgba(0, 122, 204, 0));
+  }
+
+  .badge {
+    display: inline;
+    background-color: var(--vscode-activityBarBadge-background, rgb(0, 122, 204));
+    color: var(--vscode-activityBarBadge-foreground, #FFF);
+    font-weight: 700;
+    padding: 1px 5px;
+    font-size: 0.8em;
+    margin-left: 10px;
+    border-radius: 3px;
   }
 
   .separator {
@@ -306,7 +316,7 @@ export class OutputWebviewView {
   const vscode = acquireVsCodeApi()
   const outputEl = document.getElementById('output')
 
-  const buildLineEl = ({ text, color, ranges, kind }) => {
+  const buildLineEl = ({ text, color, badge, ranges, kind }) => {
     const row = document.createElement('div')
 
     switch (kind) {
@@ -326,15 +336,29 @@ export class OutputWebviewView {
         row.className = 'line'
 
         const textEl = Object.assign(document.createElement('span'), { className: 'line-text', textContent: text })
-        if (color) textEl.style.color = color
+        if (color) {
+          textEl.style.color = color
+        }
         row.appendChild(textEl)
+
+        if (badge) {
+          const badgeEl = document.createElement('span')
+          badgeEl.className = 'badge'
+          badgeEl.appendChild(document.createTextNode(badge))
+          row.appendChild(badgeEl)
+        }
 
         if (ranges?.length > 0) {
           const rangesEl = document.createElement('span')
           rangesEl.className = 'ranges'
           rangesEl.appendChild(document.createTextNode('(Line '))
 
+          let curIdx = 0
           for (const r of ranges) {
+            curIdx++
+            if (curIdx > 1) {
+              rangesEl.appendChild(document.createTextNode(', '))
+            }
             const a = Object.assign(document.createElement('a'), {
               className: 'range-link',
               textContent: r.label,
