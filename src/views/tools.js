@@ -56,6 +56,12 @@ class ToolsProvider {
         description: 'Generate PDF output of the current document',
         icon: 'file-pdf'
       },
+      flags.md && {
+        id: 'exportRfcXml',
+        label: 'Export as RFCXML',
+        description: 'Generate RFCXML output of the current document',
+        icon: 'file-code'
+      },
       {
         id: 'exportTxt',
         label: 'Export as TXT',
@@ -269,6 +275,16 @@ export function activateToolsView(context, outputView) {
             } else {
               await vscode.window.showInformationMessage(
                 'Export to PDF not available for this document type.'
+              )
+            }
+            break
+          }
+          case 'exportRfcXml': {
+            if (doc.languageId === 'markdown') {
+              await vscode.commands.executeCommand('draftforge.mdOutput', 'xml')
+            } else {
+              await vscode.window.showInformationMessage(
+                'Export to RFCXML not available for this document type.'
               )
             }
             break

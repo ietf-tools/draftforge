@@ -29,7 +29,10 @@ async function run(inputContent, outputFileType, outputPathUri) {
         // Write input
         const outputPathUriParts = path.parse(outputPathUri)
         const inputPath = path.join(tmpPath, `${outputPathUriParts.name}.md`)
-        const intermediatePath = path.join(tmpPath, `${outputPathUriParts.name}.xml`)
+        const intermediatePath =
+          outputFileType === 'xml'
+            ? outputPathUri
+            : path.join(tmpPath, `${outputPathUriParts.name}.xml`)
         await fs.writeFile(inputPath, inputContent, 'utf8')
 
         // Run kramdown-rfc
@@ -47,18 +50,20 @@ async function run(inputContent, outputFileType, outputPathUri) {
         })
 
         // Run xml2rfc
-        const xmlExecPath = vscode.workspace
-          .getConfiguration('draftforge.xml2rfc')
-          .get('executablePath')
-        const xmlFlags = vscode.workspace
-          .getConfiguration('draftforge.xml2rfc')
-          .get(`${outputFileType}OutputFlags`)
-        const outputFileTypeFlag = outputFileType === 'txt' ? 'text' : outputFileType
-        const xmlCmd = `${xmlExecPath} ${xmlFlags} --${outputFileTypeFlag} -o "${outputPathUri}" "${intermediatePath}"`
-        await execAsync(xmlCmd, {
-          timeout: 30000, // 30s
-          windowsHide: true
-        })
+        if (outputFileType !== 'xml') {
+          const xmlExecPath = vscode.workspace
+            .getConfiguration('draftforge.xml2rfc')
+            .get('executablePath')
+          const xmlFlags = vscode.workspace
+            .getConfiguration('draftforge.xml2rfc')
+            .get(`${outputFileType}OutputFlags`)
+          const outputFileTypeFlag = outputFileType === 'txt' ? 'text' : outputFileType
+          const xmlCmd = `${xmlExecPath} ${xmlFlags} --${outputFileTypeFlag} -o "${outputPathUri}" "${intermediatePath}"`
+          await execAsync(xmlCmd, {
+            timeout: 30000, // 30s
+            windowsHide: true
+          })
+        }
         vscode.window.showInformationMessage('Document exported successfully.')
         await fs.rm(tmpPath, { recursive: true, force: true })
       } catch (err) {
