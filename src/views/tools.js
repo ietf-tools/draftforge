@@ -237,6 +237,7 @@ export function activateToolsView(context, outputView) {
             }
             let desiredPath = ''
             let curFormatIdx = 0
+            outputView.clear()
             for (const format of selectedOutputsRaw) {
               curFormatIdx++
               if (desiredPath.length > 2 && desiredPath.includes('.')) {

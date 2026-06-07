@@ -31,10 +31,7 @@ import { OutputWebviewView } from './views/neue-output.js'
 export function activate(context) {
   console.log('Initializing DraftForge...')
 
-  // Create DraftForge Output channel
-  let outputChannel = vscode.window.createOutputChannel('DraftForge')
-  context.subscriptions.push(outputChannel)
-
+  // Create DraftForge Output View
   let outputView = new OutputWebviewView()
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider('draftforge.outputView', outputView)
@@ -52,21 +49,21 @@ export function activate(context) {
   registerAddXmlModelsCommand(context)
   registerAuthCommands(context)
   registerExpandIncludesCommands(context)
-  registerExtractCodeComponentsCommand(context, outputChannel)
-  registerExtractCommentsCommand(context, outputChannel)
+  registerExtractCodeComponentsCommand(context, outputView)
+  registerExtractCommentsCommand(context, outputView)
   registerIdnitsCommand(context)
-  registerListAbbreviationsCommand(context, outputChannel)
+  registerListAbbreviationsCommand(context, outputView)
   registerListInconsistentCapitalizationCommand(context, outputView)
-  registerListInconsistentFormattingCommand(context, outputChannel)
-  registerLookupSelectionAcrossDocsCommand(context, outputChannel)
-  // registerMakeDiffCommand(context, outputChannel)
-  registerMdOutputCommand(context, outputChannel)
-  registerPrepareForPublishingCommand(context, outputChannel)
+  registerListInconsistentFormattingCommand(context, outputView)
+  registerLookupSelectionAcrossDocsCommand(context, outputView)
+  // registerMakeDiffCommand(context, outputView)
+  registerMdOutputCommand(context, outputView)
+  registerPrepareForPublishingCommand(context, outputView)
   registerStripMLineEndingsCommand(context)
   registerSurroundBcp14KeywordsCommand(context, outputView)
   registerSvgcheckCommand(context, diagnosticCollection)
   registerXmlOutputCommand(context, outputView)
-  registerXmlPreviewCommand(context, outputChannel)
+  registerXmlPreviewCommand(context, outputView)
 
   // Activate views
   void activateChecksView(context, diagnosticCollection)

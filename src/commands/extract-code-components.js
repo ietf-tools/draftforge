@@ -1,13 +1,13 @@
 import * as vscode from 'vscode'
-import { posix } from 'node:path'
+import { parse, posix } from 'node:path'
 
 const EXTRACT_DIR = 'code-extracts'
 
 /**
  * @param {vscode.ExtensionContext} context
- * @param {vscode.OutputChannel} outputChannel
+ * @param outputView
  */
-export function registerExtractCodeComponentsCommand(context, outputChannel) {
+export function registerExtractCodeComponentsCommand(context, outputView) {
   context.subscriptions.push(
     vscode.commands.registerCommand('draftforge.extractCodeComponents', async function () {
       const activeDoc = vscode.window.activeTextEditor?.document
@@ -52,8 +52,10 @@ export function registerExtractCodeComponentsCommand(context, outputChannel) {
           /<sourcecode ?(?<attr>[a-z0-9=@.\-_ "]+)?>\n?(?<code>[\s\S]+?)\n?<\/sourcecode>/gim
         const contents = activeDoc.getText()
 
-        outputChannel.clear()
-        outputChannel.appendLine(`Code components extracted from ${activeDoc.fileName}:\n`)
+        const fileName = parse(activeDoc.fileName).base
+        outputView.clear()
+        outputView.setFileUri(activeDoc.uri)
+        outputView.appendHeader(`Code components extracted from ${fileName}:`)
         let idx = 1
         let noNameIdx = 1
 
@@ -107,22 +109,22 @@ export function registerExtractCodeComponentsCommand(context, outputChannel) {
             new TextEncoder().encode(match.groups?.code || '')
           )
 
-          outputChannel.appendLine(`- ./${EXTRACT_DIR}/${codeFileName}`)
+          outputView.appendLine(`- ./${EXTRACT_DIR}/${codeFileName}`)
           idx++
         }
         idx--
 
         if (idx <= 0) {
-          outputChannel.appendLine('No code components found.')
+          outputView.appendLine('No code components found.')
           vscode.window.showInformationMessage('No code components found.')
         } else {
-          outputChannel.appendLine(`\n${idx - 1} code components extracted to ./${EXTRACT_DIR}`)
+          outputView.appendLine(`\n${idx - 1} code components extracted to ./${EXTRACT_DIR}`)
           vscode.window.showInformationMessage(
             `Found ${idx - 1} code component(s). See Output: DraftForge`
           )
         }
 
-        outputChannel.show(true)
+        outputView.reveal()
       } catch (err) {
         console.log(err)
         vscode.window.showErrorMessage(`Something went wrong: ${err.message}`)

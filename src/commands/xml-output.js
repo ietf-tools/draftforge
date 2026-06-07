@@ -14,6 +14,7 @@ const warnErrRgx = /(.xml\((?<line>[0-9]+)\): )?(?<kind>Warning|Error): (?<msg>.
  * @param {String} inputContent
  * @param {String} outputFileType
  * @param {String} outputPathUri
+ * @param outputView
  * @returns {Promise<void>}
  */
 async function run(inputContent, outputFileType, outputPathUri, outputView) {

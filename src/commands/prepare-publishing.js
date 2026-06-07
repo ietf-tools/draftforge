@@ -7,9 +7,9 @@ import manifestManager from '../helpers/manifest.js'
 
 /**
  * @param {vscode.ExtensionContext} context
- * @param {vscode.OutputChannel} outputChannel
+ * @param outputView
  */
-export function registerPrepareForPublishingCommand(context, outputChannel) {
+export function registerPrepareForPublishingCommand(context, outputView) {
   context.subscriptions.push(
     vscode.commands.registerCommand('draftforge.prepareForPublishing', async function () {
       // Ensure workspace is opened
@@ -33,6 +33,9 @@ export function registerPrepareForPublishingCommand(context, outputChannel) {
           }
         }
       })
+      if (!rfcNumber) {
+        return
+      }
 
       const manifest = await manifestManager.getManifest(workspaceUri.fsPath)
 
@@ -53,8 +56,9 @@ export function registerPrepareForPublishingCommand(context, outputChannel) {
         }
       }
 
-      outputChannel.clear()
-      outputChannel.show(true)
+      outputView.clear()
+      outputView.reveal()
+      outputView.appendHeader('Preparing for publishing:')
 
       // Scan workspace for files
       const includedFiles = []
@@ -76,14 +80,14 @@ export function registerPrepareForPublishingCommand(context, outputChannel) {
                   !rfcNumberMatch?.groups?.rfcNumber ||
                   rfcNumberMatch.groups?.rfcNumber !== rfcNumber
                 ) {
-                  outputChannel.appendLine(`Operation canceled.`)
+                  outputView.appendLine(`Operation canceled.`)
                   return vscode.window.showErrorMessage(
                     `RFC number mismatch in ${filePathRelative}`,
                     { modal: true }
                   )
                 }
               } catch (err) {
-                outputChannel.appendLine(`Operation canceled.`)
+                outputView.appendLine(`Operation canceled.`)
                 return vscode.window.showErrorMessage(
                   `Failed to read ${filePathRelative}: ${err.message}`,
                   { modal: true }
@@ -96,19 +100,19 @@ export function registerPrepareForPublishingCommand(context, outputChannel) {
               path: filePathRelative,
               type: fileType
             })
-            outputChannel.appendLine(`Adding ${filePathRelative}`)
+            outputView.appendLine(`Adding ${filePathRelative}`)
           } else if (filePath.name === `rfc${rfcNumber}.notprepped` && fileType === 'xml') {
             includedFiles.push({
               path: filePathRelative,
               type: 'notprepped'
             })
-            outputChannel.appendLine(`Adding ${filePathRelative}`)
+            outputView.appendLine(`Adding ${filePathRelative}`)
           }
         }
       }
 
       if (includedFiles.length < 1) {
-        return outputChannel.appendLine(
+        return outputView.appendLine(
           `⚠️ No suitable file candidates found. Looked for **/rfc${rfcNumber}.{html,pdf,txt,xml} and **/rfc${rfcNumber}.notprepped.xml`
         )
       }
@@ -126,7 +130,7 @@ export function registerPrepareForPublishingCommand(context, outputChannel) {
         true
       )
 
-      outputChannel.appendLine(`\nAdded ${includedFiles.length} files to manifest.`)
+      outputView.appendLine(`\n✅ Added ${includedFiles.length} files to manifest.`)
     })
   )
 }

@@ -7,14 +7,17 @@ import { tmpdir } from 'node:os'
 
 const execAsync = promisify(exec)
 
+const warnErrRgx = /(.xml\((?<line>[0-9]+)\): )?(?<kind>Warning|Error): (?<msg>.*)/i
+
 /**
  * Run XML2RFC
  * @param {String} inputContent
  * @param {String} outputFileType
  * @param {String} outputPathUri
+ * @param outputView
  * @returns {Promise<void>}
  */
-async function run(inputContent, outputFileType, outputPathUri) {
+async function run(inputContent, outputFileType, outputPathUri, outputView) {
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
@@ -43,11 +46,31 @@ async function run(inputContent, outputFileType, outputPathUri) {
           .getConfiguration('draftforge.kramdownRfc')
           .get(`outputFlags`)
         const mdCmd = `${mdExecPath} ${mdFlags} "${inputPath}" > "${intermediatePath}"`
-        await execAsync(mdCmd, {
+        const { stderr: mdStderr } = await execAsync(mdCmd, {
           cwd: tmpPath,
           timeout: 30000, // 30s
           windowsHide: true
         })
+
+        // Parse kramdown-rfc stderr output
+        if (mdStderr?.includes('*** ')) {
+          outputView.appendHeader(
+            outputFileType !== 'xml'
+              ? `Warnings/Errors from kramdown-rfc output (intermediate RFCXML before ${outputFileType.toUpperCase()}):`
+              : 'Warnings/Errors from kramdown-rfc output (RFCXML)'
+          )
+          for (const line of mdStderr.split('\n')) {
+            if (line.startsWith('*** ')) {
+              outputView.appendLine(line)
+            }
+          }
+        } else {
+          outputView.appendLine(
+            outputFileType !== 'xml'
+              ? 'kramdown-rfc exported the document to intermediate RFCXML without any warning/error.'
+              : 'kramdown-rfc exported the document to RFCXML without any warning/error.'
+          )
+        }
 
         // Run xml2rfc
         if (outputFileType !== 'xml') {
@@ -59,10 +82,44 @@ async function run(inputContent, outputFileType, outputPathUri) {
             .get(`${outputFileType}OutputFlags`)
           const outputFileTypeFlag = outputFileType === 'txt' ? 'text' : outputFileType
           const xmlCmd = `${xmlExecPath} ${xmlFlags} --${outputFileTypeFlag} -o "${outputPathUri}" "${intermediatePath}"`
-          await execAsync(xmlCmd, {
+          const { stderr: xmlStderr } = await execAsync(xmlCmd, {
             timeout: 30000, // 30s
             windowsHide: true
           })
+
+          // Parse xml2rfc stderr output
+          let xmlErrLines = 0
+          for (const line of xmlStderr.split('\n')) {
+            const match = line.match(warnErrRgx)
+            if (match) {
+              xmlErrLines++
+              if (xmlErrLines === 1) {
+                outputView.appendHeader(
+                  `Warnings/Errors from xml2rfc output (${outputFileType.toUpperCase()}):`
+                )
+              }
+              if (match.groups.line) {
+                const lineInt = Math.abs(parseInt(match.groups.line) - 1)
+                outputView.appendLineWithRanges({
+                  text: `- ${match.groups.kind}: ${match.groups.msg}`,
+                  ranges: [
+                    {
+                      startLine: lineInt,
+                      startCharacter: 0,
+                      endLine: lineInt,
+                      endCharacter: 0,
+                      label: `${match.groups.line}`
+                    }
+                  ]
+                })
+              } else {
+                outputView.appendLine(`- ${match.groups.kind}: ${match.groups.msg}`)
+              }
+            }
+          }
+          if (xmlErrLines === 0) {
+            outputView.appendLine('\n✅ xml2rfc exported the document without any warning/error.')
+          }
         }
         vscode.window.showInformationMessage('Document exported successfully.')
         await fs.rm(tmpPath, { recursive: true, force: true })
@@ -71,12 +128,13 @@ async function run(inputContent, outputFileType, outputPathUri) {
       }
     }
   )
+  outputView.reveal()
 }
 
 /**
  * @param {vscode.ExtensionContext} context
  */
-export function registerMdOutputCommand(context) {
+export function registerMdOutputCommand(context, outputView) {
   context.subscriptions.push(
     vscode.commands.registerCommand(
       'draftforge.mdOutput',
@@ -114,7 +172,7 @@ export function registerMdOutputCommand(context) {
           }
 
           if (chosenPath) {
-            await run(activeDoc.getText(), fileType, chosenPath)
+            await run(activeDoc.getText(), fileType, chosenPath, outputView)
           }
           return chosenPath
         } catch (err) {

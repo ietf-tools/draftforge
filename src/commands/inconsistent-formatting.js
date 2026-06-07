@@ -1,10 +1,11 @@
 import * as vscode from 'vscode'
+import { parse } from 'node:path'
 
 /**
  * @param {vscode.ExtensionContext} context
- * @param {vscode.OutputChannel} outputChannel
+ * @param outputView
  */
-export function registerListInconsistentFormattingCommand(context, outputChannel) {
+export function registerListInconsistentFormattingCommand(context, outputView) {
   context.subscriptions.push(
     vscode.commands.registerCommand('draftforge.listInconsistentFormatting', async function () {
       try {
@@ -22,23 +23,25 @@ export function registerListInconsistentFormattingCommand(context, outputChannel
 
         const results = findInconsistentFormatting(activeDoc.getText(), activeDoc.languageId)
 
-        outputChannel.clear()
-        outputChannel.appendLine(`List of inconsistent formatting in ${activeDoc.fileName}:\n`)
+        const fileName = parse(activeDoc.fileName).base
+        outputView.clear()
+        outputView.setFileUri(activeDoc.uri)
+        outputView.appendHeader(`List of inconsistent formatting in ${fileName}:`)
         let idx = 0
 
         for (const key in results) {
           if (idx > 0) {
-            outputChannel.appendLine('--------')
+            outputView.appendSeparator()
           }
           idx++
           const phrase = results[key]
           for (const variation of phrase) {
-            outputChannel.appendLine(`${variation.text} (${variation.count})`)
+            outputView.appendLine(variation.text, { badge: variation.count })
           }
         }
 
         if (idx === 0) {
-          outputChannel.appendLine('No inconsistent formatting found.')
+          outputView.appendLine('No inconsistent formatting found.')
           vscode.window.showInformationMessage('No inconsistent formatting found.')
         } else {
           vscode.window.showInformationMessage(
@@ -46,7 +49,7 @@ export function registerListInconsistentFormattingCommand(context, outputChannel
           )
         }
 
-        outputChannel.show(true)
+        outputView.reveal()
       } catch (err) {
         console.warn(err)
         vscode.window.showErrorMessage(err.message)

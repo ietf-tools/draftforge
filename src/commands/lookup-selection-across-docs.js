@@ -2,9 +2,9 @@ import * as vscode from 'vscode'
 
 /**
  * @param {vscode.ExtensionContext} context
- * @param {vscode.OutputChannel} outputChannel
+ * @param outputView
  */
-export function registerLookupSelectionAcrossDocsCommand(context, outputChannel) {
+export function registerLookupSelectionAcrossDocsCommand(context, outputView) {
   context.subscriptions.push(
     vscode.commands.registerTextEditorCommand(
       'draftforge.lookupSelectionAcrossDocs',
@@ -17,7 +17,7 @@ export function registerLookupSelectionAcrossDocsCommand(context, outputChannel)
         }
 
         const text = editor.document.getText(selection)
-        outputChannel.clear()
+        outputView.clear()
         const foundDocs = []
 
         // -> Ensure all tabs are loaded in memory.
@@ -43,20 +43,19 @@ export function registerLookupSelectionAcrossDocsCommand(context, outputChannel)
 
         // -> Display the results
         if (foundDocs.length > 0) {
-          outputChannel.appendLine('The selected text below was found in these documents:\n')
-          outputChannel.appendLine(`- ${editor.document.fileName} (source)`)
+          outputView.appendHeader('The selected text below was found in these documents:')
+          outputView.appendLine(`- ${editor.document.fileName} (source)`)
           for (const fileName of foundDocs) {
-            outputChannel.appendLine(`- ${fileName}`)
+            outputView.appendLine(`- ${fileName}`)
           }
-          outputChannel.appendLine('')
         } else {
-          outputChannel.appendLine(
+          outputView.appendLine(
             'The selected text below was NOT found in any of the other opened documents.\n'
           )
         }
-        outputChannel.appendLine('--------------------------------')
-        outputChannel.appendLine(text)
-        outputChannel.show(true)
+        outputView.appendSeparator()
+        outputView.appendLine(text)
+        outputView.reveal()
       }
     )
   )

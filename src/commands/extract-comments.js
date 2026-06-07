@@ -1,11 +1,12 @@
 import * as vscode from 'vscode'
 import { dedent } from '../helpers/text.js'
+import { parse } from 'node:path'
 
 /**
  * @param {vscode.ExtensionContext} context
- * @param {vscode.OutputChannel} outputChannel
+ * @param outputView
  */
-export function registerExtractCommentsCommand(context, outputChannel) {
+export function registerExtractCommentsCommand(context, outputView) {
   context.subscriptions.push(
     vscode.commands.registerCommand('draftforge.extractComments', async function () {
       const activeDoc = vscode.window.activeTextEditor?.document
@@ -23,20 +24,36 @@ export function registerExtractCommentsCommand(context, outputChannel) {
       const commentsRgx = /<!--\s?\[rfced\]([^]+?)-->/gim
       const contents = activeDoc.getText()
 
-      outputChannel.clear()
-      outputChannel.appendLine(`List of comments for the RPC staff in ${activeDoc.fileName}:\n`)
+      const fileName = parse(activeDoc.fileName).base
+      outputView.clear()
+      outputView.setFileUri(activeDoc.uri)
+      outputView.appendHeader(`List of comments for the RPC staff in ${fileName}:`)
       let idx = 0
 
       for (const match of contents.matchAll(commentsRgx)) {
         if (idx > 0) {
-          outputChannel.appendLine('\n--------\n')
+          outputView.appendSeparator()
         }
         idx++
-        outputChannel.appendLine(`${idx}. ${dedent(match[1]).trim()}`)
+        const startPos = activeDoc.positionAt(match.index)
+        const endPos = activeDoc.positionAt(match.index + match[0].length)
+        outputView.appendLineWithRanges({
+          text: `${idx}. ${dedent(match[1]).trim()}`,
+          ranges: [
+            {
+              startLine: startPos.line,
+              startCharacter: startPos.character,
+              endLine: endPos.line,
+              endCharacter: endPos.character,
+              label:
+                startPos.line !== endPos.line ? `${startPos.line}-${endPos.line}` : startPos.line
+            }
+          ]
+        })
       }
 
       if (idx === 0) {
-        outputChannel.appendLine('No [rfced] mentions found.')
+        outputView.appendLine('No [rfced] mentions found.')
         vscode.window.showInformationMessage('No [rfced] mentions found.')
       } else {
         vscode.window.showInformationMessage(
@@ -44,7 +61,7 @@ export function registerExtractCommentsCommand(context, outputChannel) {
         )
       }
 
-      outputChannel.show(true)
+      outputView.reveal()
     })
   )
 }

@@ -2,15 +2,16 @@ import * as vscode from 'vscode'
 import { uniq } from 'es-toolkit/array'
 import { escapeRegExp } from 'es-toolkit/string'
 import { setTimeout } from 'node:timers/promises'
+import { parse } from 'node:path'
 
 const ABBR_URL =
   'https://github.com/rfc-editor-drafts/common/raw/refs/heads/main/abbreviations.json'
 
 /**
  * @param {vscode.ExtensionContext} context
- * @param {vscode.OutputChannel} outputChannel
+ * @param outputView
  */
-export function registerListAbbreviationsCommand(context, outputChannel) {
+export function registerListAbbreviationsCommand(context, outputView) {
   let abbreviations = []
 
   context.subscriptions.push(
@@ -40,7 +41,7 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
         // )
 
         const results = []
-        outputChannel.clear()
+        outputView.clear()
 
         // Show progress notification
         await vscode.window.withProgress(
@@ -260,7 +261,9 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
           }
         )
 
-        outputChannel.appendLine(`List of abbreviations usage in ${activeDoc.fileName}:\n`)
+        const fileName = parse(activeDoc.fileName).base
+        outputView.setFileUri(activeDoc.uri)
+        outputView.appendHeader(`List of abbreviations usage in ${fileName}:`)
         let idx = 0
         let totalWarnings = 0
         const lf = new Intl.ListFormat('en')
@@ -295,7 +298,7 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
                 if (!multiExpansions.some((me) => me.chosen)) {
                   // Warn that multiple expansions will be listed
                   result.chosen = true
-                  outputChannel.appendLine(`🔶 Multiple expansions for ${result.term}:`)
+                  outputView.appendLine(`🔶 Multiple expansions for ${result.term}:`)
                 }
               }
             }
@@ -374,7 +377,7 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
 
           // -> Print now or add to second batch
           if (isWarning || isIndented) {
-            outputChannel.appendLine(resultStr)
+            outputView.appendLine(resultStr)
           } else {
             secondBatch.push(resultStr)
           }
@@ -383,27 +386,27 @@ export function registerListAbbreviationsCommand(context, outputChannel) {
         // -> Print second batch
         if (secondBatch.length > 0) {
           for (const resultStr of secondBatch) {
-            outputChannel.appendLine(resultStr)
+            outputView.appendLine(resultStr)
           }
         }
 
         if (idx === 0) {
-          outputChannel.appendLine('No abbreviations found.')
+          outputView.appendLine('No abbreviations found.')
           vscode.window.showInformationMessage('No abbreviations found.')
         } else {
           if (totalWarnings) {
-            outputChannel.appendLine(
+            outputView.appendLine(
               `\nFound ${idx} abbreviations (${totalWarnings} with ⚠️ warnings).`
             )
           } else {
-            outputChannel.appendLine(`\nFound ${idx} abbreviations.`)
+            outputView.appendLine(`\nFound ${idx} abbreviations.`)
           }
           vscode.window.showInformationMessage(
             `Found ${idx} abbreviation(s). See Output: DraftForge`
           )
         }
 
-        outputChannel.show(true)
+        outputView.reveal()
       } catch (err) {
         console.warn(err)
         vscode.window.showErrorMessage(err.message)

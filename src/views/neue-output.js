@@ -282,6 +282,10 @@ export class OutputWebviewView {
     background: linear-gradient(45deg, rgba(0, 122, 204, .1), rgba(0, 122, 204, 0));
   }
 
+  .line + .header {
+    margin-top: 10px;
+  }
+
   .badge {
     display: inline;
     background-color: var(--vscode-activityBarBadge-background, rgb(0, 122, 204));

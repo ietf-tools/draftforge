@@ -53,12 +53,12 @@ class DocumentPreview {
    *
    * @param {vscode.Uri} documentUri
    * @param {string} fileName
-   * @param {vscode.OutputChannel} outputChannel
+   * @param outputView
    */
-  constructor(documentUri, fileName, outputChannel) {
+  constructor(documentUri, fileName, outputView) {
     this.documentUri = documentUri
     this.documentFilename = path.parse(fileName).base
-    this.outputChannel = outputChannel
+    this.outputView = outputView
 
     this.setupPanel(documentUri)
     // oxlint-disable-next-line typescript/unbound-method
@@ -132,27 +132,44 @@ class DocumentPreview {
    */
   parseOutput(stderr) {
     const diagRgx = /(.xml\((?<line>[0-9]+)\): )?(?<kind>Warning|Error): (?<msg>.*)/i
-    this.outputChannel.clear()
+    this.outputView.clear()
+    this.outputView.setFileUri(this.documentUri)
+    let errLines = 0
     for (const line of stderr.split('\n')) {
       const match = line.match(diagRgx)
       if (match) {
-        const lineParts = [match.groups.kind]
-        if (match.groups.line) {
-          lineParts.push(`Line ${match.groups.line}`)
+        errLines++
+        if (errLines === 1) {
+          this.outputView.appendHeader(`Warnings/Errors from xml2rfc output:`)
         }
-        lineParts.push(match.groups.msg)
-        this.outputChannel.appendLine(lineParts.join(' - '))
+        if (match.groups.line) {
+          const lineInt = Math.abs(parseInt(match.groups.line) - 1)
+          this.outputView.appendLineWithRanges({
+            text: `- ${match.groups.kind}: ${match.groups.msg}`,
+            ranges: [
+              {
+                startLine: lineInt,
+                startCharacter: 0,
+                endLine: lineInt,
+                endCharacter: 0,
+                label: `${match.groups.line}`
+              }
+            ]
+          })
+        } else {
+          this.outputView.appendLine(`- ${match.groups.kind}: ${match.groups.msg}`)
+        }
       }
     }
-    this.outputChannel.show(true)
+    this.outputView.reveal()
   }
 }
 
 /**
  * @param {vscode.ExtensionContext} context
- * @param {vscode.OutputChannel} outputChannel
+ * @param outputView
  */
-export function registerXmlPreviewCommand(context, outputChannel) {
+export function registerXmlPreviewCommand(context, outputView) {
   context.subscriptions.push(
     vscode.commands.registerCommand('draftforge.xmlPreview', async function () {
       try {
@@ -170,11 +187,7 @@ export function registerXmlPreviewCommand(context, outputChannel) {
 
         const activeUri = activeDoc.uri.toString()
         if (!previews[activeUri]) {
-          previews[activeUri] = new DocumentPreview(
-            activeDoc.uri,
-            activeDoc.fileName,
-            outputChannel
-          )
+          previews[activeUri] = new DocumentPreview(activeDoc.uri, activeDoc.fileName, outputView)
         }
 
         // Get temp dir
