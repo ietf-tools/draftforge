@@ -11,5 +11,4 @@ The reference section includes a list of links to documentation and wiki entries
 
 The best place to learn how to write Internet-Drafts is the Author Wiki:
 
-[Authors Wiki](https://authors.ietf.org)
-{ .md-button }
+[Authors Wiki](https://authors.ietf.org){ .md-button }

@@ -16,5 +16,4 @@ DraftForge is a VS Code extension from the IETF Tools team, designed to take aut
 
 It supports RFCXML, Plain Text and Markdown formats, with real-time validation checks, useful tools, ready-to-use snippets and quick access reference.
 
-[Getting Started](install.md)
-{ .md-button }
+[Getting Started](install.md){ .md-button }

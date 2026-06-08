@@ -19,8 +19,7 @@ The following scenarios are listed:
 !!! note
     This tool requires internet access to fetch the latest list. It is cached on subsequent runs.
 
-[View current list](https://github.com/rfc-editor-drafts/common/blob/main/abbreviations.json)
-{ .md-button }
+[View current list](https://github.com/rfc-editor-drafts/common/blob/main/abbreviations.json){ .md-button }
 
 ## Supported Document Types
 
