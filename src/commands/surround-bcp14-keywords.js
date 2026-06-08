@@ -23,6 +23,7 @@ export function registerSurroundBcp14KeywordsCommand(context, outputView) {
         /<bcp14>[\s\S]*?<\/bcp14>|(?<term>MUST\sNOT|MUST|SHOULD\sNOT|SHOULD|SHALL\sNOT|SHALL|RECOMMENDED|NOT\sRECOMMENDED|MAY|OPTIONAL|REQUIRED)/g
       const artworkRgx = /<artwork[^>]*>[\s\S]*?<\/artwork>/g
       const sourcecodeRgx = /<sourcecode[^>]*>[\s\S]*?<\/sourcecode>/g
+      const rfcedCommentsRgx = /<!--\s?\[rfced\]([^]+?)-->/gim
       const excludedRanges = []
       const keywordsReplaces = []
       let match
@@ -39,6 +40,16 @@ export function registerSurroundBcp14KeywordsCommand(context, outputView) {
 
       // List all sourcecode blocks first to exclude them
       while ((match = sourcecodeRgx.exec(text)) !== null) {
+        excludedRanges.push(
+          new vscode.Range(
+            activeDoc.positionAt(match.index),
+            activeDoc.positionAt(match.index + match[0].length)
+          )
+        )
+      }
+
+      // List all rfced comments blocks first to exclude them
+      while ((match = rfcedCommentsRgx.exec(text)) !== null) {
         excludedRanges.push(
           new vscode.Range(
             activeDoc.positionAt(match.index),
