@@ -24,6 +24,7 @@ import { registerXmlOutputCommand } from './commands/xml-output.js'
 import { registerXmlPreviewCommand, unregisterXmlPreviewCommand } from './commands/xml-preview.js'
 import { registerMdOutputCommand } from './commands/md-output.js'
 import { OutputWebviewView } from './views/neue-output.js'
+import { registerNewFileCommand } from './commands/new-file.js'
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -58,6 +59,7 @@ export function activate(context) {
   registerLookupSelectionAcrossDocsCommand(context, outputView)
   // registerMakeDiffCommand(context, outputView)
   registerMdOutputCommand(context, outputView)
+  registerNewFileCommand(context)
   registerPrepareForPublishingCommand(context, outputView)
   registerStripMLineEndingsCommand(context)
   registerSurroundBcp14KeywordsCommand(context, outputView)
