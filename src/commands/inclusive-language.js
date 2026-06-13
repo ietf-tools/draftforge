@@ -171,7 +171,7 @@ export function registerCheckInclusiveLanguageCommand(context, diagnosticCollect
 
             await vscode.commands.executeCommand('workbench.action.problems.focus')
           } else {
-            vscode.window.showInformationMessage('No common placeholders found in this document.')
+            vscode.window.showInformationMessage('No issues found during Inclusive Language Check.')
           }
         } catch (err) {
           console.warn(err)
