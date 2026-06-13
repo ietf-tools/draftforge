@@ -1,6 +1,5 @@
 import * as vscode from 'vscode'
 import { dedent } from '../helpers/text.js'
-import { parse } from 'node:path'
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -24,38 +23,24 @@ export function registerExtractCommentsCommand(context, outputView) {
       const commentsRgx = /<!--\s?\[rfced\]([^]+?)-->/gim
       const contents = activeDoc.getText()
 
-      const fileName = parse(activeDoc.fileName).base
       outputView.clear()
-      outputView.setFileUri(activeDoc.uri)
-      outputView.appendHeader(`List of comments for the RPC staff in ${fileName}:`)
       let idx = 0
+      const outputLines = []
 
       for (const match of contents.matchAll(commentsRgx)) {
-        if (idx > 0) {
-          outputView.appendSeparator()
-        }
         idx++
-        const startPos = activeDoc.positionAt(match.index)
-        const endPos = activeDoc.positionAt(match.index + match[0].length)
-        outputView.appendLineWithRanges({
-          text: `${idx}. ${dedent(match[1]).trim()}`,
-          ranges: [
-            {
-              startLine: startPos.line,
-              startCharacter: startPos.character,
-              endLine: endPos.line,
-              endCharacter: endPos.character,
-              label:
-                startPos.line !== endPos.line ? `${startPos.line}-${endPos.line}` : startPos.line
-            }
-          ]
-        })
+        outputLines.push(`${idx}. ${dedent(match[1]).trim()}`)
       }
 
       if (idx === 0) {
         outputView.appendLine('No [rfced] mentions found.')
         vscode.window.showInformationMessage('No [rfced] mentions found.')
       } else {
+        outputLines.unshift(`Authors,
+
+While reviewing this document during Final Review, please resolve
+(as necessary) the following questions, which are also in the source file.`)
+        outputView.appendLine(outputLines.join('\n\n\n'))
         vscode.window.showInformationMessage(
           `Found ${idx} [rfced] mention(s). See Output: DraftForge`
         )
