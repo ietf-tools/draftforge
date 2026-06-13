@@ -30,7 +30,7 @@ export function registerCheckHyphenationCommand(context, diagnosticCollection, i
           const eligibleIgnores = ignores[activeDoc.uri.toString()]?.hyphenation ?? []
 
           const hyphenTermRgx = /[a-z]+(?:-[a-z]+)+/gi
-          const targetPropRgx = / target="([^"]+?)"/gi
+          const targetPropRgx = / (target|anchor)="([^"]+?)"/gi
 
           const diags = []
           const occurences = []
@@ -38,8 +38,8 @@ export function registerCheckHyphenationCommand(context, diagnosticCollection, i
           const hyphenTermsOccurences = []
           for (let lineIdx = 0; lineIdx < activeDoc.lineCount; lineIdx++) {
             const line = activeDoc.lineAt(lineIdx)
-            const sanitizedLine = line.text.replaceAll(targetPropRgx, (m, val) => {
-              return ` target="${' '.repeat(val.length)}"`
+            const sanitizedLine = line.text.replaceAll(targetPropRgx, (m, attr, val) => {
+              return ` ${attr}="${' '.repeat(val.length)}"`
             })
             for (const match of sanitizedLine.matchAll(hyphenTermRgx)) {
               if (match[0].length > 3) {
