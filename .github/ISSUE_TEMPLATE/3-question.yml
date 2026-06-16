@@ -1,0 +1,10 @@
+name: General Question
+description: Ask a question / other requests
+assignees:
+  - ngpixel
+body:
+  - type: textarea
+    attributes:
+      label: Description
+    validations:
+      required: true

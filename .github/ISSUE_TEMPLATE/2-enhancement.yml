@@ -1,0 +1,11 @@
+name: New Feature / Enhancement Request
+description: Suggest a new feature or enhancement
+type: Enhancement
+assignees:
+  - ngpixel
+body:
+  - type: textarea
+    attributes:
+      label: Description
+    validations:
+      required: true

@@ -1,0 +1,18 @@
+name: Report a Bug
+description: An existing feature is broken or something isn't right
+type: Bug
+assignees:
+  - ngpixel
+body:
+  - type: textarea
+    attributes:
+      label: Description
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: DraftForge Version
+      description: Ensure you are using the latest version before reporting a bug.
+      placeholder: 'e.g. 1.7.2'
+    validations:
+      required: true
