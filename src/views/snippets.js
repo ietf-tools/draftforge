@@ -252,6 +252,7 @@ export function activateSnippetsView(context) {
                   schema: FAILSAFE_SCHEMA,
                   maxDepth: 2
                 })
+                snippetContent.id = name
                 if (snippetContent.category) {
                   let category = extraSnippets.find(
                     (s) => s.label === snippetContent.category && s.id.startsWith('cat_')
