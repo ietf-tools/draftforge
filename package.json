@@ -144,6 +144,11 @@
       {
         "command": "draftforge.lookupSelectionAcrossDocs",
         "title": "Lookup selection across all opened documents"
+      },
+      {
+        "command": "draftforge.fetchSnippets",
+        "title": "Fetch Remote Snippets",
+        "icon": "$(cloud-download)"
       }
     ],
     "menus": {
@@ -171,6 +176,11 @@
         {
           "command": "draftforge.runAllChecks",
           "when": "view == draftforge-checks",
+          "group": "navigation"
+        },
+        {
+          "command": "draftforge.fetchSnippets",
+          "when": "view == draftforge-snippets && config.draftforge.experience == 'rpc'",
           "group": "navigation"
         }
       ]
@@ -323,34 +333,7 @@
           "retainContextWhenHidden": true
         }
       ]
-    },
-    "walkthroughs": [
-      {
-        "id": "draftforge",
-        "title": "IETF DraftForge Setup",
-        "description": "Getting Started",
-        "steps": [
-          {
-            "id": "runcommand",
-            "title": "Run Command",
-            "description": "This step will run a command and check off once it has been run.\n[Run Command](command:draftforge.checkPlaceholders)",
-            "completionEvents": [
-              "onCommand:draftforge.checkPlaceholders"
-            ]
-          },
-          {
-            "id": "draftforgelogin",
-            "title": "Login",
-            "description": "Yes yes yes"
-          },
-          {
-            "id": "linux",
-            "title": "UI Platform: Linux",
-            "description": "This step will only show on Linux"
-          }
-        ]
-      }
-    ]
+    }
   },
   "scripts": {
     "compile": "rollup -c rollup.config.mjs"
@@ -369,7 +352,9 @@
   "dependencies": {
     "@ietf-tools/idnits": "3.0.0-alpha.74",
     "es-toolkit": "1.47.0",
+    "js-yaml": "5.1.0",
     "klaw": "4.1.0",
+    "tar": "7.5.16",
     "uuid": "14.0.0"
   }
 }
