@@ -350,7 +350,7 @@
     "rollup": "4.53.3"
   },
   "dependencies": {
-    "@ietf-tools/idnits": "3.0.0-alpha.74",
+    "@ietf-tools/idnits": "3.1.0",
     "es-toolkit": "1.47.0",
     "js-yaml": "5.1.0",
     "klaw": "4.1.0",
