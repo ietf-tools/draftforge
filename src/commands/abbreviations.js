@@ -66,7 +66,19 @@ export function registerListAbbreviationsCommand(context, outputView) {
                 try {
                   const resp = await fetch(ABBR_URL).then((r) => r.json())
                   if (Array.isArray(resp) && resp?.length > 0) {
+                    // Discard entries with an empty term: their regex would match on the
+                    // surrounding delimiters alone and get reported as an empty result.
                     abbreviations = resp
+                      .map((abbr) => ({
+                        ...abbr,
+                        term: typeof abbr?.term === 'string' ? abbr.term.trim() : '',
+                        full: typeof abbr?.full === 'string' ? abbr.full.trim() : ''
+                      }))
+                      .filter((abbr) => abbr.term.length > 0)
+
+                    if (abbreviations.length < 1) {
+                      throw new Error('Remote abbreviations.json file has no usable entries.')
+                    }
                   } else {
                     throw new Error('Failed to fetch abbreviations list from GitHub.')
                   }
