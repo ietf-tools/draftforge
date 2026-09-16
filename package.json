@@ -348,7 +348,7 @@
     "@rollup/plugin-node-resolve": "16.0.3",
     "@tsconfig/node22": "22.0.6",
     "@types/node": "22.x",
-    "@types/vscode": "1.138.0",
+    "@types/vscode": "1.120.0",
     "oxfmt": "0.68.0",
     "oxlint": "1.83.0",
     "oxlint-tsgolint": "7.0.2001",
