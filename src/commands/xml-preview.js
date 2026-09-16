@@ -5,6 +5,7 @@ import { promisify } from 'node:util'
 import fs from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { debounce } from 'es-toolkit/function'
+import { appendXml2rfcOutput } from '../helpers/xml2rfc.js'
 
 const execAsync = promisify(exec)
 let tmpPath = ''
@@ -131,36 +132,9 @@ class DocumentPreview {
    * @param {string} stderr xml2rfc stderr output
    */
   parseOutput(stderr) {
-    const diagRgx = /(.xml\((?<line>[0-9]+)\): )?(?<kind>Warning|Error): (?<msg>.*)/i
     this.outputView.clear()
     this.outputView.setFileUri(this.documentUri)
-    let errLines = 0
-    for (const line of stderr.split('\n')) {
-      const match = line.match(diagRgx)
-      if (match) {
-        errLines++
-        if (errLines === 1) {
-          this.outputView.appendHeader(`Warnings/Errors from xml2rfc output:`)
-        }
-        if (match.groups.line) {
-          const lineInt = Math.abs(parseInt(match.groups.line) - 1)
-          this.outputView.appendLineWithRanges({
-            text: `- ${match.groups.kind}: ${match.groups.msg}`,
-            ranges: [
-              {
-                startLine: lineInt,
-                startCharacter: 0,
-                endLine: lineInt,
-                endCharacter: 0,
-                label: `${match.groups.line}`
-              }
-            ]
-          })
-        } else {
-          this.outputView.appendLine(`- ${match.groups.kind}: ${match.groups.msg}`)
-        }
-      }
-    }
+    appendXml2rfcOutput(this.outputView, stderr, 'Warnings/Errors from xml2rfc output:')
     this.outputView.reveal()
   }
 }

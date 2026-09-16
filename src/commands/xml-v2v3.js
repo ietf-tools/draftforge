@@ -2,10 +2,9 @@ import * as vscode from 'vscode'
 import path from 'node:path'
 import { exec } from 'node:child_process'
 import { promisify } from 'node:util'
+import { appendXml2rfcOutput } from '../helpers/xml2rfc.js'
 
 const execAsync = promisify(exec)
-
-const warnErrRgx = /(.xml\((?<line>[0-9]+)\): )?(?<kind>Warning|Error): (?<msg>.*)/i
 
 /**
  * Run XML2RFC in v2v3 conversion mode
@@ -36,33 +35,11 @@ async function run(inputPathUri, outputPathUri, outputView) {
         })
 
         // Parse stderr output
-        let errLines = 0
-        for (const line of stderr.split('\n')) {
-          const match = line.match(warnErrRgx)
-          if (match) {
-            errLines++
-            if (errLines === 1) {
-              outputView.appendHeader('Warnings/Errors from xml2rfc output (RFCXML v3):')
-            }
-            if (match.groups.line) {
-              const lineInt = Math.abs(parseInt(match.groups.line) - 1)
-              outputView.appendLineWithRanges({
-                text: `- ${match.groups.kind}: ${match.groups.msg}`,
-                ranges: [
-                  {
-                    startLine: lineInt,
-                    startCharacter: 0,
-                    endLine: lineInt,
-                    endCharacter: 0,
-                    label: `${match.groups.line}`
-                  }
-                ]
-              })
-            } else {
-              outputView.appendLine(`- ${match.groups.kind}: ${match.groups.msg}`)
-            }
-          }
-        }
+        const errLines = appendXml2rfcOutput(
+          outputView,
+          stderr,
+          'Warnings/Errors from xml2rfc output (RFCXML v3):'
+        )
         if (errLines === 0) {
           outputView.appendLine('xml2rfc converted the document without any warning/error.')
         }

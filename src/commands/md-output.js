@@ -4,10 +4,9 @@ import { exec } from 'node:child_process'
 import { promisify } from 'node:util'
 import fs from 'node:fs/promises'
 import { tmpdir } from 'node:os'
+import { appendXml2rfcOutput } from '../helpers/xml2rfc.js'
 
 const execAsync = promisify(exec)
-
-const warnErrRgx = /(.xml\((?<line>[0-9]+)\): )?(?<kind>Warning|Error): (?<msg>.*)/i
 
 /**
  * Run XML2RFC
@@ -88,35 +87,11 @@ async function run(inputContent, outputFileType, outputPathUri, outputView) {
           })
 
           // Parse xml2rfc stderr output
-          let xmlErrLines = 0
-          for (const line of xmlStderr.split('\n')) {
-            const match = line.match(warnErrRgx)
-            if (match) {
-              xmlErrLines++
-              if (xmlErrLines === 1) {
-                outputView.appendHeader(
-                  `Warnings/Errors from xml2rfc output (${outputFileType.toUpperCase()}):`
-                )
-              }
-              if (match.groups.line) {
-                const lineInt = Math.abs(parseInt(match.groups.line) - 1)
-                outputView.appendLineWithRanges({
-                  text: `- ${match.groups.kind}: ${match.groups.msg}`,
-                  ranges: [
-                    {
-                      startLine: lineInt,
-                      startCharacter: 0,
-                      endLine: lineInt,
-                      endCharacter: 0,
-                      label: `${match.groups.line}`
-                    }
-                  ]
-                })
-              } else {
-                outputView.appendLine(`- ${match.groups.kind}: ${match.groups.msg}`)
-              }
-            }
-          }
+          const xmlErrLines = appendXml2rfcOutput(
+            outputView,
+            xmlStderr,
+            `Warnings/Errors from xml2rfc output (${outputFileType.toUpperCase()}):`
+          )
           if (xmlErrLines === 0) {
             outputView.appendLine('\n✅ xml2rfc exported the document without any warning/error.')
           }
