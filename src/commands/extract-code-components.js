@@ -9,6 +9,11 @@ const EXTRACT_DIR = 'code-extracts'
 const XML_CODE_RGX =
   /<sourcecode(?<attr>(?:"[^"]*"|'[^']*'|[^>"'])*)>\r?\n?(?<code>[\s\S]*?)\r?\n?<\/sourcecode>/gi
 
+// Matches a CDATA section enclosing the whole contents of a code component,
+// along with the line break that usually follows the opening delimiter and
+// precedes the closing one.
+const XML_CDATA_RGX = /^[ \t]*<!\[CDATA\[(?:\r?\n)?(?<code>[\s\S]*?)(?:\r?\n)?[ \t]*\]\]>[ \t]*$/
+
 // Matches a fenced code block (kramdown / CommonMark). The info string is the
 // language, which kramdown-rfc turns into the sourcecode / artwork type; it may
 // contain any character except whitespace (e.g. `asn.1`, `C#`, `cbor-diag`).
@@ -77,6 +82,16 @@ function sanitizeFileName(name) {
 }
 
 /**
+ * Strip the CDATA section enclosing the contents of a code component, if any.
+ *
+ * @param {string} code Contents of the code component
+ * @returns {string} The code, without its enclosing CDATA delimiters
+ */
+function stripCdata(code) {
+  return code.match(XML_CDATA_RGX)?.groups?.code ?? code
+}
+
+/**
  * Get the full line preceding the given offset, which must be at a line start.
  *
  * @param {string} contents Document contents
@@ -122,7 +137,7 @@ function collectXmlComponents(contents) {
       end: match.index + match[0].length,
       name: getAttrValue(attrs, 'name'),
       type: getAttrValue(attrs, 'type'),
-      code: match.groups?.code ?? ''
+      code: stripCdata(match.groups?.code ?? '')
     })
   }
   return components
