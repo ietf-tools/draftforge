@@ -28,7 +28,7 @@ jobs:
           patchList: fix, bugfix, perf, refactor, test, tests, chore
 
       - name: Install vsce
-        run: npm install -g vsce
+        run: npm install -g @vscode/vsce
 
       - name: Replace README
         run: |

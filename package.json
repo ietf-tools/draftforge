@@ -346,20 +346,20 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "29.0.3",
     "@rollup/plugin-node-resolve": "16.0.3",
-    "@tsconfig/node22": "22.0.5",
+    "@tsconfig/node22": "22.0.6",
     "@types/node": "22.x",
-    "@types/vscode": "1.120.0",
-    "oxfmt": "0.53.0",
-    "oxlint": "1.68.0",
-    "oxlint-tsgolint": "0.23.0",
-    "rollup": "4.53.3"
+    "@types/vscode": "1.138.0",
+    "oxfmt": "0.68.0",
+    "oxlint": "1.83.0",
+    "oxlint-tsgolint": "7.0.2001",
+    "rollup": "4.63.3"
   },
   "dependencies": {
     "@ietf-tools/idnits": "3.1.0",
-    "es-toolkit": "1.47.0",
-    "js-yaml": "5.1.0",
+    "es-toolkit": "1.52.0",
+    "js-yaml": "5.4.2",
     "klaw": "4.1.0",
-    "tar": "7.5.16",
-    "uuid": "14.0.0"
+    "tar": "7.5.22",
+    "uuid": "14.0.2"
   }
 }
