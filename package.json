@@ -267,6 +267,11 @@
           "default": "--v3 --bom --id-reference-base-url=\"https://datatracker.ietf.org/doc/html/\" --id-is-work-in-progress",
           "description": "The flags to provide to xml2rfc when generating TXT outputs of XMLRFC documents. Do not include the output format / paths flags."
         },
+        "draftforge.xml2rfc.v2v3OutputFlags": {
+          "type": "string",
+          "default": "--add-xinclude",
+          "description": "The flags to provide to xml2rfc when converting RFCXML v2 documents to v3. Do not include the --v2v3 flag or the output paths flags."
+        },
         "draftforge.xml2rfc.pdfOutputFlags": {
           "type": "string",
           "default": "--v3 --id-reference-base-url=\"https://datatracker.ietf.org/doc/html/\" --rfc-reference-base-url=\"https://www.rfc-editor.org/rfc/\" --id-is-work-in-progress",

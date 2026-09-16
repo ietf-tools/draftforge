@@ -62,6 +62,12 @@ class ToolsProvider {
         description: 'Generate RFCXML output of the current document',
         icon: 'file-code'
       },
+      flags.xml && {
+        id: 'exportRfcXmlV3',
+        label: 'Export as RFCXMLv3',
+        description: 'Convert the current v2 document to RFCXML v3',
+        icon: 'file-code'
+      },
       {
         id: 'exportTxt',
         label: 'Export as TXT',
@@ -287,6 +293,16 @@ export function activateToolsView(context, outputView) {
             } else {
               await vscode.window.showInformationMessage(
                 'Export to RFCXML not available for this document type.'
+              )
+            }
+            break
+          }
+          case 'exportRfcXmlV3': {
+            if (doc.languageId === 'xml') {
+              await vscode.commands.executeCommand('draftforge.xmlV2v3Output')
+            } else {
+              await vscode.window.showInformationMessage(
+                'Export to RFCXML v3 not available for this document type.'
               )
             }
             break

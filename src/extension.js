@@ -22,6 +22,7 @@ import { registerSurroundBcp14KeywordsCommand } from './commands/surround-bcp14-
 import { registerSvgcheckCommand } from './commands/svgcheck.js'
 import { registerXmlOutputCommand } from './commands/xml-output.js'
 import { registerXmlPreviewCommand, unregisterXmlPreviewCommand } from './commands/xml-preview.js'
+import { registerXmlV2v3Command } from './commands/xml-v2v3.js'
 import { registerMdOutputCommand } from './commands/md-output.js'
 import { OutputWebviewView } from './views/neue-output.js'
 import { registerNewFileCommand } from './commands/new-file.js'
@@ -66,6 +67,7 @@ export function activate(context) {
   registerSvgcheckCommand(context, diagnosticCollection)
   registerXmlOutputCommand(context, outputView)
   registerXmlPreviewCommand(context, outputView)
+  registerXmlV2v3Command(context, outputView)
 
   // Activate views
   void activateChecksView(context, diagnosticCollection)
