@@ -1,7 +1,7 @@
 <template>
   <div class="bg-white dark:bg-zinc-900 flex flex-col gap-2 flex-1 overflow-y-auto p-2">
     <div v-if="state.results.length < 1" class="text-zinc-500 dark:text-zinc-200">Analyzing...</div>
-    <div v-for="grp of state.results" :key="grp.key" class="pb-2 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-700 rounded-md shadow-sm dark:shadow-white/5">
+    <div v-for="grp of visibleResults" :key="grp.key" class="pb-2 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-700 rounded-md shadow-sm dark:shadow-white/5">
       <div class="p-3 flex items-center justify-between sm:flex-nowrap">
         <div class="flex items-center justify-between px-1 truncate">
           <IconLucideListTree class="mr-2" />
@@ -63,7 +63,7 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 
 import UBadge from './components/UBadge.vue'
 import IconLucideListTree from '~icons/lucide/list-tree'
@@ -77,6 +77,21 @@ const vscode = acquireVsCodeApi()
 
 const state = reactive({
   results: []
+})
+
+function hasNits(task) {
+  return task.nits.length > 0 || task.state === 'failed'
+}
+
+// Only display tasks with nits (comment / warning / error) or failures.
+// If every task succeeded, fall back to displaying all of them.
+const visibleResults = computed(() => {
+  if (!state.results.some(grp => grp.tasks.some(hasNits))) {
+    return state.results
+  }
+  return state.results
+    .map(grp => ({ ...grp, tasks: grp.tasks.filter(hasNits) }))
+    .filter(grp => grp.tasks.length > 0)
 })
 
 function viewRef(url) {
